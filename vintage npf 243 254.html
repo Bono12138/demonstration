@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Interactive Vintage Analysis</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.0/dist/echarts.min.js"></script>
+    <style>
+        #filter { 
+            margin: 20px; 
+            padding: 10px; 
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        .chart-container { 
+            width: 100%; 
+            height: 90vh;
+            margin: 0 auto; 
+        }
+        .date-range { display: flex; gap: 10px; }
+    </style>
+</head>
+<body>
+    <div id="filter">
+        <div class="date-range">
+            <span>开始日期:</span>
+            <select id="startDate"></select>
+            <span>结束日期:</span>
+            <select id="endDate"></select>
+        </div>
+        <button onclick="updateChartByRange()">应用筛选</button>
+    </div>
+    <div class="chart-container">
+        <div id="mainChart" style="height: 100%;"></div>
+    </div>
+
+<script>
+// 原始数据转换
+const rawData = {
+    "MOB": ["0","1","2","3","4","5","6","7","8","9","10","11","12","13"],
+    "dates": [
+        "2024/3/1","2024/4/1","2024/5/1","2024/6/1","2024/7/1",
+        "2024/8/1","2024/9/1","2024/10/1","2024/11/1","2024/12/1",
+        "2025/1/1","2025/2/1","2025/3/1","2025/4/1"
+    ],
+    "values": [
+        [0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.01,0.00,0.00],
+        [0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,null],
+        [0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,null,null],
+        [0.00,0.00,1.14,0.93,1.32,1.20,1.09,1.19,0.00,0.71,null,null,null,null],
+        [50.25,10.13,40.00,7.45,6.03,7.87,8.04,7.57,7.57,14.43,null,null,null,null],
+        [11.35,18.53,45.08,6.64,12.81,15.29,15.53,14.53,14.72,null,null,null,null,null],
+        [0.00,18.71,45.84,13.58,19.51,22.29,22.65,21.58,null,null,null,null,null,null],
+        [0.00,10.56,9.11,19.10,21.14,23.24,22.67,null,null,null,null,null,null,null],
+        [3.38,0.76,1.44,22.66,22.92,24.49,null,null,null,null,null,null,null,null],
+        [4.00,1.95,3.86,26.35,26.42,null,null,null,null,null,null,null,null,null],
+        [4.41,2.19,8.83,30.55,null,null,null,null,null,null,null,null,null,null],
+        [0.00,8.05,15.21,null,null,null,null,null,null,null,null,null,null,null],
+        [0.00,7.10,null,null,null,null,null,null,null,null,null,null,null,null],
+        [4.15,null,null,null,null,null,null,null,null,null,null,null,null,null]
+    ]
+};
+
+// 预处理数据
+const processedData = rawData.dates.map((date, dateIndex) => ({
+    date: date,
+    values: rawData.values.map((mobData, mobIndex) => 
+        mobData[dateIndex] !== null ? mobData[dateIndex] : null
+    ).filter(v => v !== null)
+}));
+
+// 初始化日期筛选器
+function initDateFilters() {
+    const startSelect = document.getElementById('startDate');
+    const endSelect = document.getElementById('endDate');
+    
+    rawData.dates.forEach(date => {
+        const option = document.createElement('option');
+        option.value = date;
+        option.textContent = date;
+        startSelect.appendChild(option.cloneNode(true));
+        endSelect.appendChild(option);
+    });
+    
+    // 设置默认范围为所有日期
+    startSelect.value = rawData.dates[0];
+    endSelect.value = rawData.dates[rawData.dates.length - 1];
+}
+
+// ECharts配置
+const chart = echarts.init(document.getElementById('mainChart'));
+
+function updateChartByRange() {
+    const startDate = document.getElementById('startDate').value;
+    const endDate = document.getElementById('endDate').value;
+    
+    const startIndex = rawData.dates.indexOf(startDate);
+    const endIndex = rawData.dates.indexOf(endDate);
+    
+    const filteredDates = rawData.dates.slice(startIndex, endIndex + 1);
+    
+    const seriesData = processedData
+        .filter(d => filteredDates.includes(d.date))
+        .map(d => ({
+            name: d.date,
+            type: 'line',
+            data: d.values.map((v, i) => ({
+                value: v,
+                name: `MOB ${i}`
+            })),
+            lineStyle: { width: 2 },
+            showSymbol: true,
+            symbolSize: 6,
+            emphasis: {
+                focus: 'series',
+                itemStyle: {
+                    borderWidth: 2,
+                    borderColor: '#333'
+                }
+            }
+        }));
+
+    const option = {
+        tooltip: {
+            trigger: 'axis',
+            formatter: params => {
+                let result = `MOB ${params[0].axisValue}<br>`;
+                params.forEach(param => {
+                    result += `${param.seriesName}: ${param.data.value}%<br>`;
+                });
+                return result;
+            }
+        },
+        legend: { 
+            type: 'scroll',
+            bottom: 20,
+            pageIconColor: '#666',
+            pageTextStyle: { color: '#999' },
+            selectedMode: 'multiple',
+            selector: [
+                {
+                    type: 'all',
+                    title: '全选'
+                },
+                {
+                    type: 'inverse',
+                    title: '反选'
+                }
+            ]
+        },
+        xAxis: {
+            type: 'category',
+            name: 'MOB',
+            data: rawData.MOB,
+            axisLabel: { interval: 0, rotate: 45 }
+        },
+        yAxis: {
+            type: 'value',
+            name: '逾期率',
+            axisLabel: { formatter: '{value}%' }
+        },
+        series: seriesData,
+        grid: {
+            top: 80,
+            bottom: 150,
+            containLabel: true
+        },
+        emphasis: {
+            focus: 'series',
+            blurScope: 'coordinateSystem'
+        }
+    };
+
+    // 添加点击高亮事件
+    chart.on('click', function(params) {
+        chart.dispatchAction({
+            type: 'downplay',
+            seriesIndex: params.seriesIndex === undefined ? [] : [params.seriesIndex]
+        });
+        chart.dispatchAction({
+            type: 'highlight',
+            seriesIndex: params.seriesIndex
+        });
+    });
+
+    // 添加Ctrl+点击图例反选功能
+    chart.on('legendselectchanged', function(params) {
+        if (window.event.ctrlKey) {
+            const selected = params.selected;
+            const inverseSelected = {};
+            Object.keys(selected).forEach(key => {
+                inverseSelected[key] = !selected[key];
+            });
+            chart.dispatchAction({
+                type: 'legendSelect',
+                name: Object.keys(inverseSelected),
+                selected: inverseSelected
+            });
+        }
+    });
+    chart.setOption(option, true);
+}
+
+// 初始加载
+initDateFilters();
+updateChartByRange();
+</script>
+</body>
+</html>
