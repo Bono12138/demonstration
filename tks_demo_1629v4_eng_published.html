@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comprehensive Risk Management System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            display: flex; /* Use flexbox layout */
+            min-height: 100vh; /* Ensure content spans full viewport height */
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+        .card {
+            background-color: #ffffff;
+            border-radius: 0.75rem; /* rounded-xl */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* shadow-md */
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .status-green {
+            background-color: #d1fae5; /* green-100 */
+            color: #065f46; /* green-800 */
+            font-weight: 500; /* font-medium */
+            padding: 0.25rem 0.75rem; /* px-3 py-1 */
+            border-radius: 9999px; /* rounded-full */
+            display: inline-block;
+        }
+        .status-yellow {
+            background-color: #fef9c3; /* yellow-100 */
+            color: #a16207; /* yellow-800 */
+            font-weight: 500; /* font-medium */
+            padding: 0.25rem 0.75rem; /* px-3 py-1 */
+            border-radius: 9999px; /* rounded-full */
+            display: inline-block;
+        }
+        .status-red {
+            background-color: #fee2e2; /* red-100 */
+            color: #991b1b; /* red-800 */
+            font-weight: 500; /* font-medium */
+            padding: 0.25rem 0.75rem; /* px-3 py-1 */
+            border-radius: 9999px; /* rounded-full */
+            display: inline-block;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb; /* border-gray-200 */
+        }
+        th {
+            background-color: #f9fafb; /* gray-50 */
+            font-weight: 600; /* font-semibold */
+            color: #4b5563; /* gray-700 */
+            text-transform: uppercase;
+            font-size: 0.75rem; /* text-xs */
+            letter-spacing: 0.05em; /* tracking-wider */
+        }
+        tbody tr:hover {
+            background-color: #f3f4f6; /* gray-50 */
+        }
+        /* Sidebar styling */
+        .sidebar {
+            width: 280px; /* Adjust width as needed */
+            background-color: #2c3e50; /* Darker blue-grey */
+            color: #ecf0f1;
+            padding: 1.5rem 1rem;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            border-radius: 0 0.75rem 0.75rem 0; /* Rounded bottom-right corner */
+        }
+        .sidebar-menu a {
+            display: block;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 0.5rem;
+            transition: background-color 0.2s ease-in-out;
+            color: #ecf0f1;
+            font-weight: 500;
+        }
+        .sidebar-menu a:hover {
+            background-color: #34495e; /* Slightly lighter dark blue-grey */
+        }
+        .sidebar-menu a.active {
+            background-color: #3498db; /* Blue */
+            color: white;
+            font-weight: 600;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .sidebar-submenu a {
+            padding-left: 2.5rem; /* Indent sub-menu items */
+            font-size: 0.9rem;
+        }
+        /* Main content area */
+        .content-area {
+            flex-grow: 1; /* Occupy remaining space */
+            padding: 1.5rem;
+        }
+        /* Adjusted header height for better content visibility */
+        header {
+            height: 5rem; /* Or adjust padding */
+            display: flex;
+            align-items: center;
+        }
+        .mt-header { /* Custom utility to push content down */
+            margin-top: 5rem; /* Must match header height */
+        }
+        /* TKS Input table styling */
+        .manual-input-table input[type="number"],
+        .manual-input-table input[type="text"] {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #d1d5db; /* gray-300 */
+            border-radius: 0.375rem; /* rounded-md */
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <header class="bg-gradient-to-r from-blue-600 to-indigo-700 text-white px-6 shadow-lg rounded-b-xl fixed top-0 left-0 right-0 z-10 w-full">
+        <div class="container flex justify-between items-center h-full">
+            <h1 class="text-3xl font-bold">Comprehensive Risk Management System</h1>
+        </div>
+    </header>
+
+    <div class="flex flex-1 mt-header"> <!-- Adjusted margin-top to clear fixed header -->
+        <!-- Left Sidebar -->
+        <aside class="sidebar">
+            <nav class="sidebar-menu">
+                <a href="#" id="menu-tks-management" class="font-bold text-lg mb-2">TKS Management</a>
+                <div class="sidebar-submenu ml-4">
+                    <a href="#" id="menu-dashboard" class="active">TKS Dashboard</a>
+                    <a href="#" id="menu-tks-input">TKS Input</a>
+                    <a href="#" id="menu-configuration">TKS Configuration</a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="content-area">
+            <!-- TKS Dashboard Section -->
+            <section id="dashboard-content" class="card">
+                <h2 class="text-2xl font-semibold mb-4 text-gray-800">TKS Dashboard</h2>
+
+                <!-- Data Synchronization Status Bar -->
+                <div class="mb-6 bg-blue-50 border border-blue-200 text-blue-800 px-4 py-3 rounded-md">
+                    <p class="font-medium mb-2">Data Synchronization Status:</p>
+                    <p>Latest Financial Data Month: <span class="font-bold" id="latest-financial-month">May 2025</span></p>
+                    <p>Latest Manual Update Indicator Month: <span class="font-bold" id="latest-manual-update-month">May 2025</span></p>
+                </div>
+
+                <!-- Month Selector -->
+                <div class="mb-6 flex items-center space-x-4">
+                    <label for="displayMonth" class="text-gray-700 font-medium">Select Display Month:</label>
+                    <input type="month" id="displayMonth" name="displayMonth" value="2025-05" class="p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                </div>
+
+                <!-- TKS Calculation and Results Display -->
+                <h3 class="text-xl font-medium mb-3 text-gray-700">TKS Calculation and Results</h3>
+                <div class="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-md mb-4" id="calculation-result-message" style="display:none;">
+                    <p class="font-medium">Calculation Completed!</p>
+                    <p>All TKS indicators have been calculated with the latest data and configurations.</p>
+                </div>
+                <button id="triggerCalculationBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg shadow-xl transform hover:scale-105 transition duration-300 ease-in-out mb-6">
+                    Complete Pre-calculation Preparation & Start Calculation
+                </button>
+                <p id="calculationStatus" class="mt-3 text-sm text-gray-600 italic hidden">
+                    Calculation in progress...
+                </p>
+
+                <div class="mb-4 flex flex-wrap gap-2">
+                    <label for="categoryFilter" class="block text-sm font-medium text-gray-700 self-center">Filter by Category:</label>
+                    <select id="categoryFilter" class="p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                        <option value="All">All Categories</option>
+                        <option value="Capital">Capital</option>
+                        <option value="Profitability">Profitability</option>
+                        <option value="Asset Quality">Asset Quality</option>
+                        <option value="Liquidity">Liquidity</option>
+                        <option value="Risk Management">Risk Management</option>
+                        <option value="Good Corporate Governance">Good Corporate Governance</option>
+                    </select>
+
+                    <label for="statusFilter" class="block text-sm font-medium text-gray-700 self-center ml-4">Filter by Status:</label>
+                    <select id="statusFilter" class="p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                        <option value="All">All Statuses</option>
+                        <option value="Green">Healthy</option>
+                        <option value="Yellow">Moderate</option>
+                        <option value="Red">Unhealthy</option>
+                    </select>
+                </div>
+
+                <div class="overflow-x-auto rounded-lg shadow-md">
+                    <table id="tksResultsTable">
+                        <thead>
+                            <tr>
+                                <th>Indicator Name</th>
+                                <th>Category</th>
+                                <th>Value</th>
+                                <th>Risk Appetite</th>
+                                <th>Warning Value</th>
+                                <th>Status</th>
+                                <th>Data Source</th>
+                                <th>Trend</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Dummy Data for Prototype -->
+                            <tr data-category="Capital" data-status="Green" data-metric="Capital Ratio" data-source="Automatic">
+                                <td>Capital Ratio</td>
+                                <td>Capital</td>
+                                <td>35.5%</td>
+                                <td>> 10%</td>
+                                <td>< 30%</td>
+                                <td><span class="status-green">Healthy</span></td>
+                                <td>Automatic</td>
+                                <td><button class="text-blue-600 hover:underline view-trend-btn" data-metric-name="Capital Ratio">View Trend</button></td>
+                            </tr>
+                            <tr data-category="Asset Quality" data-status="Yellow" data-metric="NPL Ratio" data-source="Automatic">
+                                <td>NPL Ratio</td>
+                                <td>Asset Quality</td>
+                                <td>4.8%</td>
+                                <td>< 3%</td>
+                                <td>> 4%</td>
+                                <td><span class="status-yellow">Moderate</span></td>
+                                <td>Automatic</td>
+                                <td><button class="text-blue-600 hover:underline view-trend-btn" data-metric-name="NPL Ratio">View Trend</button></td>
+                            </tr>
+                            <tr data-category="Profitability" data-status="Green" data-metric="ROA" data-source="Automatic">
+                                <td>ROA</td>
+                                <td>Profitability</td>
+                                <td>2.1%</td>
+                                <td>> 1.5%</td>
+                                <td>< 1%</td>
+                                <td><span class="status-green">Healthy</span></td>
+                                <td>Automatic</td>
+                                <td><button class="text-blue-600 hover:underline view-trend-btn" data-metric-name="ROA">View Trend</button></td>
+                            </tr>
+                            <tr data-category="Liquidity" data-status="Red" data-metric="LDR" data-source="Automatic">
+                                <td>LDR</td>
+                                <td>Liquidity</td>
+                                <td>95.0%</td>
+                                <td>< 80%</td>
+                                <td>> 90%</td>
+                                <td><span class="status-red">Unhealthy</span></td>
+                                <td>Automatic</td>
+                                <td><button class="text-blue-600 hover:underline view-trend-btn" data-metric-name="LDR">View Trend</button></td>
+                            </tr>
+                            <tr data-category="Risk Management" data-status="Green" data-metric="Operational Risk Incident Rate" data-source="Manual">
+                                <td>Operational Risk Incident Rate</td>
+                                <td>Risk Management</td>
+                                <td>0.02%</td>
+                                <td>< 0.05%</td>
+                                <td>> 0.04%</td>
+                                <td><span class="status-green">Healthy</span></td>
+                                <td>Manual</td>
+                                <td><button class="text-blue-600 hover:underline view-trend-btn" data-metric-name="Operational Risk Incident Rate">View Trend</button></td>
+                            </tr>
+                            <tr data-category="Good Corporate Governance" data-status="Green" data-metric="Compliance Breach Index" data-source="Manual">
+                                <td>Compliance Breach Index</td>
+                                <td>Good Corporate Governance</td>
+                                <td>0.5</td>
+                                <td>< 1.0</td>
+                                <td>> 0.8</td>
+                                <td><span class="status-green">Healthy</span></td>
+                                <td>Manual</td>
+                                <td><button class="text-blue-600 hover:underline view-trend-btn" data-metric-name="Compliance Breach Index">View Trend</button></td>
+                            </tr>
+                            <tr data-category="Capital" data-status="Yellow" data-metric="Qualitative Assessment Score" data-source="Manual">
+                                <td>Qualitative Assessment Score</td>
+                                <td>Capital</td>
+                                <td>85</td>
+                                <td>> 90</td>
+                                <td>< 80</td>
+                                <td><span class="status-yellow">Moderate</span></td>
+                                <td>Manual</td>
+                                <td><button class="text-blue-600 hover:underline view-trend-btn" data-metric-name="Qualitative Assessment Score">View Trend</button></td>
+                            </tr>
+                             <tr data-category="Profitability" data-status="Green" data-metric="External Report Metric" data-source="Manual">
+                                <td>Market Share</td>
+                                <td>Profitability</td>
+                                <td>15.2%</td>
+                                <td>> 10%</td>
+                                <td>< 5%</td>
+                                <td><span class="status-green">Healthy</span></td>
+                                <td>Manual</td>
+                                <td><button class="text-blue-600 hover:underline view-trend-btn" data-metric-name="External Report Metric">View Trend</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Trend Display Area (initially hidden) -->
+                <div id="trend-display-area" class="card mt-8" style="display:none;">
+                    <h3 class="text-xl font-semibold mb-4 text-gray-800">Indicator Historical Trend: <span id="trend-metric-name"></span></h3>
+                    <p class="text-gray-700 mb-4">Below are example historical values for the indicator and its related financial data:</p>
+                    <div class="overflow-x-auto rounded-lg shadow-md">
+                        <table class="w-full">
+                            <thead>
+                                <tr>
+                                    <th>Month</th>
+                                    <th>Indicator Value</th>
+                                    <th>Related Financial Data 1</th>
+                                    <th>Related Financial Data 2</th>
+                                </tr>
+                            </thead>
+                            <tbody id="trend-data-body">
+                                <!-- Trend data will be dynamically added here -->
+                                <tr><td>2025-01</td><td>32.0%</td><td>$100M</td><td>$280M</td></tr>
+                                <tr><td>2025-02</td><td>33.5%</td><td>$105M</td><td>$290M</td></tr>
+                                <tr><td>2025-03</td><td>34.0%</td><td>$108M</td><td>$300M</td></tr>
+                                <tr><td>2025-04</td><td>35.0%</td><td>$110M</td><td>$310M</td></tr>
+                                <tr><td>2025-05</td><td>35.5%</td><td>$112M</td><td>$315M</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <button class="mt-4 bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out" id="close-trend-btn">
+                        Close Trend View
+                    </button>
+                </div>
+            </section>
+
+            <!-- TKS Input Section (newly added) -->
+            <section id="tks-input-content" class="card" style="display:none;">
+                <h2 class="text-2xl font-semibold mb-4 text-gray-800">TKS Manual Indicator Input</h2>
+                <p class="text-gray-700 mb-6">
+                    Manage TKS indicators that cannot be calculated from financial data and require manual input here (e.g., indicators with "N/A" in the formula column of tks.xlsx).
+                </p>
+
+                <div class="mb-6 flex items-center space-x-4">
+                    <label for="inputMonth" class="text-gray-700 font-medium">Accounting Month:</label>
+                    <input type="month" id="inputMonth" name="inputMonth" value="2025-05" class="p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                    <span id="historical-month-warning" class="text-sm text-yellow-700 italic" style="display:none;">
+                        Selecting a historical month requires submission for Role B approval.
+                    </span>
+                </div>
+
+                <div class="overflow-x-auto rounded-lg shadow-md mb-6">
+                    <table id="manualInputTable" class="manual-input-table">
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Indicator Name</th>
+                                <th>Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Manual input rows will be generated here by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+                <button class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out">
+                    Submit Manual Updates
+                </button>
+            </section>
+
+            <!-- TKS Configuration Section -->
+            <section id="configuration-content" class="card" style="display:none;">
+                <h2 class="text-2xl font-semibold mb-4 text-gray-800">TKS Configuration</h2>
+                <p class="text-red-600 font-medium mb-4">Note: Only current month's indicator calculation results can be changed.</p>
+
+                <div class="mb-4">
+                    <label for="configCategoryFilter" class="block text-sm font-medium text-gray-700 mb-2">Filter by Category:</label>
+                    <select id="configCategoryFilter" class="p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                        <option value="All">All Categories</option>
+                        <option value="Capital">Capital</option>
+                        <option value="Profitability">Profitability</option>
+                        <option value="Asset Quality">Asset Quality</option>
+                        <option value="Liquidity">Liquidity</option>
+                        <option value="Risk Management">Risk Management</option>
+                        <option value="Good Corporate Governance">Good Corporate Governance</option>
+                        <option value="Legal">Legal</option>
+                        <option value="Compliance">Compliance</option>
+                        <option value="Reputation">Reputation</option>
+                    </select>
+                </div>
+
+                <div class="mb-6">
+                    <label for="selectMetric" class="block text-sm font-medium text-gray-700 mb-2">Select Metric to Configure:</label>
+                    <select id="selectMetric" class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">-- Please select a metric --</option>
+                        <!-- Options will be populated by JavaScript -->
+                    </select>
+                </div>
+
+                <div id="metric-config-form" class="hidden">
+                    <div class="mb-4">
+                        <label for="metricFormula" class="block text-sm font-medium text-gray-700 mb-1">Indicator Formula:</label>
+                        <textarea id="metricFormula" rows="3" class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., (Adjusted_Capital / Adjusted_Assets) * 100%"></textarea>
+                        <p class="text-gray-500 text-sm mt-1">
+                            <em>Hint: Only existing fields from the financial statement (excluding accounting_month) can be selected. The formula must comply with Prestosql syntax.</em>
+                        </p>
+                    </div>
+                    <div class="mb-4">
+                        <label for="riskAppetite" class="block text-sm font-medium text-gray-700 mb-1">Risk Appetite:</label>
+                        <input type="text" id="riskAppetite" class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., > 10%">
+                    </div>
+                    <div class="mb-4">
+                        <label for="warningValue" class="block text-sm font-medium text-gray-700 mb-1">Warning Value:</label>
+                        <input type="text" id="warningValue" class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., < 30%">
+                    </div>
+                     <div class="mb-4">
+                        <label for="warningReference" class="block text-sm font-medium text-gray-700 mb-1">Warning Value Reference:</label>
+                        <input type="text" id="warningReference" class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., OJK SEOJK 12/2023, Internal Policy_Capital_001">
+                    </div>
+                    <button class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out">
+                        Save Configuration
+                    </button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const dashboardContent = document.getElementById('dashboard-content');
+            const tksInputContent = document.getElementById('tks-input-content');
+            const configurationContent = document.getElementById('configuration-content');
+            const menuTksManagement = document.getElementById('menu-tks-management');
+            const menuDashboard = document.getElementById('menu-dashboard');
+            const menuTksInput = document.getElementById('menu-tks-input');
+            const menuConfiguration = document.getElementById('menu-configuration');
+
+            const latestFinancialMonthDisplay = document.getElementById('latest-financial-month');
+            const latestManualUpdateMonthDisplay = document.getElementById('latest-manual-update-month');
+            const displayMonthInput = document.getElementById('displayMonth');
+
+            const triggerCalculationBtn = document.getElementById('triggerCalculationBtn');
+            const calculationStatus = document.getElementById('calculationStatus');
+            const calculationResultMessage = document.getElementById('calculation-result-message');
+            const categoryFilter = document.getElementById('categoryFilter');
+            const statusFilter = document.getElementById('statusFilter');
+            const tksResultsTableBody = document.getElementById('tksResultsTable').getElementsByTagName('tbody')[0];
+            const viewTrendButtons = document.querySelectorAll('.view-trend-btn');
+            const trendDisplayArea = document.getElementById('trend-display-area');
+            const trendMetricName = document.getElementById('trend-metric-name');
+            const trendDataBody = document.getElementById('trend-data-body');
+            const closeTrendBtn = document.getElementById('close-trend-btn');
+
+            const inputMonth = document.getElementById('inputMonth');
+            const historicalMonthWarning = document.getElementById('historical-month-warning');
+            const manualInputTableBody = document.getElementById('manualInputTable').getElementsByTagName('tbody')[0];
+
+
+            const selectMetric = document.getElementById('selectMetric');
+            const metricConfigForm = document.getElementById('metric-config-form');
+            const metricFormula = document.getElementById('metricFormula');
+            const riskAppetite = document.getElementById('riskAppetite');
+            const warningValue = document.getElementById('warningValue');
+            const warningReference = document.getElementById('warningReference');
+            const configCategoryFilter = document.getElementById('configCategoryFilter');
+
+
+            // Manual metrics data (simulating data from tks.xlsx where formula is N/A)
+            const manualMetrics = [
+                { category: "Legal", name: "Number of Legal Suits", type: "number", placeholder: "e.g., 2"},
+                { category: "Legal", name: "Legal Compliance Training Completion Rate", type: "text", placeholder: "e.g., 95%"},
+                { category: "Legal", name: "Timeliness of Important Contract Review", type: "text", placeholder: "e.g., 98%"},
+                { category: "Compliance", name: "Number of Regulatory Violation Incidents", type: "number", placeholder: "e.g., 1"},
+                { category: "Compliance", name: "Internal Compliance Check Pass Rate", type: "text", placeholder: "e.g., 99%"},
+                { category: "Compliance", name: "Timeliness of AML Report Submission", type: "text", placeholder: "e.g., 100%"},
+                { category: "Compliance", name: "Data Privacy Protection Adherence", type: "text", placeholder: "e.g., High"},
+                { category: "Reputation", name: "Customer Complaint Resolution Rate", type: "text", placeholder: "e.g., 90%"},
+                { category: "Reputation", name: "Number of Negative Media Reports", type: "number", placeholder: "e.g., 0"},
+                { category: "Reputation", name: "Employee Satisfaction Index", type: "number", placeholder: "e.g., 75"},
+                { category: "Reputation", name: "CSR Activities Participation Rate", type: "text", placeholder: "e.g., High"},
+                { category: "Risk Management", name: "Operational Risk Incident Rate", type: "number", step: "0.01", placeholder: "e.g., 0.02"},
+                { category: "Good Corporate Governance", name: "Compliance Breach Index", type: "number", step: "0.1", placeholder: "e.g., 0.5"},
+                { category: "Capital", name: "Qualitative Assessment Score", type: "number", placeholder: "e.g., 85"},
+                { category: "Profitability", name: "Market Share", type: "text", placeholder: "e.g., 15.2%"}
+                // Add more as needed to reach 18
+            ];
+
+
+            // --- Navigation Menu Switching ---
+            function showSection(sectionId) {
+                dashboardContent.style.display = 'none';
+                tksInputContent.style.display = 'none';
+                configurationContent.style.display = 'none';
+
+                // Deactivate all submenu links first
+                menuDashboard.classList.remove('active');
+                menuTksInput.classList.remove('active');
+                menuConfiguration.classList.remove('active');
+
+                // Activate the selected submenu link
+                if (sectionId === 'dashboard') {
+                    dashboardContent.style.display = 'block';
+                    menuDashboard.classList.add('active');
+                } else if (sectionId === 'tks-input') {
+                    tksInputContent.style.display = 'block';
+                    menuTksInput.classList.add('active');
+                    populateManualInputTable(); // Populate table when TKS Input is shown
+                } else if (sectionId === 'configuration') {
+                    configurationContent.style.display = 'block';
+                    menuConfiguration.classList.add('active');
+                }
+            }
+
+            // Handler for the primary "TKS Management" menu (currently just activates dashboard as default)
+            menuTksManagement.addEventListener('click', (e) => {
+                e.preventDefault();
+                showSection('dashboard'); // Default to Dashboard when TKS Management is clicked
+            });
+
+            menuDashboard.addEventListener('click', (e) => {
+                e.preventDefault();
+                showSection('dashboard');
+            });
+
+            menuTksInput.addEventListener('click', (e) => {
+                e.preventDefault();
+                showSection('tks-input');
+            });
+
+            menuConfiguration.addEventListener('click', (e) => {
+                e.preventDefault();
+                showSection('configuration');
+            });
+
+            // Default to display Dashboard
+            showSection('dashboard');
+
+            // --- Data Synchronization Status & Month Selector (Dashboard) ---
+            // Simulate initial data sync months
+            latestFinancialMonthDisplay.textContent = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
+            latestManualUpdateMonthDisplay.textContent = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
+
+            displayMonthInput.addEventListener('change', function() {
+                const selectedMonth = this.value;
+                // In a real application, this would trigger data loading for the selected month
+                console.log(`Displaying data for month: ${selectedMonth}`);
+            });
+
+            // Initialize display month
+            displayMonthInput.dispatchEvent(new Event('change'));
+
+            // --- Simulate Calculation Trigger ---
+            triggerCalculationBtn.addEventListener('click', function() {
+                calculationStatus.classList.remove('hidden');
+                calculationStatus.textContent = 'Calculation in progress...';
+                calculationStatus.classList.remove('text-green-700', 'font-bold');
+                calculationStatus.classList.add('text-gray-600', 'italic');
+                triggerCalculationBtn.disabled = true; // Disable button during calculation
+
+                setTimeout(() => {
+                    calculationStatus.textContent = 'Calculation completed!';
+                    calculationStatus.classList.remove('text-gray-600', 'italic');
+                    calculationStatus.classList.add('text-green-700', 'font-bold');
+                    calculationResultMessage.style.display = 'block'; // Show calculation completion message
+                    triggerCalculationBtn.disabled = false; // Re-enable button
+                }, 2000); // Simulate a 2-second calculation
+            });
+
+            // --- Filtering Functionality (Dashboard) ---
+            function applyDashboardFilters() {
+                const selectedCategory = categoryFilter.value;
+                const selectedStatus = statusFilter.value;
+
+                for (let i = 0; i < tksResultsTableBody.rows.length; i++) {
+                    const row = tksResultsTableBody.rows[i];
+                    const rowCategory = row.getAttribute('data-category');
+                    const rowStatus = row.getAttribute('data-status');
+
+                    const categoryMatch = selectedCategory === 'All' || rowCategory === selectedCategory;
+                    const statusMatch = selectedStatus === 'All' || rowStatus === selectedStatus;
+
+                    if (categoryMatch && statusMatch) {
+                        row.style.display = ''; // Show row
+                    } else {
+                        row.style.display = 'none'; // Hide row
+                    }
+                }
+            }
+
+            categoryFilter.addEventListener('change', applyDashboardFilters);
+            statusFilter.addEventListener('change', applyDashboardFilters);
+
+            // Apply filters initially
+            applyDashboardFilters();
+
+            // --- View Trend Functionality ---
+            viewTrendButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const metric = this.dataset.metricName;
+                    trendMetricName.textContent = metric;
+                    trendDataBody.innerHTML = ''; // Clear existing trend data
+
+                    // Simulate historical data, in a real application this would be fetched from the backend
+                    let dummyTrendData;
+                    if (metric === 'Capital Ratio') {
+                        dummyTrendData = [
+                            { month: '2024-12', value: '30.2%', data1: '$95M', data2: '$275M' },
+                            { month: '2025-01', value: '32.0%', data1: '$100M', data2: '$280M' },
+                            { month: '2025-02', value: '33.5%', data1: '$105M', data2: '$290M' },
+                            { month: '2025-03', value: '34.0%', data1: '$108M', data2: '$300M' },
+                            { month: '2025-04', value: '35.0%', data1: '$110M', data2: '$310M' },
+                            { month: '2025-05', value: '35.5%', data1: '$112M', data2: '$315M' }
+                        ];
+                    } else if (metric === 'NPL Ratio') {
+                        dummyTrendData = [
+                            { month: '2024-12', value: '3.5%', data1: '$5M', data2: '$140M' },
+                            { month: '2025-01', value: '3.8%', data1: '$5.5M', data2: '$145M' },
+                            { month: '2025-02', value: '4.2%', data1: '$6M', data2: '$143M' },
+                            { month: '2025-03', value: '4.5%', data1: '$6.5M', data2: '$144M' },
+                            { month: '2025-04', value: '4.7%', data1: '$6.8M', data2: '$145M' },
+                            { month: '2025-05', value: '4.8%', data1: '$7M', data2: '$146M' }
+                        ];
+                    }
+                    else if (metric === 'Operational Risk Incident Rate') {
+                        dummyTrendData = [
+                            { month: '2024-12', value: '0.03%', data1: '2', data2: '6000' },
+                            { month: '2025-01', value: '0.025%', data1: '2', data2: '8000' },
+                            { month: '2025-02', value: '0.02%', data1: '1', data2: '5000' },
+                            { month: '2025-03', value: '0.02%', data1: '1', data2: '5500' },
+                            { month: '2025-04', value: '0.02%', data1: '1', data2: '6000' },
+                            { month: '2025-05', value: '0.02%', data1: '1', data2: '5000' }
+                        ];
+                    }
+                    else if (metric === 'Compliance Breach Index') {
+                        dummyTrendData = [
+                            { month: '2024-12', value: '0.8', data1: '3', data2: '5' },
+                            { month: '2025-01', value: '0.7', data1: '2', data2: '4' },
+                            { month: '2025-02', value: '0.6', data1: '1', data2: '3' },
+                            { month: '2025-03', value: '0.5', data1: '1', data2: '3' },
+                            { month: '2025-04', value: '0.5', data1: '1', data2: '2' },
+                            { month: '2025-05', value: '0.5', data1: '1', data2: '2' }
+                        ];
+                    }
+                    else if (metric === 'Qualitative Assessment Score') {
+                        dummyTrendData = [
+                            { month: '2024-12', value: '80', data1: 'Audit Score 1', data2: 'Risk Score 1' },
+                            { month: '2025-01', value: '82', data1: 'Audit Score 2', data2: 'Risk Score 2' },
+                            { month: '2025-02', value: '83', data1: 'Audit Score 3', data2: 'Risk Score 3' },
+                            { month: '2025-03', value: '84', data1: 'Audit Score 4', data2: 'Risk Score 4' },
+                            { month: '2025-04', value: '85', data1: 'Audit Score 5', data2: 'Risk Score 5' },
+                            { month: '2025-05', value: '85', data1: 'Audit Score 6', data2: 'Risk Score 6' }
+                        ];
+                    }
+                    else if (metric === 'Market Share') {
+                        dummyTrendData = [
+                            { month: '2024-12', value: '14.0%', data1: 'Competitor A', data2: 'Competitor B' },
+                            { month: '2025-01', value: '14.5%', data1: 'Competitor A', data2: 'Competitor B' },
+                            { month: '2025-02', value: '15.0%', data1: 'Competitor A', data2: 'Competitor B' },
+                            { month: '2025-03', value: '15.1%', data1: 'Competitor A', data2: 'Competitor B' },
+                            { month: '2025-04', value: '15.2%', data1: 'Competitor A', data2: 'Competitor B' },
+                            { month: '2025-05', value: '15.2%', data1: 'Competitor A', data2: 'Competitor B' }
+                        ];
+                    }
+                    else {
+                         dummyTrendData = [
+                            { month: '2024-12', value: 'N/A', data1: 'N/A', data2: 'N/A' },
+                            { month: '2025-01', value: 'N/A', data1: 'N/A', data2: 'N/A' },
+                            { month: '2025-02', value: 'N/A', data1: 'N/A', data2: 'N/A' },
+                            { month: '2025-03', value: 'N/A', data1: 'N/A', data2: 'N/A' },
+                            { month: '2025-04', value: 'N/A', data1: 'N/A', data2: 'N/A' },
+                            { month: '2025-05', value: 'N/A', data1: 'N/A', data2: 'N/A' }
+                        ];
+                    }
+
+
+                    dummyTrendData.forEach(data => {
+                        const row = trendDataBody.insertRow();
+                        row.insertCell().textContent = data.month;
+                        row.insertCell().textContent = data.value;
+                        row.insertCell().textContent = data.data1;
+                        row.insertCell().textContent = data.data2;
+                    });
+
+                    trendDisplayArea.style.display = 'block'; // Show trend area
+                    trendDisplayArea.scrollIntoView({ behavior: 'smooth' }); // Smooth scroll to trend area
+                });
+            });
+
+            closeTrendBtn.addEventListener('click', function() {
+                trendDisplayArea.style.display = 'none'; // Hide trend area
+            });
+
+            // --- TKS Manual Input Logic ---
+            inputMonth.addEventListener('change', function() {
+                const selectedMonth = new Date(this.value);
+                const currentMonth = new Date();
+                // Check if selected month is in the past
+                if (selectedMonth.getFullYear() < currentMonth.getFullYear() ||
+                   (selectedMonth.getFullYear() === currentMonth.getFullYear() && selectedMonth.getMonth() < currentMonth.getMonth())) {
+                    historicalMonthWarning.style.display = 'inline';
+                } else {
+                    historicalMonthWarning.style.display = 'none';
+                }
+                console.log(`Accounting month for manual input: ${this.value}`);
+                // In a real app, this would load existing manual data for the selected month into the table
+            });
+
+            // Function to populate the manual input table
+            function populateManualInputTable() {
+                manualInputTableBody.innerHTML = ''; // Clear existing rows
+                manualMetrics.forEach(metric => {
+                    const row = manualInputTableBody.insertRow();
+                    row.insertCell().textContent = metric.category;
+                    row.insertCell().textContent = metric.name;
+                    const valueCell = row.insertCell();
+                    const input = document.createElement('input');
+                    input.type = metric.type;
+                    if (metric.step) {
+                        input.step = metric.step;
+                    }
+                    input.placeholder = metric.placeholder;
+                    input.className = "w-full p-2 border border-gray-300 rounded-md"; // Apply Tailwind classes
+                    valueCell.appendChild(input);
+                });
+            }
+
+
+            // --- TKS Configuration Module Logic ---
+            const metricConfigurations = {
+                "Capital Ratio": {
+                    category: "Capital",
+                    formula: "(Adjusted_Capital / Adjusted_Assets) * 100%",
+                    appetite: "> 10%",
+                    warning: "< 30%",
+                    reference: "OJK SEOJK 12/2023, Internal Policy_Capital_001"
+                },
+                "NPL Ratio": {
+                    category: "Asset Quality",
+                    formula: "(Non-Performing Loans / Total Loans) * 100%",
+                    appetite: "< 3%",
+                    warning: "> 4%",
+                    reference: "OJK SEOJK 15/2022"
+                },
+                "ROA": {
+                    category: "Profitability",
+                    formula: "(Net Income / Total Assets) * 100%",
+                    appetite: "> 1.5%",
+                    warning: "< 1%",
+                    reference: "OJK SEOJK 10/2023"
+                },
+                "LDR": {
+                    category: "Liquidity",
+                    formula: "(Loans / Deposits) * 100%",
+                    appetite: "< 80%",
+                    warning: "> 90%",
+                    reference: "OJK SEOJK 11/2023"
+                },
+                 "Operational Risk Incident Rate": {
+                    category: "Risk Management",
+                    formula: "N/A - See Manual Input", // Marked as manual
+                    appetite: "< 0.05%",
+                    warning: "> 0.04%",
+                    reference: "Internal Policy_Operational Risk_002"
+                },
+                 "Compliance Breach Index": {
+                    category: "Good Corporate Governance",
+                    formula: "N/A - See Manual Input", // Marked as manual
+                    appetite: "< 1.0",
+                    warning: "> 0.8",
+                    reference: "Internal Policy_Compliance_003"
+                },
+                "Qualitative Assessment Score": {
+                    category: "Capital", // Example category for manual metric
+                    formula: "N/A - Manual Input",
+                    appetite: "> 90",
+                    warning: "< 80",
+                    reference: "Internal Policy_Assessment_001"
+                },
+                "Market Share": { // Renamed for clarity in configuration
+                    category: "Profitability", // Example category for manual metric
+                    formula: "N/A - Manual Input",
+                    appetite: "> 10%",
+                    warning: "< 5%",
+                    reference: "External Report_Market_2024"
+                },
+                "Number of Legal Suits": { category: "Legal", formula: "N/A - Manual Input", appetite: "< 5", warning: "> 3", reference: "Internal Policy_Legal_001" },
+                "Legal Compliance Training Completion Rate": { category: "Legal", formula: "N/A - Manual Input", appetite: "> 90%", warning: "< 80%", reference: "Internal Policy_Legal_002" },
+                "Timeliness of Important Contract Review": { category: "Legal", formula: "N/A - Manual Input", appetite: "> 95%", warning: "< 90%", reference: "Internal Policy_Legal_003" },
+                "Number of Regulatory Violation Incidents": { category: "Compliance", formula: "N/A - Manual Input", appetite: "< 1", warning: "> 0", reference: "Internal Policy_Compliance_004" },
+                "Internal Compliance Check Pass Rate": { category: "Compliance", formula: "N/A - Manual Input", appetite: "> 98%", warning: "< 95%", reference: "Internal Policy_Compliance_005" },
+                "Timeliness of AML Report Submission": { category: "Compliance", formula: "N/A - Manual Input", appetite: "> 99%", warning: "< 98%", reference: "OJK SEOJK 18/2023" },
+                "Data Privacy Protection Adherence": { category: "Compliance", formula: "N/A - Manual Input", appetite: "High", warning: "Medium or Lower", reference: "Internal Policy_Data Privacy_001" },
+                "Customer Complaint Resolution Rate": { category: "Reputation", formula: "N/A - Manual Input", appetite: "> 95%", warning: "< 90%", reference: "Internal Policy_Reputation_001" },
+                "Number of Negative Media Reports": { category: "Reputation", formula: "N/A - Manual Input", appetite: "< 1", warning: "> 0", reference: "Internal Policy_Reputation_002" },
+                "Employee Satisfaction Index": { category: "Reputation", formula: "N/A - Manual Input", appetite: "> 80", warning: "< 70", reference: "Internal Policy_Reputation_003" },
+                "CSR Activities Participation Rate": { category: "Reputation", formula: "N/A - Manual Input", appetite: "High", warning: "Medium or Lower", reference: "Internal Policy_Reputation_004" }
+            };
+
+            function updateMetricSelectOptions() {
+                const selectedCategory = configCategoryFilter.value;
+                selectMetric.innerHTML = '<option value="">-- Please select a metric --</option>'; // Clear existing options
+
+                for (const metricName in metricConfigurations) {
+                    const config = metricConfigurations[metricName];
+                    if (selectedCategory === 'All' || config.category === selectedCategory) {
+                        const option = document.createElement('option');
+                        option.value = metricName;
+                        option.textContent = metricName; // Display metric name
+                        selectMetric.appendChild(option);
+                    }
+                }
+            }
+
+            configCategoryFilter.addEventListener('change', updateMetricSelectOptions);
+            // Initial load of metric options based on default filter
+            updateMetricSelectOptions();
+
+
+            selectMetric.addEventListener('change', function() {
+                const selectedMetric = this.value;
+                if (selectedMetric && metricConfigurations[selectedMetric]) {
+                    const config = metricConfigurations[selectedMetric];
+                    metricFormula.value = config.formula;
+                    riskAppetite.value = config.appetite;
+                    warningValue.value = config.warning;
+                    warningReference.value = config.reference;
+                    metricConfigForm.classList.remove('hidden');
+                } else {
+                    metricConfigForm.classList.add('hidden');
+                    metricFormula.value = '';
+                    riskAppetite.value = '';
+                    warningValue.value = '';
+                    warningReference.value = '';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

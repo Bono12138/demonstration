@@ -1,0 +1,1391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comprehensive Risk Management System - RCSA Module</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+            display: flex;
+            min-height: 100vh;
+        }
+        .sidebar {
+            width: 200px;
+            background-color: #333;
+            color: white;
+            padding-top: 20px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            flex-shrink: 0;
+        }
+        .sidebar a {
+            display: block;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+        }
+        .sidebar a:hover {
+            background-color: #575757;
+        }
+        .sidebar .main-menu-item {
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-top: 15px;
+            cursor: pointer;
+            padding-right: 10px; /* Add padding to make space for arrow */
+            position: relative;
+        }
+        .sidebar .sub-menu-item {
+            padding-left: 30px;
+            font-size: 0.95em;
+        }
+        .sidebar .sub-menu {
+            display: none;
+        }
+        .sidebar .sub-menu.active {
+            display: block;
+        }
+        .sidebar .arrow {
+            float: right;
+            transition: transform 0.3s ease;
+        }
+        .sidebar .main-menu-item.active .arrow {
+            transform: rotate(90deg);
+        }
+
+        .main-content {
+            flex-grow: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+        .header {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            border-radius: 8px 8px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-shrink: 0;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 1.8em;
+        }
+        .user-switcher {
+            position: relative;
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 5px;
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        .user-switcher:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+        .user-switcher .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+            right: 0;
+            top: 40px; /* Adjust based on header height */
+            border-radius: 5px;
+        }
+        .user-switcher .dropdown-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            text-align: left;
+        }
+        .user-switcher .dropdown-content a:hover {
+            background-color: #ddd;
+            border-radius: 5px;
+        }
+        .user-switcher.active .dropdown-content {
+            display: block;
+        }
+
+        .container {
+            width: 100%;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            flex-grow: 1;
+        }
+        h1, h2, h3 {
+            color: #0056b3;
+        }
+        .content {
+            padding: 20px 0;
+        }
+        .hidden {
+            display: none;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input[type="text"],
+        .form-group textarea,
+        .form-group select,
+        .form-group input[type="date"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box; /* Include padding in width */
+        }
+        .form-group button {
+            background-color: #28a745;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .form-group button:hover {
+            background-color: #218838;
+        }
+        .button-primary {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+        .button-primary:hover {
+            background-color: #0056b3;
+        }
+        .button-danger {
+            background-color: #dc3545;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .button-danger:hover {
+            background-color: #c82333;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .dashboard-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            background-color: #fafafa;
+        }
+        .filter-controls {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .filter-controls label {
+            font-weight: bold;
+        }
+        .filter-controls select, .filter-controls input[type="text"] {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 5px;
+            color: white;
+            font-weight: bold;
+            font-size: 0.8em;
+        }
+        .status-draft { background-color: #6c757d; }
+        .status-submitted { background-color: #007bff; }
+        .status-approved-rm { background-color: #28a745; }
+        .status-approved-head { background-color: #008000; }
+        .status-rejected { background-color: #dc3545; }
+        .status-completed { background-color: #17a2b8; }
+        .status-pending { background-color: #ffc107; color: #333; }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="main-menu-item" onclick="toggleSubMenu('rcsa-sub-menu')">
+            RCSA <span class="arrow">></span>
+        </div>
+        <div class="sub-menu" id="rcsa-sub-menu">
+            <a href="#" class="sub-menu-item" onclick="showDashboard()">Dashboard</a>
+            <a href="#" class="sub-menu-item" onclick="showActionPlans()">Action Plans</a>
+        </div>
+        </div>
+
+    <div class="main-content">
+        <div class="header">
+            <h1>Comprehensive Risk Management System - RCSA Module</h1>
+            <div class="user-switcher" onclick="toggleUserSwitcher()">
+                <span id="current-user-display">Switch User / Role</span>
+                <div class="dropdown-content" id="user-dropdown">
+                    <a href="#" onclick="switchUser('riskmanagementhead')">Risk Management Head</a>
+                    <a href="#" onclick="switchUser('riskmanager')">Risk Management Department</a>
+                    <a href="#" onclick="switchUser('creditcontrol')">Credit Control Department</a>
+                    <a href="#" onclick="switchUser('collection')">Collection Department</a>
+                    <a href="#" onclick="switchUser('publicrelation')">Public Relation Department</a>
+                    <a href="#" onclick="switchUser('it')">IT Department</a>
+                    <a href="#" onclick="switchUser('legal')">Legal Department</a>
+                    <a href="#" onclick="switchUser('fundingtreasury')">Funding & Treasury Department</a>
+                    <a href="#" onclick="switchUser('remediallitigation')">Remedial & Litigation Department</a>
+                    <a href="#" onclick="switchUser('businessdevelopment')">Business Development Department</a>
+                    <a href="#" onclick="switchUser('customerservice')">Customer Service Department</a>
+                    <a href="#" onclick="switchUser('antifraud')">Anti Fraud Department</a>
+                    <a href="#" onclick="switchUser('compliance')">Compliance Department</a>
+                    <a href="#" onclick="switchUser('productiveloan')">Productive Loan Department</a>
+                    <a href="#" onclick="switchUser('apu_ppt')">APU_PPT Department</a>
+                    <a href="#" onclick="switchUser('financeaccounting')">Finance & Accounting Department</a>
+                    <a href="#" onclick="switchUser('hr')">HR Department</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div id="dashboard-content" class="content">
+                <h2>RCSA Dashboard</h2>
+
+                <div class="filter-controls" id="dashboard-filters">
+                    <label for="filter-department">Department:</label>
+                    <select id="filter-department" onchange="filterDashboard()">
+                        <option value="all">All Departments</option>
+                        </select>
+                    <label for="filter-year">Year:</label>
+                    <select id="filter-year" onchange="filterDashboard()">
+                        <option value="2025">2025</option>
+                        <option value="2024">2024</option>
+                        <option value="2023">2023</option>
+                    </select>
+                </div>
+
+                <div id="dept-dashboard-view" class="dashboard-section hidden">
+                    <h3>Your Department's RCSA Progress</h3>
+                    <p id="dept-rcsa-progress">Loading progress...</p>
+                    <p>Deadline: <strong>December 31, 2025</strong></p>
+                    <button class="button-primary" onclick="startOrContinueRCSA()">Start/Continue RCSA</button>
+
+                    <div id="rcsa-input-form" class="hidden" style="margin-top: 20px;">
+                        <h4>Input/Update RCSA Data</h4>
+                        <div class="form-group">
+                            <label for="form-risk-event">Risk Event:</label>
+                            <input type="text" id="form-risk-event">
+                        </div>
+                        <div class="form-group">
+                            <label for="form-risk-description">Risk Description:</label>
+                            <textarea id="form-risk-description" rows="3"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="form-control-measure">Control Measure:</label>
+                            <textarea id="form-control-measure" rows="3"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="form-root-cause">Root Cause:</label>
+                            <textarea id="form-root-cause" rows="3"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="form-consequences">Consequences:</label>
+                            <textarea id="form-consequences" rows="3"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="form-existing-control">Existing Control:</label>
+                            <input type="text" id="form-existing-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="form-control-effectiveness">Control Effectiveness:</label>
+                            <select id="form-control-effectiveness">
+                                <option value="">Select</option>
+                                <option value="Effective">Effective</option>
+                                <option value="Partially Effective">Partially Effective</option>
+                                <option value="Ineffective">Ineffective</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="form-likelihood">Likelihood (Pre-Mitigation):</label>
+                            <select id="form-likelihood">
+                                <option value="">Select Likelihood</option>
+                                </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="form-impact">Impact (Pre-Mitigation):</label>
+                            <select id="form-impact">
+                                <option value="">Select Impact</option>
+                                </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="form-residual-likelihood">Residual Likelihood (Post-Mitigation):</label>
+                            <select id="form-residual-likelihood">
+                                <option value="">Select Likelihood</option>
+                                </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="form-residual-impact">Residual Impact (Post-Mitigation):</label>
+                            <select id="form-residual-impact">
+                                <option value="">Select Impact</option>
+                                </select>
+                        </div>
+                        <div class="form-group">
+                            <button onclick="submitRCSAData()">Save RCSA Entry</button>
+                            <button class="button-danger" onclick="hideRCSAInputForm()">Cancel</button>
+                        </div>
+                    </div>
+
+                    <h3 style="margin-top: 30px;">Your Submitted RCSA Entries</h3>
+                    <table id="dept-submitted-rcsa-table">
+                        <thead>
+                            <tr>
+                                <th>Risk Event</th>
+                                <th>Likelihood</th>
+                                <th>Impact</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            </tbody>
+                    </table>
+                    <button class="button-primary" style="margin-top: 20px;" onclick="submitDepartmentRCSA()">Submit Department RCSA for Review</button>
+                </div>
+
+                <div id="rm-dashboard-view" class="dashboard-section hidden">
+                    <h3>Consolidated RCSA Summary Report</h3>
+                    <table id="rcsa-summary-display-table">
+                        <thead>
+                            <tr>
+                                <th>Department</th>
+                                <th>Total Risks</th>
+                                <th>High Risks</th>
+                                <th>Medium Risks</th>
+                                <th>Low Risks</th>
+                                <th>Status</th>
+                                <th>Details</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            </tbody>
+                    </table>
+                    <button class="button-primary" style="margin-top: 20px;" onclick="generateRCSASummary()">Generate Final RCSA Summary Report (for Head)</button>
+                </div>
+
+                <div id="detailed-rcsa-view" class="dashboard-section hidden">
+                    <h3 id="detailed-rcsa-title">Detailed RCSA for [Department]</h3>
+                    <button class="button-primary" onclick="hideDetailedRCSA()">Back to Summary</button>
+                    <table id="detailed-rcsa-table">
+                        <thead>
+                            <tr>
+                                <th>Risk Event</th>
+                                <th>Description</th>
+                                <th>Control</th>
+                                <th>Likelihood (Pre)</th>
+                                <th>Impact (Pre)</th>
+                                <th>Likelihood (Post)</th>
+                                <th>Impact (Post)</th>
+                                <th>Status</th>
+                                <th>Review</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="action-plans-content" class="content hidden">
+                <h2>Action Plans</h2>
+
+                <div class="filter-controls" id="action-plan-filters">
+                    <label for="ap-filter-department">Department:</label>
+                    <select id="ap-filter-department" onchange="filterActionPlans()">
+                        <option value="all">All Departments</option>
+                        </select>
+                    <label for="ap-filter-status">Status:</label>
+                    <select id="ap-filter-status" onchange="filterActionPlans()">
+                        <option value="all">All Statuses</option>
+                        <option value="Pending">Pending</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Completed">Completed</option>
+                    </select>
+                    <label for="ap-filter-risk-level">Risk Level:</label>
+                    <select id="ap-filter-risk-level" onchange="filterActionPlans()">
+                        <option value="all">All</option>
+                        <option value="Very High">Very High</option>
+                        <option value="High">High</option>
+                        <option value="Medium">Medium</option>
+                        <option value="Low">Low</option>
+                    </select>
+                     <label for="ap-filter-due-date">Due Date (YYYY-MM-DD):</label>
+                    <input type="date" id="ap-filter-due-date" onchange="filterActionPlans()">
+                </div>
+
+
+                <button class="button-primary" onclick="showActionPlanForm()" id="add-ap-button">Add New Action Plan</button>
+
+                <div id="action-plan-form" class="hidden" style="margin-top: 20px;">
+                    <h4>New Action Plan Entry</h4>
+                    <div class="form-group">
+                        <label for="ap-risk">Associated Risk Event:</label>
+                        <input type="text" id="ap-risk" placeholder="e.g., Data Breach">
+                    </div>
+                    <div class="form-group">
+                        <label for="ap-plan">Action Plan:</label>
+                        <textarea id="ap-plan" rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="ap-due-date">Due Date:</label>
+                        <input type="date" id="ap-due-date">
+                    </div>
+                     <div class="form-group">
+                        <label for="ap-risk-level">Risk Level:</label>
+                        <select id="ap-risk-level">
+                            <option value="">Select Risk Level</option>
+                            <option value="Very High">Very High</option>
+                            <option value="High">High</option>
+                            <option value="Medium">Medium</option>
+                            <option value="Low">Low</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <button onclick="submitActionPlan()">Save Action Plan</button>
+                        <button class="button-danger" onclick="hideActionPlanForm()">Cancel</button>
+                    </div>
+                </div>
+
+                <table id="action-plans-table">
+                    <thead>
+                        <tr>
+                            <th>Department</th>
+                            <th>Risk</th>
+                            <th>Action Plan</th>
+                            <th>Due Date</th>
+                            <th>Status</th>
+                            <th>Risk Level</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        </tbody>
+                </table>
+            </div>
+             <div id="rm-head-final-approval" class="content hidden">
+                <h2>RCSA Summary Report for Final Approval</h2>
+                <div class="dashboard-section">
+                    <h3>Review & Approve</h3>
+                    <table id="rm-head-summary-table">
+                        <thead>
+                            <tr>
+                                <th>Department</th>
+                                <th>Total Risks</th>
+                                <th>High Risks</th>
+                                <th>Medium Risks</th>
+                                <th>Low Risks</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            </tbody>
+                    </table>
+                    <button class="button-primary" style="margin-top: 20px;" onclick="approveRCSAReport()">Approve RCSA Summary Report</button>
+                    <button class="button-danger" style="margin-top: 20px;" onclick="rejectRCSAReport()">Reject RCSA Summary Report</button>
+                </div>
+
+                <div class="dashboard-section hidden" id="approved-report-section">
+                    <h3>Approved RCSA Summary Report</h3>
+                    <p>The RCSA Summary Report has been officially approved and is ready for dissemination.</p>
+                    <p><em>(In a real system, this would be a downloadable report or a link to the finalized document.)</em></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Data Simulation ---
+        const ALL_DEPARTMENTS = [
+            'Credit Control', 'Public Relation', 'IT', 'Legal', 'Funding & Treasury',
+            'Remedial & Litigation', 'Business Development', 'Collection',
+            'Customer Service', 'Anti Fraud', 'Compliance', 'Productive Loan',
+            'APU_PPT', 'Finance & Accounting', 'HR'
+        ];
+
+        const LIKELIHOOD_OPTIONS = [
+            { value: '1', text: '1 - Rare' },
+            { value: '2', text: '2 - Unlikely' },
+            { value: '3', text: '3 - Moderate' },
+            { value: '4', text: '4 - Likely' },
+            { value: '5', text: '5 - Almost Certain' }
+        ];
+
+        const IMPACT_OPTIONS = [
+            { value: '1', text: '1 - Insignificant' },
+            { value: '2', text: '2 - Minor' },
+            { value: '3', text: '3 - Moderate' },
+            { value: '4', text: '4 - Major' },
+            { value: '5', text: '5 - Catastrophic' }
+        ];
+
+        let currentUser = { role: 'riskmanagementhead', department: null }; // Default user
+        let rcsaData = {}; // Stores all RCSA entries by department
+        let actionPlansData = {}; // Stores all action plans by department
+        let rcsaSummaryForApproval = {}; // Consolidated summary for RM Head
+
+        // Simulate initial data loading
+        ALL_DEPARTMENTS.forEach(dept => {
+            rcsaData[dept] = [];
+            actionPlansData[dept] = [];
+        });
+
+        // Add some dummy data for Credit Control (to show progress and submitted items)
+        rcsaData['Credit Control'].push({
+            id: 'cc-rcsa-001',
+            riskEvent: 'Non-performing loan default',
+            riskDescription: 'Risk of borrower failing to repay loan installments.',
+            controlMeasure: 'Robust credit scoring and collateral requirements.',
+            rootCause: 'Economic downturn',
+            consequences: 'Financial loss, reputation damage',
+            existingControl: 'Credit Committee Review',
+            controlEffectiveness: 'Effective',
+            likelihood: '3', impact: '4',
+            residualLikelihood: '2', residualImpact: '3',
+            status: 'Submitted',
+            year: '2025'
+        });
+        rcsaData['Credit Control'].push({
+            id: 'cc-rcsa-002',
+            riskEvent: 'Inaccurate credit assessment',
+            riskDescription: 'Risk of approving loans to unqualified applicants.',
+            controlMeasure: 'Automated credit assessment system with manual review.',
+            rootCause: 'Outdated data',
+            consequences: 'Increased NPLs',
+            existingControl: 'Credit scoring model',
+            controlEffectiveness: 'Partially Effective',
+            likelihood: '2', impact: '3',
+            residualLikelihood: '2', residualImpact: '2',
+            status: 'Draft',
+            year: '2025'
+        });
+
+        // Add some dummy data for Collection
+         rcsaData['Collection'].push({
+            id: 'col-rcsa-001',
+            riskEvent: 'Ineffective collection process',
+            riskDescription: 'Failure to recover overdue debts efficiently.',
+            controlMeasure: 'Regular training for collection officers, clear escalation matrix.',
+            rootCause: 'Lack of follow-up',
+            consequences: 'Revenue loss',
+            existingControl: 'Collection Call Scripts',
+            controlEffectiveness: 'Effective',
+            likelihood: '4', impact: '3',
+            residualLikelihood: '3', residualImpact: '2',
+            status: 'Approved by RM',
+            year: '2025'
+        });
+        rcsaData['Collection'].push({
+            id: 'col-rcsa-002',
+            riskEvent: 'Customer dissatisfaction during collection',
+            riskDescription: 'Aggressive collection tactics leading to customer complaints.',
+            controlMeasure: 'Adherence to ethical collection guidelines, customer feedback mechanism.',
+            rootCause: 'Poor communication skills',
+            consequences: 'Reputational damage',
+            existingControl: 'Code of Conduct',
+            controlEffectiveness: 'Partially Effective',
+            likelihood: '3', impact: '4',
+            residualLikelihood: '2', residualImpact: '3',
+            status: 'Submitted',
+            year: '2025'
+        });
+
+
+        // Dummy action plan data
+        actionPlansData['Credit Control'].push({
+            id: 'cc-ap-001',
+            risk: 'Inaccurate credit assessment',
+            plan: 'Review and update credit scoring model by Q3 2025.',
+            dueDate: '2025-09-30',
+            status: 'In Progress',
+            riskLevel: 'Medium'
+        });
+        actionPlansData['Collection'].push({
+            id: 'col-ap-001',
+            risk: 'Ineffective collection process',
+            plan: 'Implement new collection software by Q4 2025.',
+            dueDate: '2025-12-31',
+            status: 'Pending',
+            riskLevel: 'High'
+        });
+        actionPlansData['Collection'].push({
+            id: 'col-ap-002',
+            risk: 'Customer dissatisfaction during collection',
+            plan: 'Conduct mandatory customer service training for all collection staff.',
+            dueDate: '2025-07-15',
+            status: 'Completed',
+            riskLevel: 'Medium'
+        });
+
+
+        // --- DOM Elements ---
+        const dashboardContent = document.getElementById('dashboard-content');
+        const actionPlansContent = document.getElementById('action-plans-content');
+        const deptDashboardView = document.getElementById('dept-dashboard-view');
+        const rmDashboardView = document.getElementById('rm-dashboard-view');
+        const detailedRCSAView = document.getElementById('detailed-rcsa-view');
+        const rmHeadFinalApproval = document.getElementById('rm-head-final-approval');
+
+        const rcsaInputForm = document.getElementById('rcsa-input-form');
+        const actionPlanForm = document.getElementById('action-plan-form');
+
+        // --- Core Functions ---
+
+        function toggleUserSwitcher() {
+            document.getElementById('user-dropdown').parentElement.classList.toggle('active');
+        }
+
+        function switchUser(roleOrDepartment) {
+            document.getElementById('user-dropdown').parentElement.classList.remove('active'); // Hide dropdown
+
+            const departments = ALL_DEPARTMENTS.map(d => d.toLowerCase().replace(/\s/g, ''));
+            const roleMap = {
+                'riskmanagementhead': { role: 'riskmanagementhead', department: null, display: 'Risk Management Head' },
+                'riskmanager': { role: 'riskmanagement', department: null, display: 'Risk Management Department' }
+            };
+
+            if (departments.includes(roleOrDepartment)) {
+                currentUser = { role: 'departmental', department: ALL_DEPARTMENTS[departments.indexOf(roleOrDepartment)], display: ALL_DEPARTMENTS[departments.indexOf(roleOrDepartment)] + ' Department' };
+            } else if (roleMap[roleOrDepartment]) {
+                currentUser = roleMap[roleOrDepartment];
+            } else {
+                alert('Invalid user or role selected.');
+                return;
+            }
+
+            document.getElementById('current-user-display').textContent = currentUser.display;
+            showDashboard(); // Default to dashboard after switching
+            updateSidebarAndFilters();
+        }
+
+        function updateSidebarAndFilters() {
+             const rcsaSubMenu = document.getElementById('rcsa-sub-menu');
+            // Ensure RCSA submenu is expanded by default
+            const rcsaMenuItem = document.querySelector('.main-menu-item');
+            rcsaMenuItem.classList.add('active');
+            rcsaSubMenu.classList.add('active');
+
+            // Populate department filter for Dashboard
+            const dashboardDeptFilter = document.getElementById('filter-department');
+            dashboardDeptFilter.innerHTML = ''; // Clear existing options
+            if (currentUser.role === 'riskmanagement' || currentUser.role === 'riskmanagementhead') {
+                dashboardDeptFilter.add(new Option('All Departments', 'all'));
+                ALL_DEPARTMENTS.forEach(dept => {
+                    dashboardDeptFilter.add(new Option(dept, dept));
+                });
+            } else {
+                dashboardDeptFilter.add(new Option(currentUser.department, currentUser.department));
+                dashboardDeptFilter.value = currentUser.department;
+                dashboardDeptFilter.disabled = true; // Disable if not RM
+            }
+            dashboardDeptFilter.value = (currentUser.role === 'riskmanagement' || currentUser.role === 'riskmanagementhead') ? 'all' : currentUser.department;
+
+            // Populate department filter for Action Plans
+            const apDeptFilter = document.getElementById('ap-filter-department');
+            apDeptFilter.innerHTML = ''; // Clear existing options
+            if (currentUser.role === 'riskmanagement' || currentUser.role === 'riskmanagementhead') {
+                apDeptFilter.add(new Option('All Departments', 'all'));
+                ALL_DEPARTMENTS.forEach(dept => {
+                    apDeptFilter.add(new Option(dept, dept));
+                });
+            } else {
+                apDeptFilter.add(new Option(currentUser.department, currentUser.department));
+                apDeptFilter.value = currentUser.department;
+                apDeptFilter.disabled = true; // Disable if not RM
+            }
+            apDeptFilter.value = (currentUser.role === 'riskmanagement' || currentUser.role === 'riskmanagementhead') ? 'all' : currentUser.department;
+
+
+            // Show/hide 'Add New Action Plan' button for departmental users only
+            const addApButton = document.getElementById('add-ap-button');
+            if (currentUser.role === 'departmental') {
+                addApButton.classList.remove('hidden');
+            } else {
+                addApButton.classList.add('hidden');
+            }
+
+            // Populate likelihood and impact dropdowns
+            populateDropdown(document.getElementById('form-likelihood'), LIKELIHOOD_OPTIONS);
+            populateDropdown(document.getElementById('form-impact'), IMPACT_OPTIONS);
+            populateDropdown(document.getElementById('form-residual-likelihood'), LIKELIHOOD_OPTIONS);
+            populateDropdown(document.getElementById('form-residual-impact'), IMPACT_OPTIONS);
+        }
+
+        function populateDropdown(selectElement, options) {
+            // Keep the first default option if it exists
+            const currentFirstOption = selectElement.options.length > 0 ? selectElement.options[0].outerHTML : '';
+            selectElement.innerHTML = currentFirstOption;
+            options.forEach(option => {
+                const opt = document.createElement('option');
+                opt.value = option.value;
+                opt.textContent = option.text;
+                selectElement.appendChild(opt);
+            });
+        }
+
+        function toggleSubMenu(id) {
+            const subMenu = document.getElementById(id);
+            const menuItem = subMenu.previousElementSibling; // The main-menu-item before the sub-menu
+
+            if (subMenu.classList.contains('active')) {
+                subMenu.classList.remove('active');
+                menuItem.classList.remove('active');
+            } else {
+                // Close all other sub-menus first (if any, though only one for RCSA here)
+                document.querySelectorAll('.sub-menu.active').forEach(menu => {
+                    menu.classList.remove('active');
+                    menu.previousElementSibling.classList.remove('active');
+                });
+                subMenu.classList.add('active');
+                menuItem.classList.add('active');
+            }
+        }
+
+        function showDashboard() {
+            dashboardContent.classList.remove('hidden');
+            actionPlansContent.classList.add('hidden');
+            rmHeadFinalApproval.classList.add('hidden'); // Ensure RM head view is hidden
+
+            if (currentUser.role === 'departmental') {
+                deptDashboardView.classList.remove('hidden');
+                rmDashboardView.classList.add('hidden');
+                detailedRCSAView.classList.add('hidden');
+                displayDepartmentalRCSADashboard();
+            } else if (currentUser.role === 'riskmanagement') {
+                deptDashboardView.classList.add('hidden');
+                rmDashboardView.classList.remove('hidden');
+                detailedRCSAView.classList.add('hidden');
+                displayRMDashboard();
+            } else if (currentUser.role === 'riskmanagementhead') {
+                 // RM Head also sees a dashboard, but can initiate final approval from there
+                deptDashboardView.classList.add('hidden');
+                rmDashboardView.classList.remove('hidden'); // Reuse RM view for head to see consolidated
+                detailedRCSAView.classList.add('hidden');
+                document.getElementById('rcsa-summary-section').classList.add('hidden'); // Hide RM's generate button
+                displayRMDashboard(); // RM Head can also see the consolidated data
+            }
+            filterDashboard(); // Apply initial filters
+        }
+
+        function showActionPlans() {
+            dashboardContent.classList.add('hidden');
+            actionPlansContent.classList.remove('hidden');
+            rmHeadFinalApproval.classList.add('hidden');
+            filterActionPlans(); // Apply initial filters
+             // Hide Add New Action Plan for RM roles
+            if (currentUser.role === 'riskmanagement' || currentUser.role === 'riskmanagementhead') {
+                document.getElementById('add-ap-button').classList.add('hidden');
+                document.getElementById('action-plan-form').classList.add('hidden'); // Hide form too
+            } else {
+                document.getElementById('add-ap-button').classList.remove('hidden');
+            }
+        }
+
+        function displayDepartmentalRCSADashboard() {
+            const department = currentUser.department;
+            const deptRCSAs = rcsaData[department] || [];
+            const totalRCSAs = deptRCSAs.length;
+            const completedRCSAs = deptRCSAs.filter(r => r.status === 'Submitted' || r.status.startsWith('Approved')).length;
+            const progressPercentage = totalRCSAs === 0 ? 0 : Math.round((completedRCSAs / totalRCSAs) * 100);
+
+            document.getElementById('dept-rcsa-progress').innerHTML = `You have completed <strong>${completedRCSAs}</strong> out of <strong>${totalRCSAs}</strong> RCSA entries (${progressPercentage}%).`;
+
+            loadDepartmentSubmittedRCSA();
+        }
+
+        function loadDepartmentSubmittedRCSA() {
+            const tableBody = document.getElementById('dept-submitted-rcsa-table').getElementsByTagName('tbody')[0];
+            tableBody.innerHTML = ''; // Clear existing rows
+
+            const department = currentUser.department;
+            const currentYear = document.getElementById('filter-year').value;
+            const filteredData = (rcsaData[department] || []).filter(item => item.year === currentYear);
+
+            filteredData.forEach((data, index) => {
+                const newRow = tableBody.insertRow();
+                newRow.insertCell().textContent = data.riskEvent;
+                newRow.insertCell().textContent = data.likelihood;
+                newRow.insertCell().textContent = data.impact;
+                const statusCell = newRow.insertCell();
+                statusCell.innerHTML = `<span class="status-badge status-${data.status.toLowerCase().replace(/\s/g, '-') || 'draft'}">${data.status}</span>`;
+
+                const actionCell = newRow.insertCell();
+                if (data.status === 'Draft' || data.status === 'Rejected') {
+                    const editButton = document.createElement('button');
+                    editButton.textContent = 'Edit';
+                    editButton.className = 'button-primary';
+                    editButton.style.padding = '5px 10px';
+                    editButton.onclick = () => editRCSAEntry(department, data.id);
+                    actionCell.appendChild(editButton);
+                } else {
+                    actionCell.textContent = 'No Action';
+                }
+            });
+        }
+
+        function startOrContinueRCSA() {
+            rcsaInputForm.classList.remove('hidden');
+            // Clear form fields
+            document.getElementById('form-risk-event').value = '';
+            document.getElementById('form-risk-description').value = '';
+            document.getElementById('form-control-measure').value = '';
+            document.getElementById('form-root-cause').value = '';
+            document.getElementById('form-consequences').value = '';
+            document.getElementById('form-existing-control').value = '';
+            document.getElementById('form-control-effectiveness').value = '';
+            document.getElementById('form-likelihood').value = '';
+            document.getElementById('form-impact').value = '';
+            document.getElementById('form-residual-likelihood').value = '';
+            document.getElementById('form-residual-impact').value = '';
+            rcsaInputForm.dataset.editingId = ''; // Clear editing ID
+        }
+
+        function hideRCSAInputForm() {
+            rcsaInputForm.classList.add('hidden');
+        }
+
+        function editRCSAEntry(department, id) {
+            const entry = rcsaData[department].find(item => item.id === id);
+            if (entry) {
+                document.getElementById('form-risk-event').value = entry.riskEvent;
+                document.getElementById('form-risk-description').value = entry.riskDescription;
+                document.getElementById('form-control-measure').value = entry.controlMeasure;
+                document.getElementById('form-root-cause').value = entry.rootCause;
+                document.getElementById('form-consequences').value = entry.consequences;
+                document.getElementById('form-existing-control').value = entry.existingControl;
+                document.getElementById('form-control-effectiveness').value = entry.controlEffectiveness;
+                document.getElementById('form-likelihood').value = entry.likelihood;
+                document.getElementById('form-impact').value = entry.impact;
+                document.getElementById('form-residual-likelihood').value = entry.residualLikelihood;
+                document.getElementById('form-residual-impact').value = entry.residualImpact;
+                rcsaInputForm.dataset.editingId = id; // Store ID for update
+                rcsaInputForm.classList.remove('hidden');
+            }
+        }
+
+        function submitRCSAData() {
+            const department = currentUser.department;
+            const currentYear = document.getElementById('filter-year').value;
+            const editingId = rcsaInputForm.dataset.editingId;
+
+            const newEntry = {
+                riskEvent: document.getElementById('form-risk-event').value,
+                riskDescription: document.getElementById('form-risk-description').value,
+                controlMeasure: document.getElementById('form-control-measure').value,
+                rootCause: document.getElementById('form-root-cause').value,
+                consequences: document.getElementById('form-consequences').value,
+                existingControl: document.getElementById('form-existing-control').value,
+                controlEffectiveness: document.getElementById('form-control-effectiveness').value,
+                likelihood: document.getElementById('form-likelihood').value,
+                impact: document.getElementById('form-impact').value,
+                residualLikelihood: document.getElementById('form-residual-likelihood').value,
+                residualImpact: document.getElementById('form-residual-impact').value,
+                status: 'Draft', // Always starts as Draft when saved/updated by dept
+                year: currentYear
+            };
+
+            if (!newEntry.riskEvent || !newEntry.likelihood || !newEntry.impact) {
+                alert('Please fill in Risk Event, Likelihood (Pre), and Impact (Pre).');
+                return;
+            }
+
+            if (editingId) {
+                // Update existing entry
+                const index = rcsaData[department].findIndex(item => item.id === editingId);
+                if (index !== -1) {
+                    rcsaData[department][index] = { ...newEntry, id: editingId }; // Retain ID
+                    alert('RCSA entry updated successfully.');
+                }
+            } else {
+                // Add new entry
+                newEntry.id = department.toLowerCase().replace(/\s/g, '-') + '-' + Date.now(); // Simple unique ID
+                rcsaData[department].push(newEntry);
+                alert('New RCSA entry saved as Draft.');
+            }
+
+            hideRCSAInputForm();
+            displayDepartmentalRCSADashboard(); // Refresh dashboard
+        }
+
+
+        function submitDepartmentRCSA() {
+            const department = currentUser.department;
+            const currentYear = document.getElementById('filter-year').value;
+            const deptRCSAs = (rcsaData[department] || []).filter(item => item.year === currentYear);
+
+            if (deptRCSAs.length === 0) {
+                alert('Please add some RCSA entries before submitting your department report.');
+                return;
+            }
+
+            const confirmSubmit = confirm(`Are you sure you want to submit ${department}'s RCSA for review?`);
+            if (confirmSubmit) {
+                deptRCSAs.forEach(entry => {
+                    // Only change status if it's Draft or Rejected
+                    if (entry.status === 'Draft' || entry.status === 'Rejected') {
+                        entry.status = 'Submitted';
+                    }
+                });
+                alert(`RCSA for ${department} submitted for review.`);
+                displayDepartmentalRCSADashboard(); // Refresh dashboard
+            }
+        }
+
+        function calculateRiskLevel(likelihood, impact) {
+            // Convert to numbers for calculation
+            likelihood = parseInt(likelihood);
+            impact = parseInt(impact);
+
+            if (isNaN(likelihood) || isNaN(impact)) return 'N/A';
+
+            const score = likelihood * impact; // Simple multiplication for risk score
+
+            if (score >= 15) return 'Very High'; // 5x5=25, 4x4=16, 5x4=20, 4x5=20
+            if (score >= 10) return 'High';    // 3x4=12, 4x3=12, 5x2=10, 2x5=10
+            if (score >= 5) return 'Medium';  // 2x3=6, 3x2=6, 1x5=5, 5x1=5
+            return 'Low'; // 1x1=1, 1x2=2, 2x1=2
+        }
+
+        function displayRMDashboard() {
+            const tableBody = document.getElementById('rcsa-summary-display-table').getElementsByTagName('tbody')[0];
+            tableBody.innerHTML = ''; // Clear existing rows
+
+            const departmentFilter = document.getElementById('filter-department').value;
+            const yearFilter = document.getElementById('filter-year').value;
+
+            const summarizedData = {};
+
+            ALL_DEPARTMENTS.forEach(dept => {
+                const deptRCSAs = (rcsaData[dept] || []).filter(item => item.year === yearFilter && (item.status === 'Submitted' || item.status.startsWith('Approved')));
+
+                if (deptRCSAs.length > 0 && (departmentFilter === 'all' || departmentFilter === dept)) {
+                    let totalRisks = 0;
+                    let highRisks = 0;
+                    let mediumRisks = 0;
+                    let lowRisks = 0;
+                    let submittedStatus = 'Not Submitted'; // Default
+
+                    deptRCSAs.forEach(entry => {
+                        totalRisks++;
+                        const riskLevel = calculateRiskLevel(entry.residualLikelihood || entry.likelihood, entry.residualImpact || entry.impact);
+                        if (riskLevel === 'Very High' || riskLevel === 'High') {
+                            highRisks++;
+                        } else if (riskLevel === 'Medium') {
+                            mediumRisks++;
+                        } else if (riskLevel === 'Low') {
+                            lowRisks++;
+                        }
+                        if (entry.status === 'Submitted') submittedStatus = 'Submitted for Review';
+                        if (entry.status === 'Approved by RM') submittedStatus = 'Reviewed by RM';
+                        if (entry.status === 'Approved by Head') submittedStatus = 'Approved by Head';
+                    });
+
+                    summarizedData[dept] = {
+                        totalRisks,
+                        highRisks,
+                        mediumRisks,
+                        lowRisks,
+                        status: submittedStatus,
+                        raw: deptRCSAs
+                    };
+                }
+            });
+
+            for (const dept in summarizedData) {
+                const summary = summarizedData[dept];
+                const newRow = tableBody.insertRow();
+                newRow.insertCell().textContent = dept;
+                newRow.insertCell().textContent = summary.totalRisks;
+                newRow.insertCell().textContent = summary.highRisks;
+                newRow.insertCell().textContent = summary.mediumRisks;
+                newRow.insertCell().textContent = summary.lowRisks;
+                const statusCell = newRow.insertCell();
+                statusCell.innerHTML = `<span class="status-badge status-${summary.status.toLowerCase().replace(/\s/g, '-') || 'pending'}">${summary.status}</span>`;
+
+                const detailsCell = newRow.insertCell();
+                const viewButton = document.createElement('button');
+                viewButton.textContent = 'View Details';
+                viewButton.className = 'button-primary';
+                viewButton.style.padding = '5px 10px';
+                viewButton.onclick = () => showDetailedRCSA(dept, summary.raw);
+                detailsCell.appendChild(viewButton);
+            }
+        }
+
+        function showDetailedRCSA(department, data) {
+            rmDashboardView.classList.add('hidden');
+            detailedRCSAView.classList.remove('hidden');
+            document.getElementById('detailed-rcsa-title').textContent = `Detailed RCSA for ${department} - ${document.getElementById('filter-year').value}`;
+
+            const tableBody = document.getElementById('detailed-rcsa-table').getElementsByTagName('tbody')[0];
+            tableBody.innerHTML = '';
+
+            data.forEach(entry => {
+                const newRow = tableBody.insertRow();
+                newRow.insertCell().textContent = entry.riskEvent;
+                newRow.insertCell().textContent = entry.riskDescription;
+                newRow.insertCell().textContent = entry.controlMeasure;
+                newRow.insertCell().textContent = entry.likelihood;
+                newRow.insertCell().textContent = entry.impact;
+                newRow.insertCell().textContent = entry.residualLikelihood || 'N/A'; // Show residual if available
+                newRow.insertCell().textContent = entry.residualImpact || 'N/A'; // Show residual if available
+                const statusCell = newRow.insertCell();
+                statusCell.innerHTML = `<span class="status-badge status-${entry.status.toLowerCase().replace(/\s/g, '-') || 'draft'}">${entry.status}</span>`;
+
+                const reviewCell = newRow.insertCell();
+                if (entry.status === 'Submitted') {
+                    const approveButton = document.createElement('button');
+                    approveButton.textContent = 'Approve';
+                    approveButton.className = 'button-primary';
+                    approveButton.style.padding = '5px 10px';
+                    approveButton.onclick = () => approveRCSAEntry(department, entry.id);
+                    reviewCell.appendChild(approveButton);
+
+                    const rejectButton = document.createElement('button');
+                    rejectButton.textContent = 'Reject';
+                    rejectButton.className = 'button-danger';
+                    rejectButton.style.padding = '5px 10px';
+                    rejectButton.style.marginLeft = '5px';
+                    rejectButton.onclick = () => rejectRCSAEntry(department, entry.id);
+                    reviewCell.appendChild(rejectButton);
+
+                } else {
+                    reviewCell.textContent = 'Reviewed';
+                }
+            });
+        }
+
+        function hideDetailedRCSA() {
+            detailedRCSAView.classList.add('hidden');
+            rmDashboardView.classList.remove('hidden');
+            displayRMDashboard(); // Refresh RM dashboard
+        }
+
+        function approveRCSAEntry(department, id) {
+            const entry = rcsaData[department].find(item => item.id === id);
+            if (entry) {
+                entry.status = 'Approved by RM';
+                alert(`RCSA entry for ${department} - ${entry.riskEvent} approved by Risk Management.`);
+                showDetailedRCSA(department, rcsaData[department].filter(item => item.year === document.getElementById('filter-year').value && item.status !== 'Draft')); // Re-render detailed view
+            }
+        }
+
+        function rejectRCSAEntry(department, id) {
+             const entry = rcsaData[department].find(item => item.id === id);
+            if (entry) {
+                const reason = prompt(`Reason for rejecting RCSA entry for ${department} - ${entry.riskEvent}:`);
+                if (reason) {
+                    entry.status = 'Rejected';
+                    entry.rejectionReason = reason;
+                    alert(`RCSA entry for ${department} - ${entry.riskEvent} rejected. Reason: ${reason}`);
+                    showDetailedRCSA(department, rcsaData[department].filter(item => item.year === document.getElementById('filter-year').value && item.status !== 'Draft')); // Re-render detailed view
+                } else {
+                    alert('Rejection cancelled. Please provide a reason if you wish to reject.');
+                }
+            }
+        }
+
+
+        function generateRCSASummary() {
+            // This function prepares data for RM Head's approval
+            rcsaSummaryForApproval = {};
+            const yearFilter = document.getElementById('filter-year').value;
+
+            ALL_DEPARTMENTS.forEach(dept => {
+                const deptRCSAs = (rcsaData[dept] || []).filter(item => item.year === yearFilter && item.status === 'Approved by RM'); // Only approved by RM
+                if (deptRCSAs.length > 0) {
+                    let totalRisks = 0;
+                    let highRisks = 0;
+                    let mediumRisks = 0;
+                    let lowRisks = 0;
+
+                    deptRCSAs.forEach(entry => {
+                        totalRisks++;
+                        const riskLevel = calculateRiskLevel(entry.residualLikelihood || entry.likelihood, entry.residualImpact || entry.impact);
+                        if (riskLevel === 'Very High' || riskLevel === 'High') {
+                            highRisks++;
+                        } else if (riskLevel === 'Medium') {
+                            mediumRisks++;
+                        } else if (riskLevel === 'Low') {
+                            lowRisks++;
+                        }
+                    });
+                    rcsaSummaryForApproval[dept] = {
+                        totalRisks,
+                        highRisks,
+                        mediumRisks,
+                        lowRisks,
+                        status: 'Pending Head Approval'
+                    };
+                }
+            });
+            alert('RCSA Summary prepared for Risk Management Head approval.');
+            // This would normally trigger a notification for the RM Head
+        }
+
+        function loadRMHeadSummaryData() {
+            const tableBody = document.getElementById('rm-head-summary-table').getElementsByTagName('tbody')[0];
+            tableBody.innerHTML = '';
+
+            const yearFilter = document.getElementById('filter-year').value;
+
+            let dataToDisplay = rcsaSummaryForApproval;
+            if (Object.keys(dataToDisplay).length === 0) {
+                // If no summary was generated by RM, show a message or empty state.
+                // For a prototype, might show a dummy summary if no real one is ready.
+                // Or inform the head that RM needs to generate it.
+                 alert('No RCSA Summary has been generated by the Risk Management Department for final approval yet.');
+                 return;
+            }
+
+            for (const dept in dataToDisplay) {
+                const summary = dataToDisplay[dept];
+                const newRow = tableBody.insertRow();
+                newRow.insertCell().textContent = dept;
+                newRow.insertCell().textContent = summary.totalRisks;
+                newRow.insertCell().textContent = summary.highRisks;
+                newRow.insertCell().textContent = summary.mediumRisks;
+                newRow.insertCell().textContent = summary.lowRisks;
+                const statusCell = newRow.insertCell();
+                statusCell.innerHTML = `<span class="status-badge status-${summary.status.toLowerCase().replace(/\s/g, '-')}">${summary.status}</span>`;
+            }
+        }
+
+
+        function approveRCSAReport() {
+            if (Object.keys(rcsaSummaryForApproval).length === 0) {
+                alert('No RCSA Summary Report has been submitted for approval yet.');
+                return;
+            }
+            if (confirm('Are you sure you want to officially APPROVE this RCSA Summary Report?')) {
+                for (const dept in rcsaSummaryForApproval) {
+                    rcsaSummaryForApproval[dept].status = 'Approved by Head';
+                    // Also update the status of the underlying RCSA data entries
+                    rcsaData[dept].forEach(entry => {
+                        if (entry.status === 'Approved by RM') {
+                            entry.status = 'Approved by Head';
+                        }
+                    });
+                }
+                alert('RCSA Summary Report officially approved!');
+                document.getElementById('approved-report-section').classList.remove('hidden');
+                loadRMHeadSummaryData(); // Refresh table
+            }
+        }
+
+        function rejectRCSAReport() {
+            if (Object.keys(rcsaSummaryForApproval).length === 0) {
+                alert('No RCSA Summary Report has been submitted for approval yet.');
+                return;
+            }
+            const reason = prompt('Reason for rejecting the RCSA Summary Report:');
+            if (reason) {
+                 for (const dept in rcsaSummaryForApproval) {
+                    rcsaSummaryForApproval[dept].status = 'Rejected by Head';
+                    // Optionally, also update the status of the underlying RCSA data entries to 'Rejected'
+                    rcsaData[dept].forEach(entry => {
+                        if (entry.status === 'Approved by RM') { // Only revert RM-approved entries
+                            entry.status = 'Rejected'; // Revert back to rejected for department to fix
+                            entry.rejectionReason = reason;
+                        }
+                    });
+                }
+                alert(`RCSA Summary Report rejected. Reason: ${reason}`);
+                document.getElementById('approved-report-section').classList.add('hidden'); // Hide approved section
+                loadRMHeadSummaryData(); // Refresh table
+            } else {
+                alert('Rejection cancelled. Please provide a reason if you wish to reject.');
+            }
+        }
+
+
+        function filterDashboard() {
+            if (currentUser.role === 'departmental') {
+                loadDepartmentSubmittedRCSA();
+            } else if (currentUser.role === 'riskmanagement' || currentUser.role === 'riskmanagementhead') {
+                displayRMDashboard();
+            }
+        }
+
+        function showActionPlanForm() {
+            actionPlanForm.classList.remove('hidden');
+            document.getElementById('ap-risk').value = '';
+            document.getElementById('ap-plan').value = '';
+            document.getElementById('ap-due-date').value = '';
+            document.getElementById('ap-risk-level').value = '';
+            actionPlanForm.dataset.editingId = '';
+        }
+
+        function hideActionPlanForm() {
+            actionPlanForm.classList.add('hidden');
+        }
+
+        function submitActionPlan() {
+            const department = currentUser.department;
+            const editingId = actionPlanForm.dataset.editingId;
+
+            const newAP = {
+                risk: document.getElementById('ap-risk').value,
+                plan: document.getElementById('ap-plan').value,
+                dueDate: document.getElementById('ap-due-date').value,
+                riskLevel: document.getElementById('ap-risk-level').value,
+                status: 'Pending' // Initial status
+            };
+
+            if (!newAP.risk || !newAP.plan || !newAP.dueDate || !newAP.riskLevel) {
+                alert('Please fill in all action plan fields.');
+                return;
+            }
+
+            if (editingId) {
+                const index = actionPlansData[department].findIndex(item => item.id === editingId);
+                if (index !== -1) {
+                    actionPlansData[department][index] = { ...newAP, id: editingId };
+                    alert('Action Plan updated successfully.');
+                }
+            } else {
+                newAP.id = department.toLowerCase().replace(/\s/g, '-') + '-ap-' + Date.now();
+                actionPlansData[department].push(newAP);
+                alert('Action Plan added.');
+            }
+
+            hideActionPlanForm();
+            filterActionPlans(); // Refresh the table
+        }
+
+        function filterActionPlans() {
+            const tableBody = document.getElementById('action-plans-table').getElementsByTagName('tbody')[0];
+            tableBody.innerHTML = '';
+
+            const deptFilter = document.getElementById('ap-filter-department').value;
+            const statusFilter = document.getElementById('ap-filter-status').value;
+            const riskLevelFilter = document.getElementById('ap-filter-risk-level').value;
+            const dueDateFilter = document.getElementById('ap-filter-due-date').value;
+
+            let filteredActionPlans = [];
+
+            if (currentUser.role === 'riskmanagement' || currentUser.role === 'riskmanagementhead') {
+                ALL_DEPARTMENTS.forEach(dept => {
+                    if (actionPlansData[dept]) {
+                        filteredActionPlans.push(...actionPlansData[dept]);
+                    }
+                });
+            } else {
+                filteredActionPlans.push(...(actionPlansData[currentUser.department] || []));
+            }
+
+            // Apply filters
+            filteredActionPlans = filteredActionPlans.filter(ap => {
+                const matchesDept = (deptFilter === 'all' || ap.department === deptFilter || (currentUser.role !== 'riskmanagement' && currentUser.role !== 'riskmanagementhead' && ap.department === currentUser.department));
+                const matchesStatus = (statusFilter === 'all' || ap.status === statusFilter);
+                const matchesRiskLevel = (riskLevelFilter === 'all' || ap.riskLevel === riskLevelFilter);
+                const matchesDueDate = (dueDateFilter === '' || ap.dueDate === dueDateFilter);
+
+                return matchesDept && matchesStatus && matchesRiskLevel && matchesDueDate;
+            });
+
+            filteredActionPlans.forEach(ap => {
+                const newRow = tableBody.insertRow();
+                newRow.insertCell().textContent = ap.department || currentUser.department; // Ensure department is displayed
+                newRow.insertCell().textContent = ap.risk;
+                newRow.insertCell().textContent = ap.plan;
+                newRow.insertCell().textContent = ap.dueDate;
+                const statusCell = newRow.insertCell();
+                statusCell.innerHTML = `<span class="status-badge status-${ap.status.toLowerCase().replace(/\s/g, '-')}">${ap.status}</span>`;
+                newRow.insertCell().textContent = ap.riskLevel;
+
+                const actionCell = newRow.insertCell();
+                if (currentUser.role === 'departmental') {
+                    const updateButton = document.createElement('button');
+                    updateButton.textContent = 'Update';
+                    updateButton.className = 'button-primary';
+                    updateButton.style.padding = '5px 10px';
+                    updateButton.onclick = () => editActionPlan(ap.id, ap.department);
+                    actionCell.appendChild(updateButton);
+
+                    if (ap.status !== 'Completed') {
+                        const completeButton = document.createElement('button');
+                        completeButton.textContent = 'Mark Complete';
+                        completeButton.className = 'button-primary';
+                        completeButton.style.padding = '5px 10px';
+                        completeButton.style.marginLeft = '5px';
+                        completeButton.onclick = () => markActionPlanComplete(ap.id, ap.department);
+                        actionCell.appendChild(completeButton);
+                    }
+                } else {
+                    actionCell.textContent = 'View Only';
+                }
+            });
+        }
+
+        function editActionPlan(id, department) {
+            const ap = actionPlansData[department].find(item => item.id === id);
+            if (ap) {
+                document.getElementById('ap-risk').value = ap.risk;
+                document.getElementById('ap-plan').value = ap.plan;
+                document.getElementById('ap-due-date').value = ap.dueDate;
+                document.getElementById('ap-risk-level').value = ap.riskLevel;
+                actionPlanForm.dataset.editingId = id;
+                actionPlanForm.classList.remove('hidden');
+            }
+        }
+
+        function markActionPlanComplete(id, department) {
+            const ap = actionPlansData[department].find(item => item.id === id);
+            if (ap && confirm(`Mark action plan "${ap.plan}" as Completed?`)) {
+                ap.status = 'Completed';
+                alert('Action Plan marked as Completed.');
+                filterActionPlans(); // Refresh table
+            }
+        }
+
+
+        // Initial setup
+        document.addEventListener('DOMContentLoaded', () => {
+            switchUser('riskmanagementhead'); // Start as Risk Management Head
+            showDashboard();
+            updateSidebarAndFilters(); // Ensure initial population of dropdowns
+        });
+
+    </script>
+</body>
+</html>
