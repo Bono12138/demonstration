@@ -27,12 +27,14 @@
             background-color: var(--bg-light);
             color: var(--text-color);
             display: flex;
-            justify-content: center;
-            align-items: center;
+            /* Changed align-items to flex-start for better vertical flow */
+            /* Removed justify-content: center; */
+            align-items: flex-start; /* Changed from center */
             min-height: 100vh;
             box-sizing: border-box;
             position: relative;
-            overflow: hidden;
+            overflow-x: hidden; /* Prevent horizontal scrolling */
+            overflow-y: auto; /* Allow vertical scrolling for the whole page if needed */
         }
 
         #particles-js {
@@ -52,10 +54,14 @@
             box-shadow: 0 8px 25px var(--shadow-medium);
             max-width: 1100px;
             width: 90%;
-            height: 90vh;
+            /* Removed fixed height for better responsiveness, especially on mobile */
+            /* height: 90vh; */
             min-height: 650px;
-            overflow: hidden;
+            /* Removed overflow: hidden; to allow scrolling within the container if needed */
+            /* Also, for better mobile behavior, let the body handle overall scroll */
             z-index: 1;
+            margin: 20px auto; /* Add margin to center it and give some space */
+            flex-direction: column; /* Ensure vertical stacking on smaller screens */
         }
 
         .left-panel, .right-panel {
@@ -64,7 +70,7 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            overflow-y: auto;
+            overflow-y: auto; /* Keep this for internal panel scrolling if content is too long */
             scrollbar-width: thin;
             scrollbar-color: var(--primary-color) var(--bg-light);
         }
@@ -263,22 +269,25 @@
             .container {
                 flex-direction: column;
                 max-width: 95%;
-                height: auto;
+                height: auto; /* Ensure height adjusts to content */
                 min-height: unset;
                 padding: 0;
+                margin: 10px auto; /* Adjust margin for mobile */
             }
             .left-panel {
                 border-right: none;
                 border-bottom: 1px solid var(--border-color);
                 padding: 30px;
-                overflow-y: visible;
+                overflow-y: visible; /* Let content overflow to allow body scroll */
             }
             .right-panel {
                 padding: 30px;
-                overflow-y: visible;
+                overflow-y: visible; /* Let content overflow to allow body scroll */
             }
             body {
-                padding: 20px;
+                padding: 10px; /* Adjust padding for mobile */
+                /* Ensure body itself can scroll vertically */
+                overflow-y: auto;
             }
         }
     </style>
@@ -292,7 +301,15 @@
                 <a href="https://bono12138.github.io/demonstration/self_intro_bono_cn.html" target="_blank" class="lang-button">
                     <span class="icon">🌐</span> 查看中文版本
                 </a>
-                <h1>About Me<span>👋</span></h1>
+                <div style="display: flex; align-items: flex-start; justify-content: space-between;">
+                    <div>
+                        <h1>About Me<span>👋</span></h1>
+                        <div class="contact-info-text">
+                            <p><span class="emoji">💬</span> <a href="https://wa.me/8618902001867?text=Hello+Bono%21" target="_blank" >WhatsApp: +86 189 0200 1867</a></p>
+                        </div>
+                    </div>
+            
+                </div>
                 <div class="intro">
                     <p>
                         Hello! My name is Bono. I graduated from <strong style="color: var(--primary-color);">The Hong Kong Polytechnic University with a Bachelor of Business Administration in Financial Services</strong>. I specialize in <strong style="color: #e67e22;">Internal Control and Risk Management</strong>, and I am passionate about exploring <strong style="color: var(--accent-color);">new technologies to optimize internal control management processes</strong>.
@@ -324,10 +341,7 @@
                 </div>
             </div>
 
-            <div class="contact-info-text">
-                <p><span class="emoji">💬</span> WeChat: bono12138</p>
-                
-            </div>
+
         </div>
 
         <div class="right-panel">
@@ -336,7 +350,12 @@
                 <p>Have any questions, collaboration intentions, or just want to chat?</p>
                 <p>Feel free to contact me by filling out the message form!</p>
                 <small>🤫If you're too shy to add my linkedin</small>
-                <a href="https://docs.qq.com/form/page/DU0RsR0dvendNSUFD" target="_blank" class="message-button">Go to Message Form 🚀</a>
+                <p><a href="https://docs.qq.com/form/page/DU0RsR0dvendNSUFD" target="_blank" class="message-button">Go to Message Form 🚀</a>
+                </p>
+            </div>
+            <div class="contact-info-text">
+                <p><span class="emoji">💬</span> <a href="https://wa.me/8618902001867?text=Hello+Bono%21" target="_blank">WhatsApp: +86 189 0200 1867</a></p>
+                <img src="https://bono12138.github.io/demonstration/whatsapp.png" alt="WhatsApp" style="width: 150px; height: auto; margin-left: 55px;">
             </div>
         </div>
     </div>
