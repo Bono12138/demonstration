@@ -27,12 +27,14 @@
             background-color: var(--bg-light);
             color: var(--text-color);
             display: flex;
-            justify-content: center;
-            align-items: center; /* 垂直居中整个容器 */
+            /* 移除 justify-content: center; */
+            /* 更改 align-items 为 flex-start，让内容从顶部开始排列 */
+            align-items: flex-start;
             min-height: 100vh; /* 确保body占满视口高度 */
             box-sizing: border-box;
             position: relative; /* 用于粒子背景定位 */
-            overflow: hidden; /* 防止粒子溢出导致滚动条 */
+            overflow-x: hidden; /* 防止横向滚动条 */
+            overflow-y: auto; /* 允许纵向滚动条 */
         }
 
         /* Particles.js 容器 */
@@ -53,10 +55,12 @@
             box-shadow: 0 8px 25px var(--shadow-medium);
             max-width: 1100px; /* 进一步增加宽度 */
             width: 90%; /* 适应性宽度 */
-            height: 90vh; /* 确保容器高度适应视口，并留白 */
+            /* 移除 height: 90vh; 让高度自适应内容 */
             min-height: 650px; /* 最小高度，避免内容少时页面过短 */
-            overflow: hidden; /* 防止容器内部内容溢出到容器外 */
+            /* 移除 overflow: hidden; 让内容可以溢出并滚动 */
             z-index: 1; /* 确保内容在粒子之上 */
+            margin: 20px auto; /* 添加上下边距并水平居中 */
+            flex-direction: column; /* 默认垂直堆叠，适用于小屏幕 */
         }
 
         .left-panel, .right-panel {
@@ -271,6 +275,7 @@
                 height: auto; /* 小屏幕下高度自适应 */
                 min-height: unset;
                 padding: 0; /* 移除容器内边距，让面板自身控制 */
+                margin: 10px auto; /* 调整手机端的间距 */
             }
             .left-panel {
                 border-right: none;
@@ -283,7 +288,8 @@
                 overflow-y: visible; /* 小屏幕下取消滚动 */
             }
             body {
-                padding: 20px;
+                padding: 10px; /* 调整手机端的内边距 */
+                overflow-y: auto; /* 确保在手机端body可以滚动 */
             }
         }
     </style>
@@ -298,6 +304,9 @@
                     <span class="icon">🌐</span> View in English
                 </a>
                 <h1>关于我<span>👋</span></h1>
+                <div class="contact-info-text">
+                    <p><span class="emoji">💬</span> 微信: bono12138</p>
+                </div>
                 <div class="intro">
                     <p>
                         你好！我叫马铭泽，大家喜欢叫我Bono，本科毕业于<strong style="color: var(--primary-color);">香港理工大学金融系</strong>。前四大er(24年最开心那一家)。我专注于<strong style="color: #e67e22;">内控与风险管理</strong>领域，对探索<strong style="color: var(--accent-color);">新技术优化内控管理流程</strong>充满热情。
@@ -321,7 +330,7 @@
                     <h2>🔗 快速链接</h2>
                     <ul>
                         <li><a href="https://bono12138.github.io/demonstration/resume_cn.html" target="_blank"><span class="icon">📝</span> 我的中文简历</a></li>
-                        <li><a href="https://bono12138.github.io/demonstration/resume_eng.html" target="_blank"><span class="icon">🇬🇧</span> My English Resume</a></li>
+                        <li><a href="https://bono12138.github.io/demonstration/resume_eng.html" target="_blank"><span class="icon">🎅</span> My English Resume</a></li>
                         <li><a href="https://bono12138.github.io/demonstration/tks_demo_1629v4_eng_published.html" target="_blank"><span class="icon">📊</span> 全风管理系统TKS指标模块DEMO</a></li>
                         <li><a href="https://bono12138.github.io/demonstration/rcsa_demo_1513v3_eng_published.html" target="_blank"><span class="icon">📈</span> 全风管理系统RCSA模块DEMO</a></li>
                         <li><a href="https://www.linkedin.com/in/mingze-ma-950a78179/" target="_blank"><span class="icon">💼</span> 我的LinkedIn主页</a></li>
@@ -331,7 +340,6 @@
 
             <div class="contact-info-text">
                 <p><span class="emoji">💬</span> 微信: bono12138</p>
-                
             </div>
         </div>
 
@@ -341,7 +349,9 @@
                 <p>有任何问题、合作意向或单纯想找人唠嗑？</p>
                 <p>欢迎填写留言表单联系我！</p>
                 <small>🤫如果你不好意思直接加我微信的话：bono12138</small>
-                <a href="https://docs.qq.com/form/page/DU2dNeExNQ1RucWVC" target="_blank" class="message-button">前往留言表单 🚀</a>
+                <p>
+                    <a href="https://docs.qq.com/form/page/DU2dNeExNQ1RucWVC" target="_blank" class="message-button">前往留言表单 🚀</a>
+                </p>
             </div>
         </div>
     </div>
