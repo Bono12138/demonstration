@@ -1,0 +1,1879 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>风险评估系统</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- React and ReactDOM CDNs -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <!-- Babel for JSX transformation -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            overflow: hidden; /* Prevent body scroll */
+        }
+        /* Custom styles for Lucide icons */
+        .lucide {
+            display: inline-block;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div id="root" class="flex h-screen bg-gray-100 font-sans"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // Dummy Save icon as it's not directly from lucide-react in HTML context
+        const SaveIcon = ({ size = 24, className = "" }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                <polyline points="7 3 7 8 15 8"></polyline>
+            </svg>
+        );
+
+        // Define Lucide icons as components for JSX
+        const Home = (props) => <i className="lucide lucide-home" {...props} />;
+        const ClipboardList = (props) => <i className="lucide lucide-clipboard-list" {...props} />;
+        const TrendingUp = (props) => <i className="lucide lucide-trending-up" {...props} />;
+        const FolderEdit = (props) => <i className="lucide lucide-folder-edit" {...props} />;
+        const LayoutDashboard = (props) => <i className="lucide lucide-layout-dashboard" {...props} />;
+        const Settings = (props) => <i className="lucide lucide-settings" {...props} />;
+        const User = (props) => <i className="lucide lucide-user" {...props} />;
+        const CheckCircle = (props) => <i className="lucide lucide-check-circle" {...props} />;
+        const XCircle = (props) => <i className="lucide lucide-x-circle" {...props} />;
+        const Clock = (props) => <i className="lucide lucide-clock" {...props} />;
+        const FileText = (props) => <i className="lucide lucide-file-text" {...props} />;
+        const Download = (props) => <i className="lucide lucide-download" {...props} />;
+        const Edit = (props) => <i className="lucide lucide-edit" {...props} />;
+        const Send = (props) => <i className="lucide lucide-send" {...props} />;
+        const MessageSquareText = (props) => <i className="lucide lucide-message-square-text" {...props} />;
+        const Search = (props) => <i className="lucide lucide-search" {...props} />;
+        const PlusCircle = (props) => <i className="lucide lucide-plus-circle" {...props} />;
+        const Copy = (props) => <i className="lucide lucide-copy" {...props} />;
+        const BarChart3 = (props) => <i className="lucide lucide-bar-chart-3" {...props} />;
+        const ChevronRight = (props) => <i className="lucide lucide-chevron-right" {...props} />;
+        const ChevronDown = (props) => <i className="lucide lucide-chevron-down" {...props} />;
+        const RefreshCcw = (props) => <i className="lucide lucide-refresh-ccw" {...props} />;
+        const Save = SaveIcon; // Map custom SaveIcon to Save
+
+        function App() {
+            const [userRole, setUserRole] = useState('RM'); // 'RM' or 'ASSESSOR'
+            const [currentView, setCurrentView] = useState('progressOverview'); // Changed initial view to progressOverview
+            const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+            const [expandedMenu, setExpandedMenu] = useState('');
+
+            // Dummy Data for simulation
+            const [assessmentTemplates, setAssessmentTemplates] = useState([
+                {
+                    id: 'template-2024',
+                    year: 2024,
+                    name: '2024年度风险评估模板',
+                    categories: [
+                        {
+                            name: '治理架构',
+                            weight: 20,
+                            items: [
+                                { id: 'item-1-1', description: '公司治理结构是否健全，职责分工是否清晰？', ref: '内部制度A', assignedDepartment: '所有部门' },
+                                { id: 'item-1-2', description: '董事会和管理层是否定期审查风险管理政策？', ref: '内部制度B', assignedDepartment: '董事会办公室' },
+                            ]
+                        },
+                        {
+                            name: '策略偏好与限额',
+                            weight: 25,
+                            items: [
+                                { id: 'item-2-1', description: '风险偏好声明是否已批准并有效传达？', ref: '政策文件C', assignedDepartment: '所有部门' },
+                                { id: 'item-2-2', description: '风险限额是否明确并定期监控？', ref: '政策文件D', assignedDepartment: '财务部' },
+                            ]
+                        },
+                        {
+                            name: '政策程序',
+                            weight: 20,
+                            items: [
+                                { id: 'item-3-1', description: '风险管理政策和程序是否最新且易于访问？', ref: '操作手册E', assignedDepartment: '所有部门' },
+                                { id: 'item-3-2', description: '是否有定期培训确保员工理解政策？', ref: '培训指南F', assignedDepartment: '人力资源部' },
+                            ]
+                        },
+                        {
+                            name: '系统与数据',
+                            weight: 15,
+                            items: [
+                                { id: 'item-4-1', description: '风险管理系统是否稳定运行并有效支持决策？', ref: 'IT政策G', assignedDepartment: 'IT部' },
+                                { id: 'item-4-2', description: '风险数据是否准确、完整且及时？', ref: '数据管理H', assignedDepartment: '数据中心' },
+                            ]
+                        },
+                        {
+                            name: '内部控制与审计',
+                            weight: 20,
+                            items: [
+                                { id: 'item-5-1', description: '内部控制体系是否健全有效？', ref: '内控手册I', assignedDepartment: '审计部' },
+                                { id: 'item-5-2', description: '内部审计是否独立且定期评估风险管理？', ref: '审计章程J', assignedDepartment: '审计部' },
+                            ]
+                        },
+                    ],
+                    annualSummaryQuestions: [
+                        '本年度工作成果',
+                        '本年度遇到的问题或缺陷',
+                        '下年度工作计划',
+                    ]
+                },
+                {
+                    id: 'template-2023',
+                    year: 2023,
+                    name: '2023年度风险评估模板',
+                    categories: [
+                        {
+                            name: '治理架构',
+                            weight: 20,
+                            items: [
+                                { id: 'item-a-1', description: '公司治理结构是否健全，职责分工是否清晰？', ref: '内部制度A', assignedDepartment: '所有部门' },
+                            ]
+                        },
+                        {
+                            name: '策略偏好与限额',
+                            weight: 25,
+                            items: [
+                                { id: 'item-b-1', description: '风险偏好声明是否已批准并有效传达？', ref: '政策文件C', assignedDepartment: '所有部门' },
+                            ]
+                        },
+                    ],
+                    annualSummaryQuestions: [
+                        '本年度工作成果',
+                        '本年度遇到的问题或缺陷',
+                        '下年度工作计划',
+                    ]
+                },
+            ]);
+
+            const [assessmentTasks, setAssessmentTasks] = useState([
+                {
+                    id: 'task-001',
+                    templateId: 'template-2024',
+                    year: 2024,
+                    riskType: '战略风险',
+                    department: '市场部',
+                    status: '待填写', // 待填写, 已提交, 已驳回, 已复核
+                    // Added example data for task-001
+                    data: {
+                        'item-1-1': { score: 4, explanation: '公司治理结构健全，部门职责明确，有效支持风险管理。', files: [], rmComment: '', history: [{ timestamp: '2024-06-27 10:00:00', editor: 'ASSESSOR', score: 4, explanation: '公司治理结构健全，部门职责明确，有效支持风险管理。', rmComment: '' }] },
+                        'item-1-2': { score: 3, explanation: '董事会和管理层定期审查风险管理政策，但会议频率可适当增加以应对快速变化的市场。', files: [], rmComment: '', history: [{ timestamp: '2024-06-27 10:05:00', editor: 'ASSESSOR', score: 3, explanation: '董事会和管理层定期审查风险管理政策，但会议频率可适当增加以应对快速变化的市场。', rmComment: '' }] },
+                        'item-2-1': { score: 5, explanation: '风险偏好声明已通过内部培训和宣贯会全面传达至各层级员工，理解度高。', files: [], rmComment: '', history: [{ timestamp: '2024-06-27 10:10:00', editor: 'ASSESSOR', score: 5, explanation: '风险偏好声明已通过内部培训和宣贯会全面传达至各层级员工，理解度高。', rmComment: '' }] },
+                        'annual-summary-0': '本年度市场部完成了新产品线的市场调研与风险评估，成功规避了潜在的市场进入风险。',
+                        'annual-summary-1': '新市场拓展过程中，对当地政策法规的理解存在滞后性，导致部分业务推进受阻。',
+                        'annual-summary-2': '下年度计划加强国际市场法律顾问团队建设，并引入风险预警系统，提升市场风险识别能力。',
+                    },
+                    comments: [],
+                },
+                {
+                    id: 'task-002',
+                    templateId: 'template-2024',
+                    year: 2024,
+                    riskType: '合规风险',
+                    department: '法务部',
+                    status: '已提交',
+                    data: {
+                        'item-1-1': { score: 4, explanation: '治理结构良好，分工明确。', files: [], rmComment: '', history: [{ timestamp: '2024-06-27 09:00:00', editor: 'ASSESSOR', score: 4, explanation: '治理结构良好，分工明确。', rmComment: '' }] },
+                        'item-1-2': { score: 3, explanation: '董事会定期审查，但效率有待提升。', files: [], rmComment: '', history: [{ timestamp: '2024-06-27 09:05:00', editor: 'ASSESSOR', score: 3, explanation: '董事会定期审查，但效率有待提升。', rmComment: '' }] },
+                        'item-2-1': { score: 5, explanation: '风险偏好声明已全面宣贯。', files: [], rmComment: '', history: [{ timestamp: '2024-06-27 09:10:00', editor: 'ASSESSOR', score: 5, explanation: '风险偏好声明已全面宣贯。', rmComment: '' }] },
+                        'annual-summary-0': '完成年度法律风险自查，合规体系进一步完善。',
+                        'annual-summary-1': '合同审批流程仍存在效率瓶颈。',
+                        'annual-summary-2': '下年度计划引入AI辅助合同审查系统。',
+                    },
+                    comments: [],
+                },
+                {
+                    id: 'task-003',
+                    templateId: 'template-2024',
+                    year: 2024,
+                    riskType: '市场风险',
+                    department: '销售部',
+                    status: '已驳回',
+                    data: {
+                        'item-1-1': { score: 3, explanation: '部分区域市场负责人权责不明。', files: [], rmComment: 'RM认为此项说明不够具体，请补充。', history: [{ timestamp: '2024-06-27 09:20:00', editor: 'ASSESSOR', score: 3, explanation: '部分区域市场负责人权责不明。', rmComment: '' }, { timestamp: '2024-06-27 10:30:00', editor: 'RM', score: 3, explanation: '部分区域市场负责人权责不明。', rmComment: 'RM认为此项说明不够具体，请补充。' }] },
+                        'annual-summary-0': '销售额达到预期，市场份额稳固。',
+                        'annual-summary-1': '新产品推广遇阻，市场反馈不及预期。',
+                        'annual-summary-2': '下年度计划加强市场调研，调整产品策略。',
+                    },
+                    comments: [{ from: 'RM', text: '请补充具体区域及问题描述。', timestamp: new Date().toLocaleString() }],
+                },
+                {
+                    id: 'task-004',
+                    templateId: 'template-2024',
+                    year: 2024,
+                    riskType: '战略风险',
+                    department: '高层管理',
+                    status: '已复核',
+                    data: {
+                        'item-1-1': { score: 5, explanation: '公司战略目标明确，各层级执行力强。', files: [], rmComment: '此项评估准确，无异议。', history: [{ timestamp: '2024-06-27 09:40:00', editor: 'ASSESSOR', score: 5, explanation: '公司战略目标明确，各层级执行力强。', rmComment: '' }, { timestamp: '2024-06-27 11:00:00', editor: 'RM', score: 5, explanation: '公司战略目标明确，各层级执行力强。', rmComment: '此项评估准确，无异议。' }] },
+                        'annual-summary-0': '年度战略目标全面达成。',
+                        'annual-summary-1': '国际市场拓展面临文化差异挑战。',
+                        'annual-summary-2': '下年度计划深化本地化战略，加强国际合作。',
+                    },
+                    comments: [{ from: 'RM', text: '复核通过，报告内容详实。', timestamp: new Date().toLocaleString() }],
+                },
+            ]);
+
+            const departments = ['市场部', '法务部', '销售部', '人力资源部', 'IT部', '财务部', '董事会办公室', '数据中心', '审计部', '高层管理'];
+            const riskTypes = ['战略风险', '合规风险', '市场风险', '操作风险', '财务风险'];
+            const assessmentYears = [2024, 2023, 2022, 2021];
+            const assessmentCategories = ['治理架构', '策略偏好与限额', '政策程序', '系统与数据', '内部控制与审计'];
+
+            const calculateProgress = (tasks) => {
+                if (tasks.length === 0) return 0;
+                const completedTasks = tasks.filter(task => task.status === '已复核').length;
+                return Math.round((completedTasks / tasks.length) * 100);
+            };
+
+            const getDepartmentProgress = (department) => {
+                const departmentTasks = assessmentTasks.filter(task => task.department === department);
+                return calculateProgress(departmentTasks);
+            };
+
+            const getOverallProgress = () => {
+                return calculateProgress(assessmentTasks);
+            };
+
+            const Sidebar = () => (
+                <div className={`bg-gray-800 text-white flex flex-col transition-all duration-300 ${isSidebarOpen ? 'w-64' : 'w-20'} h-screen rounded-r-xl shadow-lg`}>
+                    <div className="flex items-center justify-between p-4 bg-gray-900 rounded-tr-xl">
+                        {isSidebarOpen && <h1 className="text-xl font-bold text-teal-400">风险评估系统</h1>}
+                        <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="p-2 rounded-full hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-teal-500">
+                            {isSidebarOpen ? <ChevronRight size={20} /> : <ChevronDown size={20} />}
+                        </button>
+                    </div>
+                    <nav className="flex-1 overflow-y-auto mt-2">
+                        <CollapsibleNavItem
+                            icon={<ClipboardList size={20} />}
+                            text="历史评估记录"
+                            isSidebarOpen={isSidebarOpen}
+                            expanded={expandedMenu === 'history'}
+                            setExpanded={() => setExpandedMenu(expandedMenu === 'history' ? '' : 'history')}
+                        >
+                            <SubNavItem
+                                text="自评估报告记录"
+                                target="historicalReports"
+                                isSidebarOpen={isSidebarOpen}
+                                onClick={() => setCurrentView('historicalReports')}
+                            />
+                            <SubNavItem
+                                text="风险热力图记录"
+                                target="heatmapRecords"
+                                isSidebarOpen={isSidebarOpen}
+                                onClick={() => setCurrentView('heatmapRecords')}
+                            />
+                        </CollapsibleNavItem>
+
+                        <CollapsibleNavItem
+                            icon={<FolderEdit size={20} />}
+                            text="当前评估管理"
+                            isSidebarOpen={isSidebarOpen}
+                            expanded={expandedMenu === 'current'}
+                            setExpanded={() => setExpandedMenu(expandedMenu === 'current' ? '' : 'current')}
+                        >
+                            {userRole === 'RM' && (
+                                <SubNavItem
+                                    text="评估模板管理"
+                                    target="templateManagement"
+                                    isSidebarOpen={isSidebarOpen}
+                                    onClick={() => setCurrentView('templateManagement')}
+                                />
+                            )}
+                            <SubNavItem
+                                text="风险评估填报"
+                                target="riskAssessmentFill"
+                                isSidebarOpen={isSidebarOpen}
+                                onClick={() => setCurrentView('riskAssessmentFill')}
+                            />
+                            {userRole === 'RM' && (
+                                <SubNavItem
+                                    text="风险评估复核"
+                                    target="riskAssessmentReview"
+                                    isSidebarOpen={isSidebarOpen}
+                                    onClick={() => setCurrentView('riskAssessmentReview')}
+                                />
+                            )}
+                            <SubNavItem
+                                text="评估进度概览"
+                                target="progressOverview"
+                                isSidebarOpen={isSidebarOpen}
+                                onClick={() => setCurrentView('progressOverview')}
+                            />
+                        </CollapsibleNavItem>
+                    </nav>
+                    <div className="p-4 border-t border-gray-700">
+                        <button
+                            onClick={() => setUserRole(userRole === 'RM' ? 'ASSESSOR' : 'RM')}
+                            className="flex items-center w-full px-3 py-2 rounded-lg text-sm font-medium text-left transition-colors duration-200 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                        >
+                            <User size={18} className="mr-3" />
+                            {isSidebarOpen ? (userRole === 'RM' ? '切换为部门评估人' : '切换为风险管理部') : ''}
+                        </button>
+                    </div>
+                </div>
+            );
+
+            const NavItem = ({ icon, text, target, isSidebarOpen, onClick }) => (
+                <button
+                    onClick={onClick}
+                    className={`flex items-center w-full px-4 py-3 rounded-lg text-left transition-colors duration-200 ${currentView === target ? 'bg-teal-600 text-white' : 'hover:bg-gray-700'}`}
+                >
+                    {icon}
+                    {isSidebarOpen && <span className="ml-3 text-base">{text}</span>}
+                </button>
+            );
+
+            const CollapsibleNavItem = ({ icon, text, isSidebarOpen, expanded, setExpanded, children }) => (
+                <div>
+                    <button
+                        onClick={setExpanded}
+                        className={`flex items-center w-full px-4 py-3 rounded-lg text-left transition-colors duration-200 hover:bg-gray-700`}
+                    >
+                        {icon}
+                        {isSidebarOpen && (
+                            <span className="ml-3 text-base flex-1">{text}</span>
+                        )}
+                        {isSidebarOpen && (expanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />)}
+                    </button>
+                    {isSidebarOpen && expanded && (
+                        <div className="ml-6 border-l border-gray-600 pl-2">
+                            {children}
+                        </div>
+                    )}
+                </div>
+            );
+
+            const SubNavItem = ({ text, target, isSidebarOpen, onClick }) => (
+                <button
+                    onClick={onClick}
+                    className={`flex items-center w-full px-3 py-2 rounded-lg text-left transition-colors duration-200 ${currentView === target ? 'bg-teal-700 text-white' : 'hover:bg-gray-600'} text-sm`}
+                >
+                    {isSidebarOpen && <span className="ml-3">{text}</span>}
+                </button>
+            );
+
+            const HistoricalReports = () => {
+                const [selectedYear, setSelectedYear] = useState('');
+                const [selectedRiskType, setSelectedRiskType] = useState('');
+
+                const filteredReports = assessmentTasks.filter(task => {
+                    const matchesYear = selectedYear ? task.year.toString() === selectedYear : true;
+                    const matchesRiskType = selectedRiskType ? task.riskType === selectedRiskType : true;
+                    const matchesRole = userRole === 'RM' || task.department === '法务部'; // Dept assessor only sees their department
+                    return task.status === '已复核' && matchesYear && matchesRiskType && matchesRole;
+                });
+
+                return (
+                    <div className="p-8 bg-gray-50 flex-1 overflow-auto rounded-xl shadow-lg">
+                        <h2 className="text-3xl font-extrabold text-gray-800 mb-6 border-b-2 pb-2 border-teal-500">自评估报告记录</h2>
+                        <div className="bg-white p-6 rounded-lg shadow-md mb-8">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                                <div>
+                                    <label htmlFor="year-filter" className="block text-sm font-medium text-gray-700 mb-1">年份</label>
+                                    <select
+                                        id="year-filter"
+                                        className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm rounded-md"
+                                        value={selectedYear}
+                                        onChange={(e) => setSelectedYear(e.target.value)}
+                                    >
+                                        <option value="">所有年份</option>
+                                        {assessmentYears.map(year => <option key={year} value={year}>{year}</option>)}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label htmlFor="risk-type-filter" className="block text-sm font-medium text-gray-700 mb-1">风险类型</label>
+                                    <select
+                                        id="risk-type-filter"
+                                        className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm rounded-md"
+                                        value={selectedRiskType}
+                                        onChange={(e) => setSelectedRiskType(e.target.value)}
+                                    >
+                                        <option value="">所有类型</option>
+                                        {riskTypes.map(type => <option key={type} value={type}>{type}</option>)}
+                                    </select>
+                                </div>
+                            </div>
+                            <button className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500">
+                                <Download size={18} className="mr-2" />
+                                导出报告 (Word/PDF)
+                            </button>
+                        </div>
+
+                        <div className="overflow-x-auto rounded-lg shadow">
+                            <table className="min-w-full divide-y divide-gray-200">
+                                <thead className="bg-gray-50">
+                                    <tr>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">评估年份</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">风险类型</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">所属部门</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">状态</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="bg-white divide-y divide-gray-200">
+                                    {filteredReports.length === 0 ? (
+                                        <tr>
+                                            <td colSpan="5" className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">无数据</td>
+                                        </tr>
+                                    ) : (
+                                        filteredReports.map(report => (
+                                            <tr key={report.id}>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{report.year}</td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{report.riskType}</td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{report.department}</td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm">
+                                                    <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                                        {report.status}
+                                                    </span>
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                                    <button onClick={() => alert(`查看 ${report.year} ${report.riskType} 报告详情`)} className="text-teal-600 hover:text-teal-900">
+                                                        查看报告
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                );
+            };
+
+            const RiskHeatmapRecords = () => {
+                const [selectedYear, setSelectedYear] = useState('2024');
+                const [selectedRiskCategory, setSelectedRiskCategory] = useState('');
+
+                // Dummy data for heatmap scores
+                const heatmapData = {
+                    2024: {
+                        '战略风险': { '治理架构': 3, '策略偏好与限额': 4, '政策程序': 2, '系统与数据': 3, '内部控制与审计': 4 },
+                        '合规风险': { '治理架构': 2, '策略偏好与限额': 3, '政策程序': 4, '系统与数据': 3, '内部控制与审计': 3 },
+                        '市场风险': { '治理架构': 4, '策略偏好与限额': 3, '政策程序': 2, '系统与数据': 4, '内部控制与审计': 3 },
+                        '操作风险': { '治理架构': 3, '策略偏好与限额': 2, '政策程序': 3, '系统与数据': 4, '内部控制与审计': 3 },
+                        '财务风险': { '治理架构': 2, '策略偏好与限额': 3, '政策程序': 3, '系统与数据': 2, '内部控制与审计': 4 },
+                    },
+                    2023: {
+                        '战略风险': { '治理架构': 2, '策略偏好与限额': 3, '政策程序': 3, '系统与数据': 4, '内部控制与审计': 3 },
+                        '合规风险': { '治理架构': 3, '策略偏好与限额': 2, '政策程序': 3, '系统与数据': 4, '内部控制与审计': 2 },
+                    }
+                };
+
+                const currentHeatmap = heatmapData[selectedYear] || {};
+                const categoriesForHeatmap = Object.keys(currentHeatmap);
+
+                const getScoreColor = (score) => {
+                    if (!score) return 'bg-gray-200 text-gray-700'; // No data
+                    if (score >= 4) return 'bg-red-600 text-white'; // High risk
+                    if (score === 3) return 'bg-orange-400 text-white'; // Medium risk
+                    if (score <= 2) return 'bg-green-500 text-white'; // Low risk
+                    return 'bg-gray-200 text-gray-700';
+                };
+
+                // Calculation logic for total score
+                const calculateOverallScore = (year, category) => {
+                    const template = assessmentTemplates.find(t => t.year.toString() === year);
+                    if (!template || !currentHeatmap[category]) return 'N/A';
+
+                    let totalWeightedScore = 0;
+                    let totalWeight = 0;
+
+                    template.categories.forEach(cat => {
+                        const categoryScore = currentHeatmap[category]?.[cat.name];
+                        if (categoryScore !== undefined) {
+                            totalWeightedScore += categoryScore * (cat.weight / 100);
+                            totalWeight += (cat.weight / 100);
+                        }
+                    });
+                    return totalWeight > 0 ? (totalWeightedScore / totalWeight).toFixed(1) : 'N/A';
+                };
+
+
+                return (
+                    <div className="p-8 bg-gray-50 flex-1 overflow-auto rounded-xl shadow-lg">
+                        <h2 className="text-3xl font-extrabold text-gray-800 mb-6 border-b-2 pb-2 border-teal-500">风险热力图记录</h2>
+                        <div className="bg-white p-6 rounded-lg shadow-md mb-8">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                                <div>
+                                    <label htmlFor="year-filter" className="block text-sm font-medium text-gray-700 mb-1">评估年份</label>
+                                    <select
+                                        id="year-filter"
+                                        className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm rounded-md"
+                                        value={selectedYear}
+                                        onChange={(e) => setSelectedYear(e.target.value)}
+                                    >
+                                        {assessmentYears.map(year => <option key={year} value={year}>{year}</option>)}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label htmlFor="risk-category-filter" className="block text-sm font-medium text-gray-700 mb-1">风险类别</label>
+                                    <select
+                                        id="risk-category-filter"
+                                        className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm rounded-md"
+                                        value={selectedRiskCategory}
+                                        onChange={(e) => setSelectedRiskCategory(e.target.value)}
+                                    >
+                                        <option value="">所有类别</option>
+                                        {riskTypes.map(type => <option key={type} value={type}>{type}</option>)}
+                                    </select>
+                                </div>
+                            </div>
+                            <div className="mb-4">
+                                <h4 className="text-lg font-semibold text-gray-800 mb-2">图例:</h4>
+                                <div className="flex space-x-4">
+                                    <div className="flex items-center">
+                                        <span className="w-6 h-6 rounded-md bg-green-500 mr-2"></span>
+                                        <span className="text-sm text-gray-700">低风险 (1-2分)</span>
+                                    </div>
+                                    <div className="flex items-center">
+                                        <span className="w-6 h-6 rounded-md bg-orange-400 mr-2"></span>
+                                        <span className="text-sm text-gray-700">中风险 (3分)</span>
+                                    </div>
+                                    <div className="flex items-center">
+                                        <span className="w-6 h-6 rounded-md bg-red-600 mr-2"></span>
+                                        <span className="text-sm text-gray-700">高风险 (4-5分)</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="overflow-x-auto rounded-lg shadow">
+                            <table className="min-w-full divide-y divide-gray-200">
+                                <thead className="bg-gray-50">
+                                    <tr>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">风险类型</th>
+                                        {assessmentCategories.map(cat => (
+                                            <th key={cat} className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">{cat}</th>
+                                        ))}
+                                        <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">自评总分</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="bg-white divide-y divide-gray-200">
+                                    {categoriesForHeatmap
+                                        .filter(cat => selectedRiskCategory ? cat === selectedRiskCategory : true)
+                                        .map(riskCat => (
+                                            <tr key={riskCat}>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{riskCat}</td>
+                                                {assessmentCategories.map(subCat => (
+                                                    <td key={subCat} className={`px-6 py-4 whitespace-nowrap text-sm text-center ${getScoreColor(currentHeatmap[riskCat]?.[subCat])}`}>
+                                                        {currentHeatmap[riskCat]?.[subCat] || '-'}
+                                                    </td>
+                                                ))}
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-center font-bold text-gray-900">
+                                                    {calculateOverallScore(selectedYear, riskCat)}
+                                                </td>
+                                            </tr>
+                                        ))
+                                    }
+                                    {categoriesForHeatmap.filter(cat => selectedRiskCategory ? cat === selectedRiskCategory : true).length === 0 && (
+                                        <tr>
+                                            <td colSpan={assessmentCategories.length + 2} className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">无数据</td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                );
+            };
+
+            const AssessmentTemplateManagement = () => {
+                const [newTemplateYear, setNewTemplateYear] = useState('');
+                const [selectedTemplate, setSelectedTemplate] = useState(assessmentTemplates[0]);
+                const [isCreatingNewTemplate, setIsCreatingNewTemplate] = useState(false);
+                const [showDetailModal, setShowDetailModal] = useState(false);
+                const [modalContent, setModalContent] = useState('');
+                const [copiedTemplateYear, setCopiedTemplateYear] = useState('');
+
+                const handleCopyTemplate = () => {
+                    if (!copiedTemplateYear) {
+                        alert('请选择要复制的年份！');
+                        return;
+                    }
+                    const sourceTemplate = assessmentTemplates.find(t => t.year.toString() === copiedTemplateYear);
+                    if (sourceTemplate) {
+                        const newTemplate = {
+                            ...sourceTemplate,
+                            id: `template-${newTemplateYear}`,
+                            year: parseInt(newTemplateYear),
+                            name: `${newTemplateYear}年度风险评估模板`,
+                        };
+                        setAssessmentTemplates([...assessmentTemplates, newTemplate]);
+                        setNewTemplateYear('');
+                        setCopiedTemplateYear('');
+                        alert(`${newTemplateYear}年度模板已从${copiedTemplateYear}复制成功！`);
+                    } else {
+                        alert('未找到源模板。');
+                    }
+                };
+
+                const handleCreateTemplate = () => {
+                    if (!newTemplateYear) {
+                        alert('请填写模板年份！');
+                        return;
+                    }
+                    const newTemplate = {
+                        id: `template-${newTemplateYear}`,
+                        year: parseInt(newTemplateYear),
+                        name: `${newTemplateYear}年度风险评估模板`,
+                        categories: assessmentCategories.map(cat => ({
+                            name: cat,
+                            weight: 20, // Default weight
+                            items: [{ id: `${cat}-new`, description: '新子评估项描述', ref: '制度参考', assignedDepartment: '所有部门' }]
+                        })),
+                        annualSummaryQuestions: [
+                            '本年度工作成果',
+                            '本年度遇到的问题或缺陷',
+                            '下年度工作计划',
+                        ]
+                    };
+                    setAssessmentTemplates([...assessmentTemplates, newTemplate]);
+                    setSelectedTemplate(newTemplate);
+                    setNewTemplateYear('');
+                    setIsCreatingNewTemplate(false);
+                    alert(`${newTemplateYear}年度新模板已创建成功！`);
+                };
+
+                const handleDistributeTasks = (templateId) => {
+                    const template = assessmentTemplates.find(t => t.id === templateId);
+                    if (template) {
+                        // Simulate task distribution: create tasks for each risk type/department combination
+                        const newTasks = [];
+                        riskTypes.forEach(rType => {
+                            departments.forEach(dept => {
+                                // Only create if a task for this department/riskType for this year doesn't exist
+                                const existingTask = assessmentTasks.find(t => t.year === template.year && t.riskType === rType && t.department === dept);
+                                if (!existingTask) {
+                                    newTasks.push({
+                                        id: `task-${Date.now()}-${rType}-${dept}`,
+                                        templateId: template.id,
+                                        year: template.year,
+                                        riskType: rType,
+                                        department: dept,
+                                        status: '待填写',
+                                        data: {},
+                                        comments: [],
+                                    });
+                                }
+                            });
+                        });
+                        setAssessmentTasks([...assessmentTasks, ...newTasks]);
+                        alert(`已向各部门分发 ${template.year} 年度评估任务！`);
+                    }
+                };
+
+                const handleUpdateCategoryWeight = (categoryName, newWeight) => {
+                    const updatedTemplate = { ...selectedTemplate };
+                    updatedTemplate.categories = updatedTemplate.categories.map(cat =>
+                        cat.name === categoryName ? { ...cat, weight: parseInt(newWeight) } : cat
+                    );
+                    setSelectedTemplate(updatedTemplate);
+                    setAssessmentTemplates(assessmentTemplates.map(t => t.id === updatedTemplate.id ? updatedTemplate : t));
+                };
+
+                const handleAddItem = (categoryName) => {
+                    const updatedTemplate = { ...selectedTemplate };
+                    updatedTemplate.categories = updatedTemplate.categories.map(cat => {
+                        if (cat.name === categoryName) {
+                            return {
+                                ...cat,
+                                items: [...cat.items, { id: `${Date.now()}`, description: '新的子评估项描述', ref: '', assignedDepartment: '所有部门' }]
+                            };
+                        }
+                        return cat;
+                    });
+                    setSelectedTemplate(updatedTemplate);
+                    setAssessmentTemplates(assessmentTemplates.map(t => t.id === updatedTemplate.id ? updatedTemplate : t));
+                };
+
+                const handleUpdateItem = (categoryName, itemId, field, value) => {
+                    const updatedTemplate = { ...selectedTemplate };
+                    updatedTemplate.categories = updatedTemplate.categories.map(cat => {
+                        if (cat.name === categoryName) {
+                            return {
+                                ...cat,
+                                items: cat.items.map(item =>
+                                    item.id === itemId ? { ...item, [field]: value } : item
+                                )
+                            };
+                        }
+                        return cat;
+                    });
+                    setSelectedTemplate(updatedTemplate);
+                    setAssessmentTemplates(assessmentTemplates.map(t => t.id === updatedTemplate.id ? updatedTemplate : t));
+                };
+
+                return (
+                    <div className="p-8 bg-gray-50 flex-1 overflow-auto rounded-xl shadow-lg">
+                        <h2 className="text-3xl font-extrabold text-gray-800 mb-6 border-b-2 pb-2 border-teal-500">评估模板管理</h2>
+
+                        <div className="bg-white p-6 rounded-lg shadow-md mb-8">
+                            <h3 className="text-2xl font-semibold text-gray-800 mb-4">模板操作</h3>
+                            <div className="flex flex-wrap items-end gap-4 mb-6">
+                                <div>
+                                    <label htmlFor="new-template-year" className="block text-sm font-medium text-gray-700">新建模板年份</label>
+                                    <input
+                                        type="number"
+                                        id="new-template-year"
+                                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm"
+                                        value={newTemplateYear}
+                                        onChange={(e) => setNewTemplateYear(e.target.value)}
+                                        placeholder="例如: 2025"
+                                    />
+                                </div>
+                                <button
+                                    onClick={() => setIsCreatingNewTemplate(true)}
+                                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+                                >
+                                    <PlusCircle size={18} className="mr-2" />
+                                    创建新评估模板
+                                </button>
+                                <div className="ml-auto flex items-end gap-4">
+                                    <div>
+                                        <label htmlFor="copy-from-year" className="block text-sm font-medium text-gray-700">复制上一年模板</label>
+                                        <select
+                                            id="copy-from-year"
+                                            className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm rounded-md"
+                                            value={copiedTemplateYear}
+                                            onChange={(e) => setCopiedTemplateYear(e.target.value)}
+                                        >
+                                            <option value="">选择年份</option>
+                                            {assessmentTemplates.map(t => <option key={t.id} value={t.year}>{t.year}</option>)}
+                                        </select>
+                                    </div>
+                                    <button
+                                        onClick={handleCopyTemplate}
+                                        className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                    >
+                                        <Copy size={18} className="mr-2" />
+                                        复制模板
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        {isCreatingNewTemplate && (
+                            <div className="bg-white p-6 rounded-lg shadow-md mb-8">
+                                <h3 className="text-xl font-semibold text-gray-800 mb-4">新建模板确认</h3>
+                                <p className="text-gray-700 mb-4">您确定要创建 <span className="font-bold">{newTemplateYear}</span> 年的空白评估模板吗？</p>
+                                <div className="flex gap-4">
+                                    <button
+                                        onClick={handleCreateTemplate}
+                                        className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                                    >
+                                        确认创建
+                                    </button>
+                                    <button
+                                        onClick={() => setIsCreatingNewTemplate(false)}
+                                        className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+                                    >
+                                        取消
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="bg-white p-6 rounded-lg shadow-md mb-8">
+                            <h3 className="text-2xl font-semibold text-gray-800 mb-4">选择并编辑模板</h3>
+                            <select
+                                className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm rounded-md mb-4"
+                                value={selectedTemplate.id}
+                                onChange={(e) => setSelectedTemplate(assessmentTemplates.find(t => t.id === e.target.value))}
+                            >
+                                {assessmentTemplates.map(template => (
+                                    <option key={template.id} value={template.id}>{template.name}</option>
+                                ))}
+                            </select>
+
+                            {selectedTemplate && (
+                                <div className="border border-gray-200 p-6 rounded-lg bg-gray-50">
+                                    <h4 className="text-xl font-bold text-gray-800 mb-4">{selectedTemplate.name}</h4>
+
+                                    <div className="mb-6">
+                                        <button
+                                            onClick={() => handleDistributeTasks(selectedTemplate.id)}
+                                            className="inline-flex items-center px-5 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+                                        >
+                                            <Send size={20} className="mr-2" />
+                                            向各部门分发评估任务
+                                        </button>
+                                        <p className="text-sm text-gray-500 mt-2">点击此按钮将模板分发为年度评估任务，并通知相关部门。</p>
+                                    </div>
+
+                                    {selectedTemplate.categories.map((category, catIndex) => (
+                                        <div key={category.name} className="mb-6 p-4 border border-gray-200 rounded-lg bg-white shadow-sm">
+                                            <div className="flex items-center justify-between mb-3">
+                                                <h5 className="text-lg font-semibold text-gray-800">{category.name}</h5>
+                                                <div className="flex items-center gap-2">
+                                                    <label className="text-sm font-medium text-gray-700">权重:</label>
+                                                    <input
+                                                        type="number"
+                                                        min="0"
+                                                        max="100"
+                                                        value={category.weight}
+                                                        onChange={(e) => handleUpdateCategoryWeight(category.name, e.target.value)}
+                                                        className="w-20 px-2 py-1 border border-gray-300 rounded-md text-sm text-center"
+                                                    />
+                                                    <span className="text-gray-600">%</span>
+                                                </div>
+                                            </div>
+                                            {category.items.map((item, itemIndex) => (
+                                                <div key={item.id} className="mb-4 p-3 border border-gray-100 rounded-md bg-gray-50">
+                                                    <div className="flex flex-col gap-2">
+                                                        <div>
+                                                            <label className="block text-sm font-medium text-gray-700">描述:</label>
+                                                            <textarea
+                                                                value={item.description}
+                                                                onChange={(e) => handleUpdateItem(category.name, item.id, 'description', e.target.value)}
+                                                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm"
+                                                                rows="2"
+                                                            ></textarea>
+                                                        </div>
+                                                        <div className="flex items-center gap-4">
+                                                            <div className="flex-1">
+                                                                <label className="block text-sm font-medium text-gray-700">内外部制度参考:</label>
+                                                                <input
+                                                                    type="text"
+                                                                    value={item.ref}
+                                                                    onChange={(e) => handleUpdateItem(category.name, item.id, 'ref', e.target.value)}
+                                                                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm"
+                                                                />
+                                                            </div>
+                                                            <button
+                                                                onClick={() => { setModalContent(`制度详情: ${item.ref || '无'}`); setShowDetailModal(true); }}
+                                                                className="px-3 py-2 bg-gray-200 text-gray-800 text-xs rounded-md hover:bg-gray-300"
+                                                            >
+                                                                查看详情
+                                                            </button>
+                                                        </div>
+                                                        <div>
+                                                            <label className="block text-sm font-medium text-gray-700">指定负责填写部门:</label>
+                                                            <select
+                                                                value={item.assignedDepartment}
+                                                                onChange={(e) => handleUpdateItem(category.name, item.id, 'assignedDepartment', e.target.value)}
+                                                                className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm rounded-md"
+                                                            >
+                                                                {departments.map(dept => <option key={dept} value={dept}>{dept}</option>)}
+                                                            </select>
+                                                        </div>
+                                                        <div>
+                                                            <label className="block text-sm font-medium text-gray-700">支持性文件说明框:</label>
+                                                            <textarea
+                                                                value={`请上传与 "${item.description}" 相关的支持性文件。`} // Fixed dummy text for now
+                                                                disabled
+                                                                className="mt-1 block w-full px-3 py-2 border border-gray-200 rounded-md shadow-sm bg-gray-100 text-gray-600 sm:text-sm resize-none"
+                                                                rows="1"
+                                                            ></textarea>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                            <button
+                                                onClick={() => handleAddItem(category.name)}
+                                                className="mt-3 inline-flex items-center px-4 py-2 border border-dashed border-teal-300 text-sm font-medium rounded-md text-teal-600 bg-teal-50 hover:bg-teal-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+                                            >
+                                                <PlusCircle size={16} className="mr-2" />
+                                                添加子评估项
+                                            </button>
+                                        </div>
+                                    ))}
+
+                                    <div className="mb-6 p-4 border border-gray-200 rounded-lg bg-white shadow-sm">
+                                        <h5 className="text-lg font-semibold text-gray-800 mb-3">年度总结问题 (无需分配部门填写)</h5>
+                                        {selectedTemplate.annualSummaryQuestions.map((q, index) => (
+                                            <div key={index} className="mb-2">
+                                                <input
+                                                    type="text"
+                                                    value={q}
+                                                    disabled // For demonstration, assume these are fixed
+                                                    className="mt-1 block w-full px-3 py-2 border border-gray-200 rounded-md shadow-sm bg-gray-100 text-gray-600 sm:text-sm"
+                                                />
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        {showDetailModal && (
+                            <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
+                                <div className="bg-white p-6 rounded-lg shadow-xl max-w-md w-full">
+                                    <h3 className="text-lg font-bold mb-4">制度详情</h3>
+                                    <p className="text-gray-700 mb-6">{modalContent}</p>
+                                    <button
+                                        onClick={() => setShowDetailModal(false)}
+                                        className="px-4 py-2 bg-teal-600 text-white rounded-md hover:bg-teal-700"
+                                    >
+                                        关闭
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                );
+            };
+
+            const RiskAssessmentFill = () => {
+                const [selectedTask, setSelectedTask] = useState(null);
+                const [taskData, setTaskData] = useState({});
+                const [showSaveSuccess, setShowSaveSuccess] = useState(false);
+                const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
+
+                useEffect(() => {
+                    if (selectedTask) {
+                        setTaskData(selectedTask.data || {});
+                    } else {
+                        // Find the first '待填写' task for the current department, for demo purposes
+                        const firstToDoTask = assessmentTasks.find(
+                            task => task.department === '市场部' && (task.status === '待填写' || task.status === '已驳回')
+                        );
+                        setSelectedTask(firstToDoTask);
+                        setTaskData(firstToDoTask?.data || {});
+                    }
+                }, [selectedTask, assessmentTasks]);
+
+                if (!selectedTask) {
+                    return (
+                        <div className="p-8 bg-gray-50 flex-1 overflow-auto rounded-xl shadow-lg">
+                            <h2 className="text-3xl font-extrabold text-gray-800 mb-6 border-b-2 pb-2 border-teal-500">风险评估填报</h2>
+                            <div className="bg-white p-6 rounded-lg shadow-md text-center text-gray-600">
+                                <p className="mb-4">您当前没有待填写的风险评估任务。</p>
+                                <p>请联系风险管理部获取新的评估任务。</p>
+                            </div>
+                        </div>
+                    );
+                }
+
+                const template = assessmentTemplates.find(t => t.id === selectedTask.templateId);
+                if (!template) return <div className="p-8 bg-gray-50 flex-1 overflow-auto rounded-xl shadow-lg">模板未找到。</div>;
+
+                const handleScoreChange = (itemId, score) => {
+                    setTaskData(prevData => ({
+                        ...prevData,
+                        [itemId]: { ...(prevData[itemId] || {}), score: parseInt(score) }
+                    }));
+                };
+
+                const handleExplanationChange = (itemId, text) => {
+                    setTaskData(prevData => ({
+                        ...prevData,
+                        [itemId]: { ...(prevData[itemId] || {}), explanation: text }
+                    }));
+                };
+
+                const handleFileChange = (itemId, files) => {
+                    setTaskData(prevData => ({
+                        ...prevData,
+                        [itemId]: { ...(prevData[itemId] || {}), files: Array.from(files).map(f => f.name) } // Store file names for simulation
+                    }));
+                };
+
+                const handleAnnualSummaryChange = (index, text) => {
+                    setTaskData(prevData => ({
+                        ...prevData,
+                        [`annual-summary-${index}`]: text
+                    }));
+                };
+
+                const handleSave = () => {
+                    setAssessmentTasks(prevTasks =>
+                        prevTasks.map(task =>
+                            task.id === selectedTask.id ? { ...task, data: taskData } : task
+                        )
+                    );
+                    setShowSaveSuccess(true);
+                    setTimeout(() => setShowSaveSuccess(false), 2000);
+                    alert('评估内容已保存！');
+                };
+
+                const handleSubmit = () => {
+                    setShowSubmitConfirm(false);
+                    setAssessmentTasks(prevTasks =>
+                        prevTasks.map(task => {
+                            if (task.id === selectedTask.id) {
+                                // When submitting, add current data to history
+                                const updatedData = { ...taskData };
+                                template.categories.forEach(category => {
+                                    category.items.forEach(item => {
+                                        if (updatedData[item.id]) {
+                                            updatedData[item.id].history = [
+                                                ...(updatedData[item.id].history || []),
+                                                {
+                                                    timestamp: new Date().toLocaleString(),
+                                                    editor: 'ASSESSOR',
+                                                    score: updatedData[item.id].score,
+                                                    explanation: updatedData[item.id].explanation,
+                                                    rmComment: updatedData[item.id].rmComment || ''
+                                                }
+                                            ];
+                                        }
+                                    });
+                                });
+                                return { ...task, data: updatedData, status: '已提交' };
+                            }
+                            return task;
+                        })
+                    );
+                    alert('评估内容已提交至风险管理部复核！');
+                    setCurrentView('progressOverview'); // Go back to dashboard after submission
+                };
+
+                const taskItems = template.categories.flatMap(cat => cat.items).filter(item => item.assignedDepartment === selectedTask.department || item.assignedDepartment === '所有部门');
+
+                return (
+                    <div className="p-8 bg-gray-50 flex-1 overflow-auto rounded-xl shadow-lg">
+                        <h2 className="text-3xl font-extrabold text-gray-800 mb-6 border-b-2 pb-2 border-teal-500">风险评估填报</h2>
+
+                        <div className="bg-white p-6 rounded-lg shadow-md mb-8">
+                            <h3 className="text-2xl font-semibold text-gray-800 mb-4">
+                                {selectedTask.year}年 {selectedTask.riskType} 风险评估 - {selectedTask.department}
+                            </h3>
+                            <p className="text-sm text-gray-600 mb-4">当前状态: <span className={`font-semibold ${
+                                selectedTask.status === '待填写' ? 'text-gray-800' :
+                                selectedTask.status === '已驳回' ? 'text-red-600' :
+                                ''
+                            }`}>{selectedTask.status}</span></p>
+
+                            {selectedTask.status === '已驳回' && selectedTask.comments.length > 0 && (
+                                <div className="bg-red-50 border border-red-200 text-red-800 p-4 rounded-lg mb-6">
+                                    <h4 className="font-semibold text-lg flex items-center mb-2"><XCircle size={20} className="mr-2" /> 驳回意见:</h4>
+                                    {selectedTask.comments.map((comment, idx) => (
+                                        <p key={idx} className="text-sm">{comment.text} <span className="text-gray-500 text-xs">({comment.timestamp})</span></p>
+                                    ))}
+                                </div>
+                            )}
+
+                            <div className="flex justify-end gap-3 mb-6">
+                                <button
+                                    onClick={() => alert('下载评估表单功能待实现')}
+                                    className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+                                >
+                                    <Download size={18} className="mr-2" />
+                                    下载评估表单 (Excel)
+                                </button>
+                                <button
+                                    onClick={handleSave}
+                                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                >
+                                    <Save size={18} className="mr-2" />
+                                    保存
+                                </button>
+                                <button
+                                    onClick={() => setShowSubmitConfirm(true)}
+                                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+                                >
+                                    <Send size={18} className="mr-2" />
+                                    提交
+                                </button>
+                            </div>
+
+                            {showSaveSuccess && (
+                                <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
+                                    <strong className="font-bold">成功!</strong>
+                                    <span className="block sm:inline ml-2">评估内容已保存。</span>
+                                </div>
+                            )}
+
+                            {template.categories.map(category => (
+                                <div key={category.name} className="mb-6 p-4 border border-gray-200 rounded-lg bg-gray-50 shadow-sm">
+                                    <h5 className="text-lg font-semibold text-gray-800 mb-3">{category.name} ({category.weight}%)</h5>
+                                    {category.items
+                                        .filter(item => item.assignedDepartment === selectedTask.department || item.assignedDepartment === '所有部门')
+                                        .map(item => (
+                                            <div key={item.id} className="mb-4 p-3 border border-gray-100 rounded-md bg-white">
+                                                <p className="font-medium text-gray-800 mb-2">{item.description}</p>
+                                                <p className="text-sm text-gray-600 mb-2">制度参考: {item.ref}</p>
+                                                <div className="mb-3">
+                                                    <label className="block text-sm font-medium text-gray-700 mb-1">评分 (5-1分):</label>
+                                                    <select
+                                                        value={taskData[item.id]?.score || ''}
+                                                        onChange={(e) => handleScoreChange(item.id, e.target.value)}
+                                                        className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm rounded-md"
+                                                    >
+                                                        <option value="">请选择</option>
+                                                        {[5, 4, 3, 2, 1].map(score => <option key={score} value={score}>{score} 分</option>)}
+                                                    </select>
+                                                </div>
+                                                <div className="mb-3">
+                                                    <label className="block text-sm font-medium text-gray-700 mb-1">说明文字:</label>
+                                                    <textarea
+                                                        value={taskData[item.id]?.explanation || ''}
+                                                        onChange={(e) => handleExplanationChange(item.id, e.target.value)}
+                                                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm"
+                                                        rows="3"
+                                                        placeholder="请填写详细说明..."
+                                                    ></textarea>
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-1">上传支持性文件:</label>
+                                                    <input
+                                                        type="file"
+                                                        multiple
+                                                        onChange={(e) => handleFileChange(item.id, e.target.files)}
+                                                        className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100"
+                                                    />
+                                                    {taskData[item.id]?.files && taskData[item.id]?.files.length > 0 && (
+                                                        <div className="text-xs text-gray-500 mt-1">已上传: {taskData[item.id].files.join(', ')}</div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        ))}
+                                </div>
+                            ))}
+
+                            {/* Annual Summary */}
+                            <div className="mb-6 p-4 border border-gray-200 rounded-lg bg-gray-50 shadow-sm">
+                                <h5 className="text-lg font-semibold text-gray-800 mb-3">年度总结</h5>
+                                {template.annualSummaryQuestions.map((question, index) => (
+                                    <div key={`summary-${index}`} className="mb-3">
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">{question}:</label>
+                                        <textarea
+                                            value={taskData[`annual-summary-${index}`] || ''}
+                                            onChange={(e) => handleAnnualSummaryChange(index, e.target.value)}
+                                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm"
+                                            rows="3"
+                                            placeholder={`请填写本年度${question.replace('本年度', '')}...`}
+                                        ></textarea>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {showSubmitConfirm && (
+                            <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
+                                <div className="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full">
+                                    <h3 className="text-lg font-bold mb-4">确认提交</h3>
+                                    <p className="text-gray-700 mb-6">您确定要提交此风险评估吗？提交后将流转至风险管理部进行复核。</p>
+                                    <div className="flex justify-end gap-4">
+                                        <button
+                                            onClick={() => setShowSubmitConfirm(false)}
+                                            className="px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                                        >
+                                            取消
+                                        </button>
+                                        <button
+                                            onClick={handleSubmit}
+                                            className="px-4 py-2 bg-teal-600 text-white rounded-md hover:bg-teal-700 text-sm font-medium"
+                                        >
+                                            确认提交
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                );
+            };
+
+            const RiskAssessmentReview = () => {
+                const [selectedTask, setSelectedTask] = useState(null);
+                const [reviewData, setReviewData] = useState({}); // State for RM's edits and comments
+                const [showSaveSuccess, setShowSaveSuccess] = useState(false);
+                const [editingItemId, setEditingItemId] = useState(null); // New state for editing specific item
+                const [showHistoryModal, setShowHistoryModal] = useState(false);
+                const [historyContent, setHistoryContent] = useState([]);
+
+                useEffect(() => {
+                    if (selectedTask) {
+                        // Initialize reviewData with a deep copy of selectedTask.data
+                        setReviewData(JSON.parse(JSON.stringify(selectedTask.data || {})));
+                    } else {
+                        const firstSubmittedTask = assessmentTasks.find(task => task.status === '已提交' || task.status === '已驳回');
+                        setSelectedTask(firstSubmittedTask);
+                        setReviewData(JSON.parse(JSON.stringify(firstSubmittedTask?.data || {})));
+                    }
+                }, [selectedTask, assessmentTasks]);
+
+                const handleReviewScoreChange = (itemId, score) => {
+                    setReviewData(prevData => ({
+                        ...prevData,
+                        [itemId]: { ...(prevData[itemId] || {}), score: parseInt(score) }
+                    }));
+                };
+
+                const handleReviewExplanationChange = (itemId, text) => {
+                    setReviewData(prevData => ({
+                        ...prevData,
+                        [itemId]: { ...(prevData[itemId] || {}), explanation: text }
+                    }));
+                };
+
+                const handleReviewCommentChange = (itemId, text) => {
+                    setReviewData(prevData => ({
+                        ...prevData,
+                        [itemId]: { ...(prevData[itemId] || {}), rmComment: text }
+                    }));
+                };
+
+                const handleReviewAnnualSummaryChange = (index, text) => {
+                    setReviewData(prevData => ({
+                        ...prevData,
+                        [`annual-summary-${index}`]: text
+                    }));
+                };
+
+                const handleSaveReview = () => {
+                    setAssessmentTasks(prevTasks =>
+                        prevTasks.map(task =>
+                            task.id === selectedTask.id ? { ...task, data: reviewData } : task
+                        )
+                    );
+                    setShowSaveSuccess(true);
+                    setTimeout(() => setShowSaveSuccess(false), 2000);
+                    alert('复核内容已保存！');
+                };
+
+                const handleSaveItemEdit = (itemId) => {
+                    // Add current edited state to history
+                    const currentItemData = reviewData[itemId];
+                    const updatedHistory = [
+                        ...(currentItemData.history || []),
+                        {
+                            timestamp: new Date().toLocaleString(),
+                            editor: 'RM',
+                            score: currentItemData.score,
+                            explanation: currentItemData.explanation,
+                            rmComment: currentItemData.rmComment || ''
+                        }
+                    ];
+
+                    setReviewData(prevData => ({
+                        ...prevData,
+                        [itemId]: {
+                            ...prevData[itemId],
+                            history: updatedHistory
+                        }
+                    }));
+                    setEditingItemId(null); // Exit editing mode
+                    handleSaveReview(); // Also save the overall review data
+                };
+
+                const handleCancelItemEdit = () => {
+                    setEditingItemId(null); // Exit editing mode
+                    // Revert changes for this item by re-initializing reviewData from selectedTask
+                    setReviewData(JSON.parse(JSON.stringify(selectedTask.data || {})));
+                };
+
+                const handleSubmitReviewAsRejected = () => {
+                    const newComments = [...selectedTask.comments];
+                    if (!newComments.some(c => c.from === 'RM' && c.text.includes('已驳回'))) {
+                        newComments.push({ from: 'RM', text: '复核后已驳回。', timestamp: new Date().toLocaleString() });
+                    }
+
+                    setAssessmentTasks(prevTasks =>
+                        prevTasks.map(task =>
+                            task.id === selectedTask.id
+                                ? { ...task, data: reviewData, status: '已驳回', comments: newComments }
+                                : task
+                        )
+                    );
+                    alert(`任务已提交为驳回状态，并已通知 ${selectedTask.department}。`);
+                    setSelectedTask(null); // Clear selected task to pick next one
+                };
+
+                const handleCompleteReview = () => {
+                    setAssessmentTasks(prevTasks =>
+                        prevTasks.map(task =>
+                            task.id === selectedTask.id ? { ...task, data: reviewData, status: '已复核', comments: [...task.comments, { from: 'RM', text: '复核通过。', timestamp: new Date().toLocaleString() }] } : task
+                        )
+                    );
+                    alert('复核已完成！');
+                    setSelectedTask(null); // Clear selected task to pick next one
+                };
+
+                const handleViewHistory = (itemId) => {
+                    const itemHistory = reviewData[itemId]?.history || [];
+                    setHistoryContent(itemHistory);
+                    setShowHistoryModal(true);
+                };
+
+                const submittedTasks = assessmentTasks.filter(t => t.status === '已提交' || t.status === '已驳回');
+
+                return (
+                    <div className="p-8 bg-gray-50 flex-1 overflow-auto rounded-xl shadow-lg">
+                        <h2 className="text-3xl font-extrabold text-gray-800 mb-6 border-b-2 pb-2 border-teal-500">风险评估复核</h2>
+
+                        <div className="bg-white p-6 rounded-lg shadow-md mb-8">
+                            <h3 className="text-2xl font-semibold text-gray-800 mb-4">待复核任务列表</h3>
+                            <select
+                                className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm rounded-md mb-4"
+                                value={selectedTask?.id || ''}
+                                onChange={(e) => setSelectedTask(submittedTasks.find(t => t.id === e.target.value))}
+                            >
+                                <option value="">请选择一个任务进行复核</option>
+                                {submittedTasks.map(task => (
+                                    <option key={task.id} value={task.id}>
+                                        {task.year}年 {task.riskType} - {task.department} ({task.status})
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        {selectedTask && (
+                            <div className="bg-white p-6 rounded-lg shadow-md">
+                                <h3 className="text-2xl font-semibold text-gray-800 mb-4">
+                                    复核任务: {selectedTask.year}年 {selectedTask.riskType} - {selectedTask.department}
+                                </h3>
+                                <p className="text-sm text-gray-600 mb-4">当前状态: <span className={`font-semibold ${
+                                    selectedTask.status === '已提交' ? 'text-blue-600' :
+                                    selectedTask.status === '已驳回' ? 'text-red-600' :
+                                    ''
+                                }`}>{selectedTask.status}</span></p>
+
+                                {selectedTask.comments.length > 0 && (
+                                    <div className="bg-gray-100 p-4 rounded-lg mb-6">
+                                        <h4 className="font-semibold text-lg flex items-center mb-2"><MessageSquareText size={20} className="mr-2" /> 历史评论:</h4>
+                                        {selectedTask.comments.map((comment, idx) => (
+                                            <p key={idx} className="text-sm text-gray-700">{comment.from}: {comment.text} <span className="text-gray-500 text-xs">({comment.timestamp})</span></p>
+                                        ))}
+                                    </div>
+                                )}
+
+                                {showSaveSuccess && (
+                                    <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
+                                        <strong className="font-bold">成功!</strong>
+                                        <span className="block sm:inline ml-2">复核内容已保存。</span>
+                                    </div>
+                                )}
+
+                                {assessmentTemplates.find(t => t.id === selectedTask.templateId)?.categories.map(category => (
+                                    <div key={category.name} className="mb-6 p-4 border border-gray-200 rounded-lg bg-gray-50 shadow-sm">
+                                        <h5 className="text-lg font-semibold text-gray-800 mb-3">{category.name} ({category.weight}%)</h5>
+                                        {category.items
+                                            .filter(item => item.assignedDepartment === selectedTask.department || item.assignedDepartment === '所有部门')
+                                            .map(item => (
+                                                <div key={item.id} className="mb-4 p-3 border border-gray-100 rounded-md bg-white">
+                                                    <p className="font-medium text-gray-800 mb-2">{item.description}</p>
+                                                    <p className="text-sm text-gray-600 mb-2">制度参考: {item.ref}</p>
+
+                                                    {editingItemId === item.id ? (
+                                                        // Editing mode
+                                                        <>
+                                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                                <div>
+                                                                    <label className="block text-sm font-medium text-gray-700 mb-1">评估部门评分:</label>
+                                                                    <select
+                                                                        value={reviewData[item.id]?.score || ''}
+                                                                        onChange={(e) => handleReviewScoreChange(item.id, e.target.value)}
+                                                                        className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm rounded-md"
+                                                                    >
+                                                                        <option value="">请选择</option>
+                                                                        {[5, 4, 3, 2, 1].map(score => <option key={score} value={score}>{score} 分</option>)}
+                                                                    </select>
+                                                                </div>
+                                                                <div>
+                                                                    <label className="block text-sm font-medium text-gray-700 mb-1">支持性文件:</label>
+                                                                    <span className="block p-2 border border-gray-300 rounded-md bg-gray-100 text-gray-900">
+                                                                        {(selectedTask.data[item.id]?.files?.length > 0 ? selectedTask.data[item.id].files.join(', ') : '无')}
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                            <div className="mt-3">
+                                                                <label className="block text-sm font-medium text-gray-700 mb-1">评估部门说明文字:</label>
+                                                                <textarea
+                                                                    value={reviewData[item.id]?.explanation || ''}
+                                                                    onChange={(e) => handleReviewExplanationChange(item.id, e.target.value)}
+                                                                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm resize-none"
+                                                                    rows="3"
+                                                                ></textarea>
+                                                            </div>
+                                                            <div className="mt-3">
+                                                                <label className="block text-sm font-medium text-gray-700 mb-1">RM评论:</label>
+                                                                <textarea
+                                                                    value={reviewData[item.id]?.rmComment || ''}
+                                                                    onChange={(e) => handleReviewCommentChange(item.id, e.target.value)}
+                                                                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm resize-none"
+                                                                    rows="2"
+                                                                    placeholder="添加您的评论..."
+                                                                ></textarea>
+                                                            </div>
+                                                            <div className="flex gap-2 mt-4">
+                                                                <button
+                                                                    onClick={() => handleSaveItemEdit(item.id)}
+                                                                    className="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                                                                >
+                                                                    <Save size={16} className="mr-1" /> 保存
+                                                                </button>
+                                                                <button
+                                                                    onClick={handleCancelItemEdit}
+                                                                    className="inline-flex items-center px-3 py-1.5 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+                                                                >
+                                                                    取消
+                                                                </button>
+                                                            </div>
+                                                        </>
+                                                    ) : (
+                                                        // Display mode
+                                                        <>
+                                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                                <div>
+                                                                    <label className="block text-sm font-medium text-gray-700 mb-1">评估部门评分:</label>
+                                                                    <span className="block p-2 border border-gray-300 rounded-md bg-gray-100 text-gray-900 font-bold">
+                                                                        {reviewData[item.id]?.score || '未填写'} 分
+                                                                    </span>
+                                                                </div>
+                                                                <div>
+                                                                    <label className="block text-sm font-medium text-gray-700 mb-1">支持性文件:</label>
+                                                                    <span className="block p-2 border border-gray-300 rounded-md bg-gray-100 text-gray-900">
+                                                                        {(selectedTask.data[item.id]?.files?.length > 0 ? selectedTask.data[item.id].files.join(', ') : '无')}
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                            <div className="mt-3">
+                                                                <label className="block text-sm font-medium text-gray-700 mb-1">评估部门说明文字:</label>
+                                                                <textarea
+                                                                    value={reviewData[item.id]?.explanation || '未填写'}
+                                                                    disabled
+                                                                    className="mt-1 block w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-100 text-gray-800 sm:text-sm resize-none"
+                                                                    rows="3"
+                                                                ></textarea>
+                                                            </div>
+                                                            <div className="mt-3">
+                                                                <label className="block text-sm font-medium text-gray-700 mb-1">RM评论:</label>
+                                                                <textarea
+                                                                    value={reviewData[item.id]?.rmComment || '无'}
+                                                                    disabled
+                                                                    className="mt-1 block w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-100 text-gray-800 sm:text-sm resize-none"
+                                                                    rows="2"
+                                                                ></textarea>
+                                                            </div>
+                                                            <div className="flex gap-2 mt-4">
+                                                                <button
+                                                                    onClick={() => setEditingItemId(item.id)}
+                                                                    className="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+                                                                >
+                                                                    <Edit size={16} className="mr-1" /> 编辑
+                                                                </button>
+                                                                <button
+                                                                    onClick={() => handleViewHistory(item.id)}
+                                                                    className="inline-flex items-center px-3 py-1.5 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+                                                                >
+                                                                    <RefreshCcw size={16} className="mr-1" /> 查看历史
+                                                                </button>
+                                                            </div>
+                                                        </>
+                                                    )}
+                                                </div>
+                                            ))}
+                                    </div>
+                                ))}
+
+                                {/* Annual Summary for review */}
+                                <div className="mb-6 p-4 border border-gray-200 rounded-lg bg-gray-50 shadow-sm">
+                                    <h5 className="text-lg font-semibold text-gray-800 mb-3">年度总结</h5>
+                                    {assessmentTemplates.find(t => t.id === selectedTask.templateId)?.annualSummaryQuestions.map((question, index) => (
+                                        <div key={`summary-review-${index}`} className="mb-3">
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">{question}:</label>
+                                            <textarea
+                                                value={reviewData[`annual-summary-${index}`] || ''}
+                                                onChange={(e) => handleReviewAnnualSummaryChange(index, e.target.value)}
+                                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm resize-none"
+                                                rows="3"
+                                            ></textarea>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                <div className="flex justify-end gap-3 mt-6">
+                                    <button
+                                        onClick={handleSaveReview}
+                                        className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                    >
+                                        <Save size={18} className="mr-2" />
+                                        保存
+                                    </button>
+                                    <button
+                                        onClick={handleSubmitReviewAsRejected}
+                                        className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-orange-500 hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
+                                    >
+                                        <Send size={18} className="mr-2" />
+                                        提交 (驳回)
+                                    </button>
+                                    <button
+                                        onClick={handleCompleteReview}
+                                        className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                                    >
+                                        <CheckCircle size={18} className="mr-2" />
+                                        完成复核
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
+                        {showHistoryModal && (
+                            <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
+                                <div className="bg-white p-6 rounded-lg shadow-xl max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+                                    <h3 className="text-lg font-bold mb-4">评估内容历史记录</h3>
+                                    {historyContent.length === 0 ? (
+                                        <p className="text-gray-600">无历史记录。</p>
+                                    ) : (
+                                        <div className="space-y-4">
+                                            {historyContent.map((record, index) => (
+                                                <div key={index} className="border border-gray-200 p-4 rounded-md bg-gray-50">
+                                                    <p className="text-sm font-semibold text-gray-800 mb-2">
+                                                        版本 {index + 1} - {record.timestamp} (编辑者: {record.editor === 'RM' ? '风险管理部' : '评估部门'})
+                                                    </p>
+                                                    <p className="text-sm text-gray-700">评分: <span className="font-bold">{record.score || '未填写'}</span></p>
+                                                    <p className="text-sm text-gray-700">说明: {record.explanation || '无'}</p>
+                                                    {record.rmComment && (
+                                                        <p className="text-sm text-blue-700">RM评论: {record.rmComment}</p>
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                    <button
+                                        onClick={() => setShowHistoryModal(false)}
+                                        className="mt-6 px-4 py-2 bg-teal-600 text-white rounded-md hover:bg-teal-700"
+                                    >
+                                        关闭
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                );
+            };
+
+            const ProgressOverview = () => {
+                const [selectedDepartment, setSelectedDepartment] = useState('法务部'); // Default for assessor
+
+                const getCategoryStatus = (taskData, categoryItems) => {
+                    if (!taskData || Object.keys(taskData).length === 0) return '待填写';
+                    // For progress overview, we consider an item "filled" if it has a score and explanation.
+                    // RM comments are separate and don't affect "filled" status for the assessor's view.
+                    const itemsToFill = categoryItems.filter(item => selectedTask?.department === item.assignedDepartment || item.assignedDepartment === '所有部门');
+                    const filledItems = itemsToFill.filter(item => taskData[item.id]?.score && taskData[item.id]?.explanation);
+
+                    if (filledItems.length === itemsToFill.length && itemsToFill.length > 0) return '已填写';
+                    if (filledItems.length > 0) return '部分填写';
+                    return '待填写';
+                };
+
+
+                const calculateTaskCategoryCompletion = (task) => {
+                    const template = assessmentTemplates.find(t => t.id === task.templateId);
+                    if (!template) return {};
+
+                    const categoryCompletion = {};
+                    template.categories.forEach(category => {
+                        const relevantItems = category.items.filter(item => item.assignedDepartment === task.department || item.assignedDepartment === '所有部门');
+                        if (relevantItems.length === 0) {
+                            categoryCompletion[category.name] = '不适用';
+                            return;
+                        }
+
+                        let filledCount = 0;
+                        relevantItems.forEach(item => {
+                            if (task.data[item.id]?.score && task.data[item.id]?.explanation) {
+                                filledCount++;
+                            }
+                        });
+
+                        if (task.status === '已复核') {
+                            categoryCompletion[category.name] = '已复核';
+                        } else if (task.status === '已驳回') {
+                            categoryCompletion[category.name] = '已驳回';
+                        } else if (filledCount === relevantItems.length) {
+                            categoryCompletion[category.name] = '已提交';
+                        } else if (filledCount > 0) {
+                            categoryCompletion[category.name] = '部分填写';
+                        } else {
+                            categoryCompletion[category.name] = '待填写';
+                        }
+                    });
+                    return categoryCompletion;
+                };
+
+                const departmentProgressData = {};
+                departments.forEach(dept => {
+                    const deptTasks = assessmentTasks.filter(task => task.department === dept);
+                    const totalTasks = deptTasks.length;
+                    const completedTasks = deptTasks.filter(task => task.status === '已复核').length;
+                    departmentProgressData[dept] = {
+                        progress: totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0,
+                        tasks: deptTasks,
+                    };
+                });
+
+
+                // Global view data preparation (RM)
+                const globalProgressMatrix = {};
+                riskTypes.forEach(rType => {
+                    globalProgressMatrix[rType] = {};
+                    departments.forEach(dept => {
+                        const task = assessmentTasks.find(t => t.riskType === rType && t.department === dept);
+                        globalProgressMatrix[rType][dept] = task ? task.status : '未开始';
+                    });
+                });
+
+                const getStatusColorClass = (status) => {
+                    switch (status) {
+                        case '待填写': return 'bg-gray-200 text-gray-800';
+                        case '已提交': return 'bg-blue-200 text-blue-800';
+                        case '已驳回': return 'bg-red-200 text-red-800';
+                        case '已复核': return 'bg-green-200 text-green-800';
+                        case '未开始': return 'bg-gray-100 text-gray-500';
+                        default: return 'bg-gray-200 text-gray-800';
+                    }
+                };
+
+                const renderDepartmentView = () => {
+                    const myTasks = assessmentTasks.filter(task => task.department === selectedDepartment);
+                    const myTotalProgress = getDepartmentProgress(selectedDepartment);
+
+                    return (
+                        <div className="bg-white p-6 rounded-lg shadow-md mb-8">
+                            <h3 className="text-2xl font-semibold text-gray-800 mb-4">我的评估进度 ({selectedDepartment})</h3>
+                            <div className="flex items-center mb-6">
+                                <span className="text-lg font-medium text-gray-700 mr-4">总完成度:</span>
+                                <div className="w-full bg-gray-200 rounded-full h-6">
+                                    <div
+                                        className="bg-teal-600 h-6 rounded-full text-xs flex items-center justify-center text-white"
+                                        style={{ width: `${myTotalProgress}%` }}
+                                    >
+                                        {myTotalProgress}%
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="overflow-x-auto rounded-lg shadow">
+                                <table className="min-w-full divide-y divide-gray-200">
+                                    <thead className="bg-gray-50">
+                                        <tr>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">评估年份</th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">风险类别</th>
+                                            {assessmentCategories.map(cat => (
+                                                <th key={cat} className="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">{cat}</th>
+                                            ))}
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">总状态</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="bg-white divide-y divide-gray-200">
+                                        {myTasks.length === 0 ? (
+                                            <tr>
+                                                <td colSpan={assessmentCategories.length + 3} className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">
+                                                    无评估任务
+                                                </td>
+                                            </tr>
+                                        ) : (
+                                            myTasks.map(task => {
+                                                const categoryStatus = calculateTaskCategoryCompletion(task);
+                                                return (
+                                                    <tr key={task.id}>
+                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{task.year}</td>
+                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{task.riskType}</td>
+                                                        {assessmentCategories.map(cat => (
+                                                            <td key={cat} className="px-3 py-4 whitespace-nowrap text-center text-sm">
+                                                                <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColorClass(categoryStatus[cat] || '待填写')}`}>
+                                                                    {categoryStatus[cat] || '待填写'}
+                                                                </span>
+                                                            </td>
+                                                        ))}
+                                                        <td className="px-6 py-4 whitespace-nowrap text-sm">
+                                                            <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColorClass(task.status)}`}>
+                                                                {task.status}
+                                                            </span>
+                                                        </td>
+                                                    </tr>
+                                                );
+                                            })
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    );
+                };
+
+                const renderRMView = () => (
+                    <div className="bg-white p-6 rounded-lg shadow-md mb-8">
+                        <h3 className="text-2xl font-semibold text-gray-800 mb-4">全局评估进度概览</h3>
+                        <div className="flex items-center mb-6">
+                            <span className="text-lg font-medium text-gray-700 mr-4">总完成度:</span>
+                            <div className="w-full bg-gray-200 rounded-full h-6">
+                                <div
+                                    className="bg-teal-600 h-6 rounded-full text-xs flex items-center justify-center text-white"
+                                    style={{ width: `${getOverallProgress()}%` }}
+                                >
+                                    {getOverallProgress()}%
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="mb-4">
+                            <h4 className="text-lg font-semibold text-gray-800 mb-2">图例:</h4>
+                            <div className="flex flex-wrap gap-4">
+                                <div className="flex items-center">
+                                    <span className="w-6 h-6 rounded-md bg-gray-200 mr-2"></span>
+                                    <span className="text-sm text-gray-700">待填写</span>
+                                </div>
+                                <div className="flex items-center">
+                                    <span className="w-6 h-6 rounded-md bg-blue-200 mr-2"></span>
+                                    <span className="text-sm text-gray-700">已提交</span>
+                                </div>
+                                <div className="flex items-center">
+                                    <span className="w-6 h-6 rounded-md bg-red-200 mr-2"></span>
+                                    <span className="text-sm text-gray-700">已驳回</span>
+                                </div>
+                                <div className="flex items-center">
+                                    <span className="w-6 h-6 rounded-md bg-green-200 mr-2"></span>
+                                    <span className="text-sm text-gray-700">已复核</span>
+                                </div>
+                                <div className="flex items-center">
+                                    <span className="w-6 h-6 rounded-md bg-gray-100 mr-2"></span>
+                                    <span className="text-sm text-gray-700">未开始 (无任务)</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="overflow-x-auto rounded-lg shadow">
+                            <table className="min-w-full divide-y divide-gray-200">
+                                <thead className="bg-gray-50">
+                                    <tr>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">风险类型 \ 部门</th>
+                                        {departments.map(dept => (
+                                            <th key={dept} className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">{dept}</th>
+                                        ))}
+                                    </tr>
+                                </thead>
+                                <tbody className="bg-white divide-y divide-gray-200">
+                                    {riskTypes.map(rType => (
+                                        <tr key={rType}>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{rType}</td>
+                                            {departments.map(dept => (
+                                                <td key={dept} className="px-6 py-4 whitespace-nowrap text-center text-sm">
+                                                    <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColorClass(globalProgressMatrix[rType]?.[dept] || '未开始')}`}>
+                                                        {globalProgressMatrix[rType]?.[dept] || '未开始'}
+                                                    </span>
+                                                </td>
+                                            ))}
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                );
+
+                return (
+                    <div className="p-8 bg-gray-50 flex-1 overflow-auto rounded-xl shadow-lg">
+                        <h2 className="text-3xl font-extrabold text-gray-800 mb-6 border-b-2 pb-2 border-teal-500">评估进度概览</h2>
+
+                        {/* Dashboard content moved here */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                            <div className="bg-white p-6 rounded-lg shadow-md flex items-center justify-between">
+                                <div>
+                                    <p className="text-sm font-medium text-gray-500">当前任务总数</p>
+                                    <p className="text-3xl font-bold text-gray-900">{assessmentTasks.length}</p>
+                                </div>
+                                <ClipboardList size={48} className="text-teal-500 opacity-60" />
+                            </div>
+                            <div className="bg-white p-6 rounded-lg shadow-md flex items-center justify-between">
+                                <div>
+                                    <p className="text-sm font-medium text-gray-500">待处理任务</p>
+                                    <p className="text-3xl font-bold text-red-500">{assessmentTasks.filter(t => t.status === '待填写' || t.status === '已提交' || t.status === '已驳回').length}</p>
+                                </div>
+                                <Clock size={48} className="text-red-500 opacity-60" />
+                            </div>
+                            <div className="bg-white p-6 rounded-lg shadow-md flex items-center justify-between">
+                                <div>
+                                    <p className="text-sm font-medium text-gray-500">整体评估进度</p>
+                                    <p className="text-3xl font-bold text-green-600">{getOverallProgress()}%</p>
+                                </div>
+                                <BarChart3 size={48} className="text-green-600 opacity-60" />
+                            </div>
+                        </div>
+
+                        {userRole === 'RM' && (
+                            <div className="mb-6 bg-yellow-50 border border-yellow-200 text-yellow-800 p-4 rounded-lg flex items-start">
+                                <CheckCircle size={20} className="mr-3 mt-1" />
+                                <div>
+                                    <h4 className="font-semibold text-lg mb-1">复核任务提醒：</h4>
+                                    <p className="text-sm">您有 <span className="font-bold text-yellow-700">{assessmentTasks.filter(t => t.status === '已提交').length}</span> 项风险评估任务等待复核。</p>
+                                    <button
+                                        onClick={() => setCurrentView('riskAssessmentReview')}
+                                        className="mt-3 inline-flex items-center px-4 py-2 bg-yellow-600 text-white text-sm font-medium rounded-md hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2"
+                                    >
+                                        立即前往复核
+                                        <ChevronRight size={16} className="ml-2" />
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                        {userRole === 'ASSESSOR' && (
+                            <div className="mb-6 bg-blue-50 border border-blue-200 text-blue-800 p-4 rounded-lg flex items-start">
+                                <ClipboardList size={20} className="mr-3 mt-1" />
+                                <div>
+                                    <h4 className="font-semibold text-lg mb-1">待办事项通知：</h4>
+                                    <p className="text-sm">您有 <span className="font-bold text-blue-700">{assessmentTasks.filter(t => t.department === '市场部' && t.status === '待填写').length}</span> 项新的风险评估任务等待填写。</p>
+                                    <button
+                                        onClick={() => setCurrentView('riskAssessmentFill')}
+                                        className="mt-3 inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                                    >
+                                        立即前往填写
+                                        <ChevronRight size={16} className="ml-2" />
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                        {/* End Dashboard content moved here */}
+
+                        {userRole === 'RM' ? renderRMView() : renderDepartmentView()}
+                    </div>
+                );
+            };
+
+
+            const renderContent = () => {
+                switch (currentView) {
+                    case 'historicalReports':
+                        return <HistoricalReports />;
+                    case 'heatmapRecords':
+                        return <RiskHeatmapRecords />;
+                    case 'templateManagement':
+                        return userRole === 'RM' ? <AssessmentTemplateManagement /> : <RestrictedAccess />;
+                    case 'riskAssessmentFill':
+                        return <RiskAssessmentFill />;
+                    case 'riskAssessmentReview':
+                        return userRole === 'RM' ? <RiskAssessmentReview /> : <RestrictedAccess />;
+                    case 'progressOverview':
+                        return <ProgressOverview />;
+                    default:
+                        return <ProgressOverview />; // Default to ProgressOverview
+                }
+            };
+
+            const RestrictedAccess = () => (
+                <div className="p-8 bg-gray-50 flex-1 overflow-auto rounded-xl shadow-lg flex items-center justify-center">
+                    <div className="bg-white p-8 rounded-lg shadow-md text-center">
+                        <XCircle size={60} className="text-red-500 mx-auto mb-4" />
+                        <h3 className="text-2xl font-bold text-gray-800 mb-2">访问受限</h3>
+                        <p className="text-gray-600">您没有权限访问此页面。</p>
+                    </div>
+                </div>
+            );
+
+            return (
+                <div className="flex h-screen bg-gray-100 font-sans">
+                    <Sidebar />
+                    <main className="flex-1 p-4 overflow-hidden">
+                        {renderContent()}
+                    </main>
+                </div>
+            );
+        }
+
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>
