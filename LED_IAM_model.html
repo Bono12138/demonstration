@@ -1,0 +1,2176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comprehensive Risk Management System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            display: flex;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+        .card {
+            background-color: #ffffff;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .status-open {
+            background-color: #fef3c7;
+            color: #92400e;
+            font-weight: 500;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            display: inline-block;
+        }
+        .status-closed {
+            background-color: #d1fae5;
+            color: #065f46;
+            font-weight: 500;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            display: inline-block;
+        }
+        .status-draft {
+            background-color: #e5e7eb;
+            color: #374151;
+            font-weight: 500;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            display: inline-block;
+        }
+        .status-in-progress {
+            background-color: #dbeafe;
+            color: #1e40af;
+            font-weight: 500;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            display: inline-block;
+        }
+        .status-overdue {
+            background-color: #fee2e2;
+            color: #991b1b;
+            font-weight: 500;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            display: inline-block;
+        }
+        .review-pending-l1 {
+            background-color: #fef3c7;
+            color: #92400e;
+            font-weight: 500;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            display: inline-block;
+        }
+        .review-pending-l2 {
+            background-color: #fed7aa;
+            color: #9a3412;
+            font-weight: 500;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            display: inline-block;
+        }
+        .review-approved {
+            background-color: #d1fae5;
+            color: #065f46;
+            font-weight: 500;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            display: inline-block;
+        }
+        .review-rejected {
+            background-color: #fee2e2;
+            color: #991b1b;
+            font-weight: 500;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            display: inline-block;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        th {
+            background-color: #f9fafb;
+            font-weight: 600;
+            color: #4b5563;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+        }
+        tbody tr:hover {
+            background-color: #f3f4f6;
+        }
+        .sidebar {
+            width: 280px;
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 1.5rem 1rem;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            border-radius: 0 0.75rem 0.75rem 0;
+        }
+        .sidebar-menu a {
+            display: block;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 0.5rem;
+            transition: background-color 0.2s ease-in-out;
+            color: #ecf0f1;
+            font-weight: 500;
+            text-decoration: none;
+        }
+        .sidebar-menu a:hover {
+            background-color: #34495e;
+        }
+        .sidebar-menu a.active {
+            background-color: #3498db;
+            color: white;
+            font-weight: 600;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .sidebar-submenu a {
+            padding-left: 2.5rem;
+            font-size: 0.9rem;
+        }
+        .content-area {
+            flex-grow: 1;
+            padding: 1.5rem;
+        }
+        header {
+            height: 5rem;
+            display: flex;
+            align-items: center;
+        }
+        .mt-header {
+            margin-top: 5rem;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        .form-field {
+            display: flex;
+            flex-direction: column;
+        }
+        .form-field label {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: #374151;
+        }
+        .form-field input, .form-field select, .form-field textarea {
+            padding: 0.5rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+        }
+        .form-field input:focus, .form-field select:focus, .form-field textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        .error-message {
+            color: #dc2626;
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
+        }
+        .notification {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            color: white;
+            font-weight: 500;
+            z-index: 1000;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.3s ease;
+        }
+        .notification.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        .notification.success {
+            background-color: #10b981;
+        }
+        .notification.error {
+            background-color: #ef4444;
+        }
+        .notification.info {
+            background-color: #3b82f6;
+        }
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 0.75rem;
+            max-width: 90vw;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <header class="bg-gradient-to-r from-blue-600 to-indigo-700 text-white px-6 shadow-lg rounded-b-xl fixed top-0 left-0 right-0 z-10 w-full">
+        <div class="container flex justify-between items-center h-full">
+            <h1 class="text-3xl font-bold">Comprehensive Risk Management System</h1>
+            <div class="flex items-center space-x-6">
+                <div id="userProfile" class="text-right">
+                    <div class="font-semibold text-sm">John Doe</div>
+                    <div class="text-xs text-gray-200">Inputter, Risk Management</div>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <label class="text-sm font-medium">Current Role:</label>
+                    <select id="roleSelector" class="bg-white text-gray-800 px-3 py-1 rounded border">
+                        <option value="inputter">Inputter</option>
+                        <option value="approver">Approver</option>
+                        <option value="administrator">Administrator</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex flex-1 mt-header">
+        <!-- Left Sidebar -->
+        <aside class="sidebar">
+            <nav class="sidebar-menu">
+                <a href="#" id="menu-led-management" class="font-bold text-lg mb-2">LED Module</a>
+                <div class="sidebar-submenu ml-4">
+                    <a href="#" id="menu-led-dashboard" class="active">Dashboard</a>
+                    <a href="#" id="menu-new-incident">New Incident</a>
+                    <a href="#" id="menu-incident-list">Incident List</a>
+                    <a href="#" id="menu-led-configuration" class="hidden">Configuration</a>
+                </div>
+                
+                <a href="#" id="menu-iam-management" class="font-bold text-lg mb-2 mt-4">IAM Module</a>
+                <div class="sidebar-submenu ml-4">
+                    <a href="#" id="menu-iam-dashboard">IAM Dashboard</a>
+                    <a href="#" id="menu-iam-list">Issue & Action</a>
+                    <a href="#" id="menu-iam-configuration" class="hidden">Configuration</a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="content-area">
+            <!-- LED Dashboard Section -->
+            <section id="led-dashboard-content" class="card">
+                <h2 class="text-2xl font-semibold mb-4 text-gray-800">LED Dashboard</h2>
+                
+                <!-- Filters -->
+                <div class="mb-6 flex flex-wrap items-center space-x-4">
+                    <div class="form-field" id="departmentFilterContainer">
+                        <label for="departmentFilter">Department Filter:</label>
+                        <select id="departmentFilter" class="p-2 border border-gray-300 rounded-md">
+                            <option value="all">All Departments</option>
+                            <option value="anti-fraud">Anti Fraud</option>
+                            <option value="business-offline">Business Offline</option>
+                            <option value="credit">Credit</option>
+                            <option value="compliance">Compliance</option>
+                            <option value="risk-management">Risk Management</option>
+                            <option value="it-digital">IT & Digital</option>
+                        </select>
+                    </div>
+                    <div class="form-field">
+                        <label for="yearFilter">Year Filter:</label>
+                        <select id="yearFilter" class="p-2 border border-gray-300 rounded-md">
+                            <option value="all">All Years</option>
+                            <option value="2025">2025</option>
+                            <option value="2024">2024</option>
+                            <option value="2023">2023</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Summary Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                    <div class="bg-blue-50 border border-blue-200 p-4 rounded-lg">
+                        <h3 class="font-semibold text-blue-800">Total Incidents</h3>
+                        <p class="text-2xl font-bold text-blue-600" id="totalIncidents">12</p>
+                    </div>
+                    <div class="bg-yellow-50 border border-yellow-200 p-4 rounded-lg">
+                        <h3 class="font-semibold text-yellow-800">Pending Approval</h3>
+                        <p class="text-2xl font-bold text-yellow-600" id="pendingIncidents">3</p>
+                    </div>
+                    <div class="bg-green-50 border border-green-200 p-4 rounded-lg">
+                        <h3 class="font-semibold text-green-800">Approved</h3>
+                        <p class="text-2xl font-bold text-green-600" id="approvedIncidents">8</p>
+                    </div>
+                    <div class="bg-red-50 border border-red-200 p-4 rounded-lg">
+                        <h3 class="font-semibold text-red-800">Total Loss</h3>
+                        <p class="text-2xl font-bold text-red-600" id="totalLoss">IDR 150,000,000</p>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="flex flex-wrap gap-2 mb-6">
+                    <button id="exportDataBtn" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg">
+                        Export Data (CSV)
+                    </button>
+                    <button id="generateReportBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg hidden">
+                        Generate Final LED Summary Report
+                    </button>
+                </div>
+            </section>
+
+            <!-- New Incident Form -->
+            <section id="new-incident-content" class="card hidden">
+                <h2 class="text-2xl font-semibold mb-4 text-gray-800">Incident Input Form</h2>
+                
+                <form id="incidentForm">
+                    <div class="form-grid">
+                        <div class="form-field">
+                            <label for="incidentName">Incident Name *</label>
+                            <input type="text" id="incidentName" name="incidentName" required minlength="5">
+                            <div class="error-message" id="incidentNameError"></div>
+                        </div>
+                        
+                        <div class="form-field">
+                            <label for="incidentDate">Incident Date *</label>
+                            <input type="date" id="incidentDate" name="incidentDate" required>
+                            <div class="error-message" id="incidentDateError"></div>
+                        </div>
+                        
+                        <div class="form-field">
+                            <label for="discoveryDate">Discovery Date *</label>
+                            <input type="date" id="discoveryDate" name="discoveryDate" required>
+                            <div class="error-message" id="discoveryDateError"></div>
+                        </div>
+                        
+                        <div class="form-field">
+                            <label for="keyProcess">Key Process *</label>
+                            <input type="text" id="keyProcess" name="keyProcess" required>
+                        </div>
+                        
+                        <div class="form-field">
+                            <label for="businessUnit">Business Unit *</label>
+                            <select id="businessUnit" name="businessUnit" required>
+                                <option value="">Please select...</option>
+                                <option value="anti-fraud">Anti Fraud</option>
+                                <option value="apu-ppt">APU PPT</option>
+                                <option value="business-offline">Business Offline</option>
+                                <option value="collection">Collection</option>
+                                <option value="customer-complaint">Customer Complaint</option>
+                                <option value="customer-protection">Customer Protection</option>
+                                <option value="credit">Credit</option>
+                                <option value="compliance">Compliance</option>
+                                <option value="finance">Finance, Accounting & Tax</option>
+                                <option value="funding-treasury">Funding & Treasury</option>
+                                <option value="general-affair">General Affair</option>
+                                <option value="human-resource">Human Resource</option>
+                                <option value="internal-audit">Internal Audit</option>
+                                <option value="internal-control">Internal Control</option>
+                                <option value="it-gov-sec">IT Gov&Sec</option>
+                                <option value="it-product-delivery">IT Product & Delivery</option>
+                                <option value="it-digital">IT & Digital</option>
+                                <option value="legal">Legal</option>
+                                <option value="marketing-bd">Marketing & BD</option>
+                                <option value="procurement">Procurement</option>
+                                <option value="productive-loan">Productive Loan</option>
+                                <option value="policy-procedure">Policy & Procedure</option>
+                                <option value="risk-management">Risk Management</option>
+                                <option value="remedial-litigation">Remedial & Litigation</option>
+                                <option value="strategic-communication">Strategic Communication</option>
+                                <option value="others">Others</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-field">
+                            <label for="causeOfAccident">Cause of Accident *</label>
+                            <select id="causeOfAccident" name="causeOfAccident" required>
+                                <option value="">Please select...</option>
+                                <option value="people">People</option>
+                                <option value="process">Process</option>
+                                <option value="system">System</option>
+                                <option value="external">External Factors</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-field">
+                            <label for="involvedParties">Involved Parties *</label>
+                            <select id="involvedParties" name="involvedParties" required>
+                                <option value="">Please select...</option>
+                                <option value="internal">Internal</option>
+                                <option value="external">External</option>
+                                <option value="both">Both</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-field">
+                            <label for="potentialLoss">Potential Loss (IDR)</label>
+                            <input type="number" id="potentialLoss" name="potentialLoss" min="0" step="1000">
+                        </div>
+                        
+                        <div class="form-field">
+                            <label for="recovery">Recovery (IDR)</label>
+                            <input type="number" id="recovery" name="recovery" min="0" step="1000">
+                        </div>
+                        
+                        <div class="form-field">
+                            <label for="actualLoss">Actual Loss (IDR)</label>
+                            <input type="number" id="actualLoss" name="actualLoss" readonly class="bg-gray-100">
+                        </div>
+                        
+                        <div class="form-field">
+                            <label for="status">Status *</label>
+                            <select id="status" name="status" required>
+                                <option value="">Please select...</option>
+                                <option value="open">Open</option>
+                                <option value="closed">Closed</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-grid">
+                        <div class="form-field">
+                            <label for="incidentDescription">Incident Description *</label>
+                            <textarea id="incidentDescription" name="incidentDescription" rows="3" required minlength="10"></textarea>
+                            <div class="error-message" id="incidentDescriptionError"></div>
+                        </div>
+                        
+                        <div class="form-field">
+                            <label for="rootCause">Root Cause *</label>
+                            <textarea id="rootCause" name="rootCause" rows="3" required></textarea>
+                        </div>
+                        
+                        <div class="form-field">
+                            <label for="causeOfAccidentDescription">Cause of Accident Description *</label>
+                            <textarea id="causeOfAccidentDescription" name="causeOfAccidentDescription" rows="3" required></textarea>
+                        </div>
+                        
+                        <div class="form-field">
+                            <label for="riskMitigation">Risk Mitigation *</label>
+                            <textarea id="riskMitigation" name="riskMitigation" rows="3" required></textarea>
+                        </div>
+                        
+                        <div class="form-field">
+                            <label for="actionPlan">Action Plan *</label>
+                            <textarea id="actionPlan" name="actionPlan" rows="3" required></textarea>
+                        </div>
+                        
+                        <div class="form-field">
+                            <label for="recoverySource">Recovery Source</label>
+                            <textarea id="recoverySource" name="recoverySource" rows="2"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- IAM Section (shown when status is Open) -->
+                    <div id="iamSection" class="hidden">
+                        <h3 class="text-xl font-semibold mb-4 text-gray-800 border-t pt-4">Issue & Action Management (IAM) - Required</h3>
+                        <div class="form-grid">
+                            <div class="form-field">
+                                <label for="issueDescription">Issue Description *</label>
+                                <textarea id="issueDescription" name="issueDescription" rows="3"></textarea>
+                                <div class="error-message" id="issueDescriptionError"></div>
+                            </div>
+                            
+                            <div class="form-field">
+                                <label for="iamRootCause">IAM Root Cause *</label>
+                                <textarea id="iamRootCause" name="iamRootCause" rows="3"></textarea>
+                                <div class="error-message" id="iamRootCauseError"></div>
+                            </div>
+                            
+                            <div class="form-field">
+                                <label for="iamActionPlan">IAM Action Plan *</label>
+                                <textarea id="iamActionPlan" name="iamActionPlan" rows="3"></textarea>
+                                <div class="error-message" id="iamActionPlanError"></div>
+                            </div>
+                            
+                            <div class="form-field">
+                                <label for="targetDate">Target Date *</label>
+                                <input type="date" id="targetDate" name="targetDate">
+                                <div class="error-message" id="targetDateError"></div>
+                            </div>
+                            
+                            <div class="form-field">
+                                <label for="pic">Person in Charge (PIC) *</label>
+                                <select id="pic" name="pic" multiple>
+                                    <option value="user1">John Doe - Risk Analyst</option>
+                                    <option value="user2">Jane Smith - Compliance Officer</option>
+                                    <option value="user3">Mike Johnson - IT Manager</option>
+                                    <option value="user4">Sarah Wilson - Operations Lead</option>
+                                </select>
+                                <div class="error-message" id="picError"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex flex-wrap gap-2 mt-6">
+                        <button type="button" id="saveDraftBtn" class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg">
+                            Save Draft
+                        </button>
+                        <button type="button" id="submitForApprovalBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg">
+                            Send for Approval
+                        </button>
+                        <button type="button" id="cancelBtn" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg">
+                            Cancel
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- Incident List Section -->
+            <section id="incident-list-content" class="card hidden">
+                <h2 class="text-2xl font-semibold mb-4 text-gray-800" id="incidentListTitle">Incident List</h2>
+                
+                <!-- Filters -->
+                <div class="mb-4 flex flex-wrap items-center space-x-4">
+                    <div class="form-field">
+                        <label for="listYearFilter">Year:</label>
+                        <select id="listYearFilter" class="p-2 border border-gray-300 rounded-md">
+                            <option value="all">All Years</option>
+                            <option value="2025">2025</option>
+                            <option value="2024">2024</option>
+                            <option value="2023">2023</option>
+                        </select>
+                    </div>
+                    <div class="form-field" id="listDepartmentFilterContainer">
+                        <label for="listDepartmentFilter">Department:</label>
+                        <select id="listDepartmentFilter" class="p-2 border border-gray-300 rounded-md">
+                            <option value="all">All Departments</option>
+                            <option value="anti-fraud">Anti Fraud</option>
+                            <option value="business-offline">Business Offline</option>
+                            <option value="credit">Credit</option>
+                            <option value="compliance">Compliance</option>
+                            <option value="risk-management">Risk Management</option>
+                            <option value="it-digital">IT & Digital</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="overflow-x-auto rounded-lg shadow-md">
+                    <table id="incidentTable">
+                        <thead>
+                            <tr>
+                                <th>No.</th>
+                                <th>Incident Name</th>
+                                <th>Incident Date</th>
+                                <th>Discovery Date</th>
+                                <th>Actual Loss</th>
+                                <th>Cause of Accident</th>
+                                <th>Status</th>
+                                <th>Review Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="incidentTableBody">
+                            <!-- Data will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- IAM Dashboard Section -->
+            <section id="iam-dashboard-content" class="card hidden">
+                <h2 class="text-2xl font-semibold mb-4 text-gray-800">IAM Dashboard</h2>
+                
+                <!-- Filters -->
+                <div class="mb-6 flex flex-wrap items-center space-x-4">
+                    <div class="form-field" id="iamDepartmentFilterContainer">
+                        <label for="iamDepartmentFilter">Department Filter:</label>
+                        <select id="iamDepartmentFilter" class="p-2 border border-gray-300 rounded-md">
+                            <option value="all">All Departments</option>
+                            <option value="anti-fraud">Anti Fraud</option>
+                            <option value="business-offline">Business Offline</option>
+                            <option value="credit">Credit</option>
+                            <option value="compliance">Compliance</option>
+                            <option value="risk-management">Risk Management</option>
+                            <option value="it-digital">IT & Digital</option>
+                        </select>
+                    </div>
+                    <div class="form-field">
+                        <label for="iamYearFilter">Year Filter:</label>
+                        <select id="iamYearFilter" class="p-2 border border-gray-300 rounded-md">
+                            <option value="all">All Years</option>
+                            <option value="2025">2025</option>
+                            <option value="2024">2024</option>
+                            <option value="2023">2023</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Summary Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                    <div class="bg-blue-50 border border-blue-200 p-4 rounded-lg">
+                        <h3 class="font-semibold text-blue-800">Total IAM Items</h3>
+                        <p class="text-2xl font-bold text-blue-600" id="totalIamItems">8</p>
+                    </div>
+                    <div class="bg-yellow-50 border border-yellow-200 p-4 rounded-lg">
+                        <h3 class="font-semibold text-yellow-800">Open/In Progress</h3>
+                        <p class="text-2xl font-bold text-yellow-600" id="activeIamItems">5</p>
+                    </div>
+                    <div class="bg-red-50 border border-red-200 p-4 rounded-lg">
+                        <h3 class="font-semibold text-red-800">Overdue</h3>
+                        <p class="text-2xl font-bold text-red-600" id="overdueIamItems">2</p>
+                    </div>
+                    <div class="bg-green-50 border border-green-200 p-4 rounded-lg">
+                        <h3 class="font-semibold text-green-800">Closed</h3>
+                        <p class="text-2xl font-bold text-green-600" id="closedIamItems">3</p>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="flex flex-wrap gap-2 mb-6">
+                    <button id="exportIamDataBtn" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg">
+                        Export IAM Data (CSV)
+                    </button>
+                    <button id="generateIamReportBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg hidden">
+                        Generate Final IAM Summary Report
+                    </button>
+                </div>
+            </section>
+
+            <!-- IAM List Section -->
+            <section id="iam-list-content" class="card hidden">
+                <h2 class="text-2xl font-semibold mb-4 text-gray-800" id="iamListTitle">Issue & Action Management</h2>
+                
+                <!-- Filters -->
+                <div class="mb-4 flex flex-wrap items-center space-x-4">
+                    <div class="form-field">
+                        <label for="iamListYearFilter">Year:</label>
+                        <select id="iamListYearFilter" class="p-2 border border-gray-300 rounded-md">
+                            <option value="all">All Years</option>
+                            <option value="2025">2025</option>
+                            <option value="2024">2024</option>
+                            <option value="2023">2023</option>
+                        </select>
+                    </div>
+                    <div class="form-field" id="iamListDepartmentFilterContainer">
+                        <label for="iamListDepartmentFilter">Department:</label>
+                        <select id="iamListDepartmentFilter" class="p-2 border border-gray-300 rounded-md">
+                            <option value="all">All Departments</option>
+                            <option value="anti-fraud">Anti Fraud</option>
+                            <option value="business-offline">Business Offline</option>
+                            <option value="credit">Credit</option>
+                            <option value="compliance">Compliance</option>
+                            <option value="risk-management">Risk Management</option>
+                            <option value="it-digital">IT & Digital</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="overflow-x-auto rounded-lg shadow-md">
+                    <table id="iamTable">
+                        <thead>
+                            <tr>
+                                <th>No.</th>
+                                <th>Issue</th>
+                                <th>Root Cause</th>
+                                <th>Action Plan</th>
+                                <th>Target Date</th>
+                                <th>PIC</th>
+                                <th>Status</th>
+                                <th>Review Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="iamTableBody">
+                            <!-- Data will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Configuration Section (Administrator only) -->
+            <section id="configuration-content" class="card hidden">
+                <h2 class="text-2xl font-semibold mb-4 text-gray-800" id="configTitle">System Configuration</h2>
+                
+                <div class="mb-6">
+                    <h3 class="text-xl font-semibold mb-3 text-gray-700">Form Customization</h3>
+                    <p class="text-gray-600 mb-4">Add, remove, or reorder fields for the selected form. Define validation rules and mandatory status.</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div class="border rounded-lg p-4 bg-gray-50">
+                            <h4 class="font-semibold mb-2">Available Fields</h4>
+                            <div id="availableFields" class="space-y-2 max-h-48 overflow-y-auto p-2 border rounded">
+                                <div class="p-2 bg-gray-100 rounded cursor-pointer hover:bg-gray-200">Incident Name</div>
+                                <div class="p-2 bg-gray-100 rounded cursor-pointer hover:bg-gray-200">Incident Date</div>
+                                <div class="p-2 bg-gray-100 rounded cursor-pointer hover:bg-gray-200">Discovery Date</div>
+                                <div class="p-2 bg-gray-100 rounded cursor-pointer hover:bg-gray-200">Key Process</div>
+                                <div class="p-2 bg-gray-100 rounded cursor-pointer hover:bg-gray-200">Business Unit</div>
+                            </div>
+                        </div>
+                        <div class="border rounded-lg p-4 bg-gray-50">
+                            <h4 class="font-semibold mb-2">Current Form Fields</h4>
+                            <div id="formFields" class="space-y-2 max-h-48 overflow-y-auto p-2 border rounded">
+                                <div class="p-2 bg-blue-100 rounded cursor-pointer hover:bg-blue-200">Incident Name (Required)</div>
+                                <div class="p-2 bg-blue-100 rounded cursor-pointer hover:bg-blue-200">Incident Date (Required)</div>
+                                <div class="p-2 bg-blue-100 rounded cursor-pointer hover:bg-blue-200">Discovery Date (Required)</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg">
+                        Save Form Configuration
+                    </button>
+                </div>
+                
+                <div class="mb-6 border-t pt-6">
+                    <h3 class="text-xl font-semibold mb-3 text-gray-700">Workflow Configuration</h3>
+                    <div class="form-grid">
+                        <div class="form-field">
+                            <label for="approvalLayers">Number of Approval Layers</label>
+                            <select id="approvalLayers" class="p-2 border border-gray-300 rounded-md">
+                                <option value="1">1 Layer</option>
+                                <option value="2" selected>2 Layers</option>
+                                <option value="3">3 Layers</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4" id="approverConfiguration">
+                        <h4 class="font-semibold mb-2">Approver Assignment</h4>
+                        <div class="space-y-4" id="approver-assignments">
+                            <!-- Assignments will be dynamically populated -->
+                        </div>
+                        <div class="mt-4 p-4 border-2 border-dashed rounded-lg">
+                             <h5 class="font-medium mb-2">Add New Assignment</h5>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div class="form-field">
+                                    <label for="new-assignment-level">Approval Level</label>
+                                    <select id="new-assignment-level" class="p-2 border border-gray-300 rounded-md">
+                                        <option value="1">Level 1</option>
+                                        <option value="2">Level 2</option>
+                                    </select>
+                                </div>
+                                <div class="form-field">
+                                    <label for="new-assignment-dept">Department</label>
+                                    <select id="new-assignment-dept" class="p-2 border border-gray-300 rounded-md">
+                                        <option value="all">All Departments</option>
+                                        <option value="anti-fraud">Anti Fraud</option>
+                                        <option value="risk-management">Risk Management</option>
+                                        <option value="compliance">Compliance</option>
+                                        <option value="it-digital">IT & Digital</option>
+                                    </select>
+                                </div>
+                                <div class="form-field">
+                                    <label for="new-assignment-approver">Approver</label>
+                                    <select id="new-assignment-approver" class="p-2 border border-gray-300 rounded-md">
+                                        <option value="john.doe">John Doe - Dept Head</option>
+                                        <option value="jane.smith">Jane Smith - Sr. Manager</option>
+                                        <option value="mike.johnson">Mike Johnson - Risk Director</option>
+                                        <option value="sarah.wilson">Sarah Wilson - Compliance Director</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button class="mt-2 bg-green-600 hover:bg-green-700 text-white py-1 px-3 rounded text-sm">
+                                Add Assignment
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <button class="mt-6 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg">
+                        Save Workflow Configuration
+                    </button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Incident Details Modal -->
+    <div id="incidentDetailsModal" class="modal hidden">
+        <div class="modal-content">
+            <h2 class="text-2xl font-semibold mb-4 text-gray-800">Incident Details</h2>
+            <div id="incidentDetailsContent">
+                <!-- Content will be populated by JavaScript -->
+            </div>
+            <div class="flex justify-between items-center mt-6">
+                <button id="viewLinkedIamBtn" class="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded-lg">View Linked IAM</button>
+                <div class="space-x-2">
+                    <button id="approveBtn" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg">
+                        Approve
+                    </button>
+                    <button id="rejectBtn" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg">
+                        Reject
+                    </button>
+                    <button id="backToSummaryBtn" class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg">
+                        Back to Summary
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- IAM Details Modal -->
+    <div id="iamDetailsModal" class="modal hidden">
+        <div class="modal-content">
+            <h2 class="text-2xl font-semibold mb-4 text-gray-800">IAM Details</h2>
+            <div id="iamDetailsContent">
+                <!-- Content will be populated by JavaScript -->
+            </div>
+            <div class="flex justify-between items-center mt-6">
+                <button id="viewLinkedIncidentBtn" class="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded-lg">View Linked Incident</button>
+                <div class="space-x-2">
+                    <button id="iamApproveBtn" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg">
+                        Approve
+                    </button>
+                    <button id="iamRejectBtn" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg">
+                        Reject
+                    </button>
+                    <button id="iamBackBtn" class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg">
+                        Back to Summary
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- IAM Form Modal -->
+    <div id="iamFormModal" class="modal hidden">
+        <div class="modal-content">
+            <h2 class="text-2xl font-semibold mb-4 text-gray-800">Issue & Action Management Form</h2>
+            <form id="iamForm">
+                <div class="form-grid">
+                    <div class="form-field">
+                        <label for="iamIssue">Issue *</label>
+                        <textarea id="iamIssue" name="iamIssue" rows="3" required></textarea>
+                    </div>
+                    <div class="form-field">
+                        <label for="iamRootCauseForm">Root Cause *</label>
+                        <textarea id="iamRootCauseForm" name="iamRootCauseForm" rows="3" required></textarea>
+                    </div>
+                    <div class="form-field">
+                        <label for="iamActionPlanForm">Action Plan *</label>
+                        <textarea id="iamActionPlanForm" name="iamActionPlanForm" rows="3" required></textarea>
+                    </div>
+                    <div class="form-field">
+                        <label for="iamTargetDate">Target Date *</label>
+                        <input type="date" id="iamTargetDate" name="iamTargetDate" required>
+                    </div>
+                    <div class="form-field">
+                        <label for="iamPIC">Person in Charge (PIC) *</label>
+                        <select id="iamPIC" name="iamPIC" multiple required>
+                            <option value="user1">John Doe - Risk Analyst</option>
+                            <option value="user2">Jane Smith - Compliance Officer</option>
+                            <option value="user3">Mike Johnson - IT Manager</option>
+                            <option value="user4">Sarah Wilson - Operations Lead</option>
+                        </select>
+                    </div>
+                    <div class="form-field">
+                        <label for="iamStatus">Status *</label>
+                        <select id="iamStatus" name="iamStatus" required>
+                            <option value="open">Open</option>
+                            <option value="in-progress">In Progress</option>
+                            <option value="closed">Closed</option>
+                        </select>
+                    </div>
+                    <div class="form-field" id="attachmentField" style="display:none;">
+                        <label for="proofAttachment">Proof of Attachment *</label>
+                        <input type="file" id="proofAttachment" name="proofAttachment" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
+                    </div>
+                </div>
+                <div class="flex justify-end space-x-2 mt-6">
+                    <button type="button" id="iamSaveBtn" class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg">Save</button>
+                    <button type="button" id="iamSubmitBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg">Submit</button>
+                    <button type="button" id="iamCancelBtn" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmationModal" class="modal hidden">
+        <div class="modal-content">
+            <h3 class="text-xl font-semibold mb-4 text-gray-800" id="confirmationTitle">Confirm Action</h3>
+            <p id="confirmationMessage" class="text-gray-600 mb-4"></p>
+            <div id="rejectionReasonContainer" class="hidden mb-4">
+                <label for="rejectionReason" class="block text-sm font-medium text-gray-700 mb-2">Rejection Reason:</label>
+                <textarea id="rejectionReason" rows="3" class="w-full p-2 border border-gray-300 rounded-md"></textarea>
+            </div>
+            <div class="flex justify-end space-x-2">
+                <button id="confirmYes" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg">Confirm</button>
+                <button id="confirmNo" class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div id="notification" class="notification"></div>
+
+    <script>
+        // Sample data
+        let incidents = [
+            {
+                id: 1,
+                name: "System failure causing transaction interruption",
+                incidentDate: "2025-01-15",
+                discoveryDate: "2025-01-15",
+                actualLoss: 50000000,
+                causeOfAccident: "system",
+                status: "open",
+                reviewStatus: "approved",
+                department: "it-digital",
+                createdBy: "John Doe",
+                description: "Core transaction system failed during peak hours, preventing customers from normal trading operations.",
+                rootCause: "Server overload, lack of effective load balancing mechanism.",
+                actionPlan: "Upgrade server hardware, implement load balancing strategy."
+            },
+            {
+                id: 2,
+                name: "Customer information leakage incident",
+                incidentDate: "2025-01-10",
+                discoveryDate: "2025-01-12",
+                actualLoss: 25000000,
+                causeOfAccident: "people",
+                status: "closed",
+                reviewStatus: "pending-l1",
+                department: "compliance",
+                createdBy: "Jane Smith",
+                description: "Employee error resulted in customer sensitive information being accessed by unauthorized personnel.",
+                rootCause: "Lack of sufficient access control and staff training.",
+                actionPlan: "Strengthen access control, conduct data security training."
+            },
+            {
+                id: 3,
+                name: "Fraudulent transaction loss",
+                incidentDate: "2025-01-08",
+                discoveryDate: "2025-01-09",
+                actualLoss: 75000000,
+                causeOfAccident: "external",
+                status: "open",
+                reviewStatus: "pending-l2",
+                department: "anti-fraud",
+                createdBy: "Mike Johnson",
+                description: "Multiple suspicious transactions discovered, confirmed as fraudulent activity after investigation.",
+                rootCause: "Anti-fraud system rules need optimization, monitoring mechanism not comprehensive enough.",
+                actionPlan: "Optimize anti-fraud rules, strengthen real-time monitoring."
+            }
+        ];
+
+        let iamItems = [
+            {
+                id: 1,
+                issue: "System Load Balancing Implementation",
+                rootCause: "Inadequate server capacity planning",
+                actionPlan: "Deploy load balancer and upgrade infrastructure",
+                targetDate: "2025-03-01",
+                pic: ["user1", "user3"],
+                status: "in-progress",
+                reviewStatus: "approved",
+                department: "it-digital",
+                linkedIncidentId: 1
+            },
+            {
+                id: 2,
+                issue: "Access Control Enhancement",
+                rootCause: "Weak permission management system",
+                actionPlan: "Implement role-based access control",
+                targetDate: "2025-02-15",
+                pic: ["user2"],
+                status: "open",
+                reviewStatus: "pending-l1",
+                department: "compliance",
+                linkedIncidentId: 2
+            },
+            {
+                id: 3,
+                issue: "Anti-fraud Rule Optimization",
+                rootCause: "Outdated fraud detection algorithms",
+                actionPlan: "Update ML models and detection rules",
+                targetDate: "2025-01-30",
+                pic: ["user1", "user4"],
+                status: "overdue",
+                reviewStatus: "approved",
+                department: "anti-fraud",
+                linkedIncidentId: 3
+            }
+        ];
+
+        let currentRole = 'inputter';
+        let currentIncident = null;
+        let currentIamItem = null;
+        let isEditMode = false;
+        
+        const userProfiles = {
+            inputter: { name: 'John Doe', role: 'Inputter', department: 'Risk Management', departmentId: 'risk-management' },
+            approver: { name: 'Jane Smith', role: 'Approver', department: 'Risk Management', departmentId: 'risk-management' },
+            administrator: { name: 'Admin User', role: 'Administrator', department: 'System Wide', departmentId: 'all' }
+        };
+
+        // DOM Elements
+        const roleSelector = document.getElementById('roleSelector');
+        
+        // LED sections
+        const ledDashboardContent = document.getElementById('led-dashboard-content');
+        const newIncidentContent = document.getElementById('new-incident-content');
+        const incidentListContent = document.getElementById('incident-list-content');
+        
+        // IAM sections
+        const iamDashboardContent = document.getElementById('iam-dashboard-content');
+        const iamListContent = document.getElementById('iam-list-content');
+        
+        const configurationContent = document.getElementById('configuration-content');
+        
+        // Menu items
+        const menuLedDashboard = document.getElementById('menu-led-dashboard');
+        const menuNewIncident = document.getElementById('menu-new-incident');
+        const menuIncidentList = document.getElementById('menu-incident-list');
+        const menuIamDashboard = document.getElementById('menu-iam-dashboard');
+        const menuIamList = document.getElementById('menu-iam-list');
+        const menuLedConfiguration = document.getElementById('menu-led-configuration');
+        const menuIamConfiguration = document.getElementById('menu-iam-configuration');
+
+        const incidentForm = document.getElementById('incidentForm');
+        const iamSection = document.getElementById('iamSection');
+        const statusField = document.getElementById('status');
+        
+        // Modals
+        const incidentDetailsModal = document.getElementById('incidentDetailsModal');
+        const iamDetailsModal = document.getElementById('iamDetailsModal');
+        const iamFormModal = document.getElementById('iamFormModal');
+        const confirmationModal = document.getElementById('confirmationModal');
+        const notification = document.getElementById('notification');
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateRoleBasedUI();
+            showSection('led-dashboard');
+            populateIncidentTable();
+            populateIamTable();
+            setupEventListeners();
+            calculateActualLoss();
+            updateDashboards();
+        });
+
+        // Event Listeners
+        function setupEventListeners() {
+            roleSelector.addEventListener('change', function() {
+                currentRole = this.value;
+                updateRoleBasedUI();
+                populateIncidentTable();
+                populateIamTable();
+                updateDashboards();
+            });
+
+            // Navigation - LED
+            menuLedDashboard.addEventListener('click', (e) => {
+                e.preventDefault();
+                showSection('led-dashboard');
+                updateDashboards();
+            });
+
+            menuNewIncident.addEventListener('click', (e) => {
+                e.preventDefault();
+                showSection('new-incident');
+                resetIncidentForm();
+            });
+
+            menuIncidentList.addEventListener('click', (e) => {
+                e.preventDefault();
+                showSection('incident-list');
+                populateIncidentTable();
+            });
+
+            // Navigation - IAM
+            menuIamDashboard.addEventListener('click', (e) => {
+                e.preventDefault();
+                showSection('iam-dashboard');
+                updateDashboards();
+            });
+
+            menuIamList.addEventListener('click', (e) => {
+                e.preventDefault();
+                showSection('iam-list');
+                populateIamTable();
+            });
+
+            // Configuration
+            menuLedConfiguration.addEventListener('click', (e) => {
+                e.preventDefault();
+                showSection('configuration', 'LED');
+            });
+            menuIamConfiguration.addEventListener('click', (e) => {
+                e.preventDefault();
+                showSection('configuration', 'IAM');
+            });
+
+            // Form validation and submission
+            statusField.addEventListener('change', function() {
+                if (this.value === 'open') {
+                    iamSection.classList.remove('hidden');
+                    makeIAMFieldsRequired(true);
+                } else {
+                    iamSection.classList.add('hidden');
+                    makeIAMFieldsRequired(false);
+                }
+            });
+
+            // Auto-calculate actual loss
+            document.getElementById('potentialLoss').addEventListener('input', calculateActualLoss);
+            document.getElementById('recovery').addEventListener('input', calculateActualLoss);
+
+            // Date validation
+            document.getElementById('incidentDate').addEventListener('change', validateDates);
+            document.getElementById('discoveryDate').addEventListener('change', validateDates);
+
+            // Form buttons
+            document.getElementById('saveDraftBtn').addEventListener('click', function() {
+                if (validateIncidentForm(false)) {
+                    saveIncident('draft');
+                }
+            });
+
+            document.getElementById('submitForApprovalBtn').addEventListener('click', function() {
+                if (validateIncidentForm(true)) {
+                    saveIncident('pending-l1');
+                }
+            });
+
+            document.getElementById('cancelBtn').addEventListener('click', function() {
+                resetIncidentForm();
+                showSection('incident-list');
+            });
+
+            // Export and report buttons
+            document.getElementById('exportDataBtn').addEventListener('click', exportData);
+            document.getElementById('generateReportBtn').addEventListener('click', generateReport);
+            document.getElementById('exportIamDataBtn').addEventListener('click', exportIamData);
+            document.getElementById('generateIamReportBtn').addEventListener('click', generateIamReport);
+
+            // Modal buttons
+            document.getElementById('approveBtn').addEventListener('click', function() {
+                showConfirmation('approve', 'incident');
+            });
+
+            document.getElementById('rejectBtn').addEventListener('click', function() {
+                showConfirmation('reject', 'incident');
+            });
+
+            document.getElementById('backToSummaryBtn').addEventListener('click', function() {
+                hideModal('incidentDetailsModal');
+            });
+
+            document.getElementById('viewLinkedIamBtn').addEventListener('click', function() {
+                if (currentIncident && currentIncident.linkedIamId) {
+                    hideModal('incidentDetailsModal');
+                    const iamItem = iamItems.find(item => item.id === currentIncident.linkedIamId);
+                    if (iamItem) {
+                        showIamDetails(iamItem);
+                    }
+                }
+            });
+
+            // IAM Modal buttons
+            document.getElementById('iamApproveBtn').addEventListener('click', function() {
+                showConfirmation('approve', 'iam');
+            });
+
+            document.getElementById('iamRejectBtn').addEventListener('click', function() {
+                showConfirmation('reject', 'iam');
+            });
+
+            document.getElementById('iamBackBtn').addEventListener('click', function() {
+                hideModal('iamDetailsModal');
+            });
+
+            document.getElementById('viewLinkedIncidentBtn').addEventListener('click', function() {
+                if (currentIamItem && currentIamItem.linkedIncidentId) {
+                    hideModal('iamDetailsModal');
+                    const incident = incidents.find(inc => inc.id === currentIamItem.linkedIncidentId);
+                    if (incident) {
+                        showIncidentDetails(incident);
+                    }
+                }
+            });
+
+            // IAM Form buttons
+            document.getElementById('iamSaveBtn').addEventListener('click', function() {
+                if (validateIamForm(false)) {
+                    saveIamItem('draft');
+                }
+            });
+
+            document.getElementById('iamSubmitBtn').addEventListener('click', function() {
+                if (validateIamForm(true)) {
+                    saveIamItem('pending-l1');
+                }
+            });
+
+            document.getElementById('iamCancelBtn').addEventListener('click', function() {
+                hideModal('iamFormModal');
+                resetIamForm();
+            });
+
+            // IAM Status change handler
+            document.getElementById('iamStatus').addEventListener('change', function() {
+                const attachmentField = document.getElementById('attachmentField');
+                if (this.value === 'closed') {
+                    attachmentField.style.display = 'block';
+                    document.getElementById('proofAttachment').setAttribute('required', '');
+                } else {
+                    attachmentField.style.display = 'none';
+                    document.getElementById('proofAttachment').removeAttribute('required');
+                }
+            });
+
+            // Confirmation modal
+            document.getElementById('confirmYes').addEventListener('click', handleConfirmation);
+            document.getElementById('confirmNo').addEventListener('click', function() {
+                hideModal('confirmationModal');
+            });
+        }
+
+        // Role-based UI updates
+        function updateRoleBasedUI() {
+            const departmentFilters = document.querySelectorAll('[id*="departmentFilter"]');
+            const generateButtons = document.querySelectorAll('[id*="generateReportBtn"], [id*="generateIamReportBtn"]');
+            const incidentListTitle = document.getElementById('incidentListTitle');
+            const iamListTitle = document.getElementById('iamListTitle');
+            const userProfile = userProfiles[currentRole];
+
+            // Update user profile display
+            document.getElementById('userProfile').innerHTML = `
+                <div class="font-semibold text-sm">${userProfile.name}</div>
+                <div class="text-xs text-gray-200">${userProfile.role}, ${userProfile.department}</div>
+            `;
+
+            departmentFilters.forEach(filter => {
+                if (userProfile.departmentId === 'all') {
+                    filter.disabled = false;
+                    filter.value = 'all';
+                } else {
+                    filter.value = userProfile.departmentId;
+                    filter.disabled = true;
+                }
+            });
+
+            generateButtons.forEach(btn => {
+                if (currentRole === 'administrator' || currentRole === 'approver') {
+                    btn.classList.remove('hidden');
+                } else {
+                    btn.classList.add('hidden');
+                }
+            });
+
+            if (currentRole === 'administrator') {
+                menuLedConfiguration.classList.remove('hidden');
+                menuIamConfiguration.classList.remove('hidden');
+                incidentListTitle.textContent = 'Incident Summary';
+                iamListTitle.textContent = 'IAM Summary';
+            } else {
+                menuLedConfiguration.classList.add('hidden');
+                menuIamConfiguration.classList.add('hidden');
+                if (currentRole === 'inputter') {
+                    incidentListTitle.textContent = 'Submitted Incident List';
+                    iamListTitle.textContent = 'My IAM Items';
+                } else {
+                    incidentListTitle.textContent = 'Pending Approval Summary';
+                    iamListTitle.textContent = 'IAM Approval Summary';
+                }
+            }
+        }
+
+        // Navigation
+        function showSection(sectionName, configType = null) {
+            // Hide all sections
+            const sections = [ledDashboardContent, newIncidentContent, incidentListContent, 
+                            iamDashboardContent, iamListContent, configurationContent];
+            sections.forEach(section => section.classList.add('hidden'));
+
+            // Remove active class from all menu items
+            document.querySelectorAll('.sidebar-menu a').forEach(a => a.classList.remove('active'));
+
+            // Show selected section and activate menu item
+            switch(sectionName) {
+                case 'led-dashboard':
+                    ledDashboardContent.classList.remove('hidden');
+                    menuLedDashboard.classList.add('active');
+                    break;
+                case 'new-incident':
+                    newIncidentContent.classList.remove('hidden');
+                    menuNewIncident.classList.add('active');
+                    break;
+                case 'incident-list':
+                    incidentListContent.classList.remove('hidden');
+                    menuIncidentList.classList.add('active');
+                    break;
+                case 'iam-dashboard':
+                    iamDashboardContent.classList.remove('hidden');
+                    menuIamDashboard.classList.add('active');
+                    break;
+                case 'iam-list':
+                    iamListContent.classList.remove('hidden');
+                    menuIamList.classList.add('active');
+                    break;
+                case 'configuration':
+                    configurationContent.classList.remove('hidden');
+                    const configTitle = document.getElementById('configTitle');
+                    if (configType === 'LED') {
+                        configTitle.textContent = 'LED Module Configuration';
+                        menuLedConfiguration.classList.add('active');
+                    } else if (configType === 'IAM') {
+                        configTitle.textContent = 'IAM Module Configuration';
+                        menuIamConfiguration.classList.add('active');
+                    }
+                    break;
+            }
+        }
+
+        // Form validation functions
+        function validateIncidentForm(isSubmission) {
+            let isValid = true;
+            const requiredFields = ['incidentName', 'incidentDate', 'discoveryDate', 'keyProcess', 
+                                  'incidentDescription', 'rootCause', 'causeOfAccident', 
+                                  'causeOfAccidentDescription', 'riskMitigation', 'actionPlan', 
+                                  'businessUnit', 'involvedParties', 'status'];
+
+            // Clear previous errors
+            document.querySelectorAll('.error-message').forEach(el => el.textContent = '');
+
+            // Validate required fields
+            requiredFields.forEach(fieldName => {
+                const field = document.getElementById(fieldName);
+                const errorEl = document.getElementById(fieldName + 'Error');
+                
+                if (!field.value.trim()) {
+                    if (errorEl) errorEl.textContent = 'This field is required';
+                    isValid = false;
+                }
+            });
+
+            // Validate minimum lengths
+            const incidentName = document.getElementById('incidentName');
+            if (incidentName.value.trim().length > 0 && incidentName.value.trim().length < 5) {
+                document.getElementById('incidentNameError').textContent = 'Incident name must be at least 5 characters';
+                isValid = false;
+            }
+
+            const incidentDescription = document.getElementById('incidentDescription');
+            if (incidentDescription.value.trim().length > 0 && incidentDescription.value.trim().length < 10) {
+                document.getElementById('incidentDescriptionError').textContent = 'Incident description must be at least 10 characters';
+                isValid = false;
+            }
+
+            // Validate dates
+            if (!validateDates()) {
+                isValid = false;
+            }
+
+            // Validate IAM fields if status is open
+            if (document.getElementById('status').value === 'open') {
+                const iamFields = ['issueDescription', 'iamRootCause', 'iamActionPlan', 'targetDate', 'pic'];
+                iamFields.forEach(fieldName => {
+                    const field = document.getElementById(fieldName);
+                    const errorEl = document.getElementById(fieldName + 'Error');
+                    
+                    if (!field.value.trim()) {
+                        if (errorEl) errorEl.textContent = 'This field is required when status is open';
+                        isValid = false;
+                    }
+                });
+            }
+
+            return isValid;
+        }
+
+        function validateIamForm(isSubmission) {
+            let isValid = true;
+            const requiredFields = ['iamIssue', 'iamRootCauseForm', 'iamActionPlanForm', 'iamTargetDate', 'iamPIC', 'iamStatus'];
+
+            requiredFields.forEach(fieldName => {
+                const field = document.getElementById(fieldName);
+                if (!field.value || (field.multiple && field.selectedOptions.length === 0)) {
+                    isValid = false;
+                }
+            });
+
+            // Check if attachment is required for closed status
+            if (document.getElementById('iamStatus').value === 'closed') {
+                const attachment = document.getElementById('proofAttachment');
+                if (!attachment.files.length) {
+                    isValid = false;
+                }
+            }
+
+            return isValid;
+        }
+
+        function validateDates() {
+            const incidentDate = new Date(document.getElementById('incidentDate').value);
+            const discoveryDate = new Date(document.getElementById('discoveryDate').value);
+            
+            if (incidentDate && discoveryDate && incidentDate > discoveryDate) {
+                document.getElementById('incidentDateError').textContent = 'Incident date cannot be later than discovery date';
+                return false;
+            }
+            
+            document.getElementById('incidentDateError').textContent = '';
+            return true;
+        }
+
+        function calculateActualLoss() {
+            const potentialLoss = parseFloat(document.getElementById('potentialLoss').value) || 0;
+            const recovery = parseFloat(document.getElementById('recovery').value) || 0;
+            const actualLoss = Math.max(0, potentialLoss - recovery);
+            document.getElementById('actualLoss').value = actualLoss;
+        }
+
+        function makeIAMFieldsRequired(required) {
+            const iamFields = ['issueDescription', 'iamRootCause', 'iamActionPlan', 'targetDate', 'pic'];
+            iamFields.forEach(fieldName => {
+                const field = document.getElementById(fieldName);
+                if (required) {
+                    field.setAttribute('required', '');
+                } else {
+                    field.removeAttribute('required');
+                }
+            });
+        }
+
+        // Data management functions
+        function saveIncident(reviewStatus) {
+            const formData = new FormData(incidentForm);
+            const incidentData = {};
+            
+            for (let [key, value] of formData.entries()) {
+                incidentData[key] = value;
+            }
+            
+            incidentData.reviewStatus = reviewStatus;
+            incidentData.createdBy = userProfiles[currentRole].name;
+            incidentData.department = document.getElementById('businessUnit').value;
+            incidentData.actualLoss = parseFloat(document.getElementById('actualLoss').value) || 0;
+
+            if (isEditMode && currentIncident) {
+                const index = incidents.findIndex(inc => inc.id === currentIncident.id);
+                if (index !== -1) {
+                    incidents[index] = { ...incidents[index], ...incidentData };
+                }
+                showNotification('Incident updated successfully', 'success');
+            } else {
+                incidentData.id = Date.now(); // Use timestamp for unique ID
+                incidents.push(incidentData);
+                showNotification('Incident saved successfully', 'success');
+            }
+
+            // Auto-create or update IAM item if status is open
+            if (incidentData.status === 'open') {
+                createOrUpdateLinkedIamItem(incidentData);
+            }
+
+            if (reviewStatus === 'pending-l1') {
+                showNotification('Email notification sent to approver', 'info');
+            }
+
+            resetIncidentForm();
+            showSection('incident-list');
+            populateIncidentTable();
+            updateDashboards();
+        }
+
+        function saveIamItem(reviewStatus) {
+            const formData = new FormData(document.getElementById('iamForm'));
+            const iamData = {};
+            
+            for (let [key, value] of formData.entries()) {
+                if (key === 'iamPIC') {
+                    if (!iamData[key]) iamData[key] = [];
+                    iamData[key].push(value);
+                } else {
+                    iamData[key] = value;
+                }
+            }
+            
+            iamData.reviewStatus = reviewStatus;
+            iamData.department = userProfiles[currentRole].departmentId;
+
+            if (currentIamItem) {
+                const index = iamItems.findIndex(item => item.id === currentIamItem.id);
+                if (index !== -1) {
+                    iamItems[index] = { ...iamItems[index], ...iamData };
+                }
+                showNotification('IAM item updated successfully', 'success');
+            } else {
+                iamData.id = Date.now(); // Use timestamp for unique ID
+                iamItems.push(iamData);
+                showNotification('IAM item saved successfully', 'success');
+            }
+
+            if (reviewStatus === 'pending-l1') {
+                showNotification('Email notification sent to approver', 'info');
+            }
+
+            hideModal('iamFormModal');
+            resetIamForm();
+            populateIamTable();
+            updateDashboards();
+        }
+
+        function createOrUpdateLinkedIamItem(incidentData) {
+            let iamItem = iamItems.find(item => item.linkedIncidentId === incidentData.id);
+            const picValues = Array.from(document.getElementById('pic').selectedOptions).map(opt => opt.value);
+
+            if (iamItem) {
+                // Update existing IAM item
+                iamItem.issue = incidentData.issueDescription || incidentData.name;
+                iamItem.rootCause = incidentData.iamRootCause || incidentData.rootCause;
+                iamItem.actionPlan = incidentData.iamActionPlan || incidentData.actionPlan;
+                iamItem.targetDate = incidentData.targetDate;
+                iamItem.pic = picValues;
+                iamItem.department = incidentData.department;
+            } else {
+                // Create new IAM item
+                iamItem = {
+                    id: Date.now(),
+                    issue: incidentData.issueDescription || incidentData.name,
+                    rootCause: incidentData.iamRootCause || incidentData.rootCause,
+                    actionPlan: incidentData.iamActionPlan || incidentData.actionPlan,
+                    targetDate: incidentData.targetDate,
+                    pic: picValues,
+                    status: 'open',
+                    reviewStatus: 'draft',
+                    department: incidentData.department,
+                    linkedIncidentId: incidentData.id
+                };
+                iamItems.push(iamItem);
+                // Link back from incident
+                incidentData.linkedIamId = iamItem.id;
+            }
+        }
+
+        // Table population functions
+        function populateIncidentTable() {
+            const tbody = document.getElementById('incidentTableBody');
+            tbody.innerHTML = '';
+
+            let filteredIncidents = getFilteredIncidents();
+
+            filteredIncidents.forEach((incident, index) => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${incident.name}</td>
+                    <td>${incident.incidentDate}</td>
+                    <td>${incident.discoveryDate}</td>
+                    <td>IDR ${incident.actualLoss?.toLocaleString() || '0'}</td>
+                    <td>${getCauseOfAccidentText(incident.causeOfAccident)}</td>
+                    <td><span class="status-${incident.status}">${getStatusText(incident.status)}</span></td>
+                    <td><span class="review-${incident.reviewStatus}">${getReviewStatusText(incident.reviewStatus)}</span></td>
+                    <td>${getIncidentActionButtons(incident)}</td>
+                `;
+            });
+        }
+
+        function populateIamTable() {
+            const tbody = document.getElementById('iamTableBody');
+            tbody.innerHTML = '';
+
+            let filteredItems = getFilteredIamItems();
+
+            filteredItems.forEach((item, index) => {
+                const row = tbody.insertRow();
+                const picNames = item.pic?.map(p => getPicName(p)).join(', ') || 'Not Assigned';
+                
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${item.issue}</td>
+                    <td>${item.rootCause}</td>
+                    <td>${item.actionPlan}</td>
+                    <td>${item.targetDate}</td>
+                    <td>${picNames}</td>
+                    <td><span class="status-${item.status}">${getStatusText(item.status)}</span></td>
+                    <td><span class="review-${item.reviewStatus}">${getReviewStatusText(item.reviewStatus)}</span></td>
+                    <td>${getIamActionButtons(item)}</td>
+                `;
+            });
+        }
+
+        // Action button generators
+        function getIncidentActionButtons(incident) {
+            let buttons = '';
+            const currentUserDept = userProfiles[currentRole].departmentId;
+
+            if (currentRole === 'inputter' && incident.department === currentUserDept) {
+                if (incident.reviewStatus === 'draft' || incident.reviewStatus === 'rejected') {
+                    buttons += `<button onclick="editIncident(${incident.id})" class="text-blue-600 hover:underline mr-2">Edit</button>`;
+                }
+                 if (incident.reviewStatus === 'draft') {
+                    buttons += `<button onclick="deleteIncident(${incident.id})" class="text-red-600 hover:underline mr-2">Delete</button>`;
+                }
+            }
+            
+            if (incident.status === 'open' && incident.linkedIamId) {
+                buttons += `<button onclick="manageIAM(${incident.id})" class="text-purple-600 hover:underline mr-2">Manage IAM</button>`;
+            }
+
+            if (currentRole === 'approver' && incident.reviewStatus === 'pending-l1' && incident.department === currentUserDept) {
+                buttons += `<button onclick="reviewIncident(${incident.id})" class="text-blue-600 hover:underline mr-2">Review</button>`;
+            }
+            
+            if (currentRole === 'administrator' && incident.reviewStatus === 'pending-l2') {
+                buttons += `<button onclick="reviewIncident(${incident.id})" class="text-blue-600 hover:underline mr-2">Review</button>`;
+            }
+
+            return buttons || 'No Action';
+        }
+
+        function getIamActionButtons(item) {
+            let buttons = '';
+            const currentUserDept = userProfiles[currentRole].departmentId;
+
+            if (currentRole === 'inputter' && item.department === currentUserDept) {
+                if (['draft', 'open', 'in-progress', 'overdue', 'rejected'].includes(item.status)) {
+                    buttons += `<button onclick="editIamItem(${item.id})" class="text-blue-600 hover:underline mr-2">Edit</button>`;
+                }
+                 if (item.reviewStatus === 'draft') {
+                    buttons += `<button onclick="deleteIamItem(${item.id})" class="text-red-600 hover:underline mr-2">Clear</button>`;
+                }
+            }
+            
+            if (currentRole === 'approver' && item.reviewStatus === 'pending-l1' && item.department === currentUserDept) {
+                buttons += `<button onclick="reviewIamItem(${item.id})" class="text-blue-600 hover:underline mr-2">Review</button>`;
+            }
+            
+            if (currentRole === 'administrator' && item.reviewStatus === 'pending-l2') {
+                buttons += `<button onclick="reviewIamItem(${item.id})" class="text-blue-600 hover:underline mr-2">Review</button>`;
+            }
+
+            return buttons || 'No Action';
+        }
+
+        // Utility functions
+        function getFilteredIncidents() {
+            let filtered = incidents;
+            const userDept = userProfiles[currentRole].departmentId;
+
+            if (userDept !== 'all') {
+                filtered = incidents.filter(inc => inc.department === userDept);
+            }
+
+            return filtered;
+        }
+
+        function getFilteredIamItems() {
+            let filtered = iamItems;
+            const userDept = userProfiles[currentRole].departmentId;
+
+            if (userDept !== 'all') {
+                filtered = iamItems.filter(item => item.department === userDept);
+            }
+
+            return filtered;
+        }
+
+        function getStatusText(status) {
+            const statusMap = {
+                'open': 'Open',
+                'closed': 'Closed',
+                'draft': 'Draft',
+                'in-progress': 'In Progress',
+                'overdue': 'Overdue'
+            };
+            return statusMap[status] || status;
+        }
+
+        function getReviewStatusText(reviewStatus) {
+            const reviewStatusMap = {
+                'pending-l1': 'Pending L1',
+                'pending-l2': 'Pending L2',
+                'approved': 'Approved',
+                'rejected': 'Rejected',
+                'draft': 'Draft'
+            };
+            return reviewStatusMap[reviewStatus] || reviewStatus;
+        }
+
+        function getCauseOfAccidentText(cause) {
+            const causeMap = {
+                'people': 'People',
+                'process': 'Process',
+                'system': 'System',
+                'external': 'External Factors'
+            };
+            return causeMap[cause] || cause;
+        }
+
+        function getBusinessUnitText(unitId) {
+             const unitMap = {
+                'anti-fraud': 'Anti Fraud', 'apu-ppt': 'APU PPT', 'business-offline': 'Business Offline', 
+                'collection': 'Collection', 'customer-complaint': 'Customer Complaint', 'customer-protection': 'Customer Protection',
+                'credit': 'Credit', 'compliance': 'Compliance', 'finance': 'Finance, Accounting & Tax', 
+                'funding-treasury': 'Funding & Treasury', 'general-affair': 'General Affair', 'human-resource': 'Human Resource', 
+                'internal-audit': 'Internal Audit', 'internal-control': 'Internal Control', 'it-gov-sec': 'IT Gov&Sec',
+                'it-product-delivery': 'IT Product & Delivery', 'it-digital': 'IT & Digital', 'legal': 'Legal',
+                'marketing-bd': 'Marketing & BD', 'procurement': 'Procurement', 'productive-loan': 'Productive Loan',
+                'policy-procedure': 'Policy & Procedure', 'risk-management': 'Risk Management', 
+                'remedial-litigation': 'Remedial & Litigation', 'strategic-communication': 'Strategic Communication', 'others': 'Others'
+            };
+            return unitMap[unitId] || unitId;
+        }
+
+        function getPicName(picId) {
+            const picMap = {
+                'user1': 'John Doe',
+                'user2': 'Jane Smith',
+                'user3': 'Mike Johnson',
+                'user4': 'Sarah Wilson'
+            };
+            return picMap[picId] || picId;
+        }
+
+        // Dashboard updates
+        function updateDashboards() {
+            updateLedDashboard();
+            updateIamDashboard();
+        }
+
+        function updateLedDashboard() {
+            const filteredIncidents = getFilteredIncidents();
+            const totalIncidents = filteredIncidents.length;
+            const pendingIncidents = filteredIncidents.filter(inc => 
+                inc.reviewStatus === 'pending-l1' || inc.reviewStatus === 'pending-l2'
+            ).length;
+            const approvedIncidents = filteredIncidents.filter(inc => 
+                inc.reviewStatus === 'approved'
+            ).length;
+            const totalLoss = filteredIncidents.reduce((sum, inc) => sum + (inc.actualLoss || 0), 0);
+
+            document.getElementById('totalIncidents').textContent = totalIncidents;
+            document.getElementById('pendingIncidents').textContent = pendingIncidents;
+            document.getElementById('approvedIncidents').textContent = approvedIncidents;
+            document.getElementById('totalLoss').textContent = `IDR ${totalLoss.toLocaleString()}`;
+        }
+
+        function updateIamDashboard() {
+            const filteredItems = getFilteredIamItems();
+            const totalItems = filteredItems.length;
+            const activeItems = filteredItems.filter(item => 
+                ['open', 'in-progress'].includes(item.status)
+            ).length;
+            const overdueItems = filteredItems.filter(item => 
+                item.status === 'overdue'
+            ).length;
+            const closedItems = filteredItems.filter(item => 
+                item.status === 'closed'
+            ).length;
+
+            document.getElementById('totalIamItems').textContent = totalItems;
+            document.getElementById('activeIamItems').textContent = activeItems;
+            document.getElementById('overdueIamItems').textContent = overdueItems;
+            document.getElementById('closedIamItems').textContent = closedItems;
+        }
+
+        // Export functions with proper UTF-8 encoding
+        function exportData() {
+            const filteredIncidents = getFilteredIncidents();
+            
+            const headers = ['No.', 'Incident Name', 'Incident Date', 'Discovery Date', 'Actual Loss', 'Cause of Accident', 'Status', 'Review Status'];
+            const csvContent = [
+                headers,
+                ...filteredIncidents.map((inc, index) => [
+                    index + 1,
+                    inc.name,
+                    inc.incidentDate,
+                    inc.discoveryDate,
+                    inc.actualLoss || 0,
+                    getCauseOfAccidentText(inc.causeOfAccident),
+                    getStatusText(inc.status),
+                    getReviewStatusText(inc.reviewStatus)
+                ])
+            ].map(row => row.join(',')).join('\\n');
+
+            // Create BOM for UTF-8 to prevent encoding issues
+            const BOM = '\\uFEFF';
+            const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'led_incidents.csv';
+            a.click();
+            window.URL.revokeObjectURL(url);
+
+            showNotification('Data exported successfully', 'success');
+        }
+
+        function exportIamData() {
+            const filteredItems = getFilteredIamItems();
+            
+            const headers = ['No.', 'Issue', 'Root Cause', 'Action Plan', 'Target Date', 'PIC', 'Status', 'Review Status'];
+            const csvContent = [
+                headers,
+                ...filteredItems.map((item, index) => [
+                    index + 1,
+                    item.issue,
+                    item.rootCause,
+                    item.actionPlan,
+                    item.targetDate,
+                    item.pic?.map(p => getPicName(p)).join(';') || 'Not Assigned',
+                    getStatusText(item.status),
+                    getReviewStatusText(item.reviewStatus)
+                ])
+            ].map(row => row.join(',')).join('\\n');
+
+            const BOM = '\\uFEFF';
+            const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'iam_items.csv';
+            a.click();
+            window.URL.revokeObjectURL(url);
+
+            showNotification('IAM data exported successfully', 'success');
+        }
+
+        // Report generation
+        function generateReport() {
+            const approvedIncidents = incidents.filter(inc => inc.reviewStatus === 'approved');
+            showNotification(`Generated final LED summary report with ${approvedIncidents.length} approved incidents`, 'success');
+        }
+
+        function generateIamReport() {
+            const approvedItems = iamItems.filter(item => item.reviewStatus === 'approved');
+            showNotification(`Generated final IAM summary report with ${approvedItems.length} approved items`, 'success');
+        }
+
+        // Form reset functions
+        function resetIncidentForm() {
+            incidentForm.reset();
+            iamSection.classList.add('hidden');
+            makeIAMFieldsRequired(false);
+            document.querySelectorAll('.error-message').forEach(el => el.textContent = '');
+            isEditMode = false;
+            currentIncident = null;
+        }
+
+        function resetIamForm() {
+            document.getElementById('iamForm').reset();
+            document.getElementById('attachmentField').style.display = 'none';
+            isEditMode = false;
+            currentIamItem = null;
+        }
+
+        // Modal management
+        function showModal(modalId) {
+            document.getElementById(modalId).classList.remove('hidden');
+        }
+
+        function hideModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        }
+
+        // Notifications with proper UTF-8 support
+        function showNotification(message, type = 'info') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.classList.add('show');
+
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Placeholder functions for complex operations
+        function editIncident(id) { showNotification('Edit incident functionality', 'info'); }
+        function deleteIncident(id) { showNotification('Delete incident functionality', 'info'); }
+        function reviewIncident(id) { showNotification('Review incident functionality', 'info'); }
+        function editIamItem(id) { showNotification('Edit IAM item functionality', 'info'); }
+        function deleteIamItem(id) { showNotification('Delete IAM item functionality', 'info'); }
+        function reviewIamItem(id) { showNotification('Review IAM item functionality', 'info'); }
+        function manageIAM(id) { showNotification('Navigate to IAM management', 'info'); }
+        function viewIAM(id) { showNotification('View IAM details', 'info'); }
+        function showConfirmation(action, type) { showNotification(`${action} ${type} confirmation`, 'info'); }
+        function handleConfirmation() { showNotification('Confirmation handled', 'success'); }
+
+        // --- Real Implementation of Core Functions ---
+
+        function editIncident(id) {
+            const incident = incidents.find(inc => inc.id === id);
+            if (!incident) return;
+
+            currentIncident = incident;
+            isEditMode = true;
+
+            // Populate form fields
+            for (const key in incident) {
+                const field = document.getElementById(key);
+                if (field) {
+                    if (field.type === 'date' && incident[key]) {
+                        field.value = incident[key];
+                    } else {
+                         field.value = incident[key];
+                    }
+                }
+            }
+            
+            if (incident.status === 'open') {
+                iamSection.classList.remove('hidden');
+                makeIAMFieldsRequired(true);
+                // Also populate linked IAM fields if they exist
+                const iamItem = iamItems.find(item => item.id === incident.linkedIamId);
+                if (iamItem) {
+                    document.getElementById('issueDescription').value = iamItem.issue;
+                    document.getElementById('iamRootCause').value = iamItem.rootCause;
+                    document.getElementById('iamActionPlan').value = iamItem.actionPlan;
+                    document.getElementById('targetDate').value = iamItem.targetDate;
+                    Array.from(document.getElementById('pic').options).forEach(opt => {
+                        opt.selected = iamItem.pic.includes(opt.value);
+                    });
+                }
+            } else {
+                iamSection.classList.add('hidden');
+                makeIAMFieldsRequired(false);
+            }
+
+            showSection('new-incident');
+        }
+
+        function deleteIncident(id) {
+             if (confirm('Are you sure you want to delete this incident?')) {
+                incidents = incidents.filter(inc => inc.id !== id);
+                populateIncidentTable();
+                updateDashboards();
+                showNotification('Incident deleted', 'success');
+            }
+        }
+
+        function reviewIncident(id) {
+            const incident = incidents.find(inc => inc.id === id);
+            if (!incident) return;
+            currentIncident = incident;
+            showIncidentDetails(incident);
+        }
+
+        function showIncidentDetails(incident) {
+            const content = document.getElementById('incidentDetailsContent');
+            content.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+                    <div><strong>Incident Name:</strong><p class="text-gray-700">${incident.name}</p></div>
+                    <div><strong>Department:</strong><p class="text-gray-700">${getBusinessUnitText(incident.department)}</p></div>
+                    <div><strong>Incident Date:</strong><p class="text-gray-700">${incident.incidentDate}</p></div>
+                    <div><strong>Discovery Date:</strong><p class="text-gray-700">${incident.discoveryDate}</p></div>
+                    <div><strong>Actual Loss:</strong><p class="text-gray-700">IDR ${incident.actualLoss.toLocaleString()}</p></div>
+                    <div><strong>Cause of Accident:</strong><p class="text-gray-700">${getCauseOfAccidentText(incident.causeOfAccident)}</p></div>
+                    <div><strong>Status:</strong><p><span class="status-${incident.status}">${getStatusText(incident.status)}</span></p></div>
+                    <div><strong>Review Status:</strong><p><span class="review-${incident.reviewStatus}">${getReviewStatusText(incident.reviewStatus)}</span></p></div>
+                    <div class="md:col-span-2"><strong>Description:</strong><p class="text-gray-700">${incident.description || 'N/A'}</p></div>
+                    <div class="md:col-span-2"><strong>Root Cause:</strong><p class="text-gray-700">${incident.rootCause}</p></div>
+                    <div class="md:col-span-2"><strong>Action Plan:</strong><p class="text-gray-700">${incident.actionPlan}</p></div>
+                </div>
+            `;
+            const approveBtn = document.getElementById('approveBtn');
+            const rejectBtn = document.getElementById('rejectBtn');
+            const viewIamBtn = document.getElementById('viewLinkedIamBtn');
+
+            const canApprove = (currentRole === 'approver' && incident.reviewStatus === 'pending-l1') ||
+                             (currentRole === 'administrator' && incident.reviewStatus === 'pending-l2');
+
+            approveBtn.style.display = canApprove ? 'inline-block' : 'none';
+            rejectBtn.style.display = canApprove ? 'inline-block' : 'none';
+            viewIamBtn.style.display = incident.linkedIamId ? 'inline-block' : 'none';
+
+            showModal('incidentDetailsModal');
+        }
+
+        function editIamItem(id) {
+            const item = iamItems.find(i => i.id === id);
+            if (!item) return;
+
+            currentIamItem = item;
+            isEditMode = true;
+
+            document.getElementById('iamIssue').value = item.issue;
+            document.getElementById('iamRootCauseForm').value = item.rootCause;
+            document.getElementById('iamActionPlanForm').value = item.actionPlan;
+            document.getElementById('iamTargetDate').value = item.targetDate;
+            document.getElementById('iamStatus').value = item.status;
+            
+            Array.from(document.getElementById('iamPIC').options).forEach(opt => {
+                opt.selected = item.pic.includes(opt.value);
+            });
+
+            document.getElementById('iamStatus').dispatchEvent(new Event('change'));
+            showModal('iamFormModal');
+        }
+
+        function deleteIamItem(id) {
+            if (confirm('Are you sure you want to clear this IAM item?')) {
+                iamItems = iamItems.filter(item => item.id !== id);
+                populateIamTable();
+                updateDashboards();
+                showNotification('IAM item cleared', 'success');
+            }
+        }
+
+        function reviewIamItem(id) {
+            const item = iamItems.find(i => i.id === id);
+            if (!item) return;
+            currentIamItem = item;
+            showIamDetails(item);
+        }
+
+        function showIamDetails(item) {
+            const content = document.getElementById('iamDetailsContent');
+            const picNames = item.pic?.map(p => getPicName(p)).join(', ') || 'N/A';
+            content.innerHTML = `
+                 <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+                    <div class="md:col-span-2"><strong>Issue:</strong><p class="text-gray-700">${item.issue}</p></div>
+                    <div><strong>Department:</strong><p class="text-gray-700">${getBusinessUnitText(item.department)}</p></div>
+                    <div><strong>Target Date:</strong><p class="text-gray-700">${item.targetDate}</p></div>
+                    <div class="md:col-span-2"><strong>PIC(s):</strong><p class="text-gray-700">${picNames}</p></div>
+                    <div><strong>Status:</strong><p><span class="status-${item.status}">${getStatusText(item.status)}</span></p></div>
+                    <div><strong>Review Status:</strong><p><span class="review-${item.reviewStatus}">${getReviewStatusText(item.reviewStatus)}</span></p></div>
+                    <div class="md:col-span-2"><strong>Root Cause:</strong><p class="text-gray-700">${item.rootCause}</p></div>
+                    <div class="md:col-span-2"><strong>Action Plan:</strong><p class="text-gray-700">${item.actionPlan}</p></div>
+                </div>
+            `;
+
+            const approveBtn = document.getElementById('iamApproveBtn');
+            const rejectBtn = document.getElementById('iamRejectBtn');
+            const viewIncidentBtn = document.getElementById('viewLinkedIncidentBtn');
+
+            const canApprove = (currentRole === 'approver' && item.reviewStatus === 'pending-l1') ||
+                             (currentRole === 'administrator' && item.reviewStatus === 'pending-l2');
+
+            approveBtn.style.display = canApprove ? 'inline-block' : 'none';
+            rejectBtn.style.display = canApprove ? 'inline-block' : 'none';
+            viewIncidentBtn.style.display = item.linkedIncidentId ? 'inline-block' : 'none';
+
+            showModal('iamDetailsModal');
+        }
+
+        function manageIAM(incidentId) {
+            const incident = incidents.find(inc => inc.id === incidentId);
+            if (!incident || !incident.linkedIamId) return;
+            const iamItem = iamItems.find(item => item.id === incident.linkedIamId);
+            if (iamItem) {
+                editIamItem(iamItem.id);
+            }
+        }
+        
+        function viewIAM(incidentId) {
+            const incident = incidents.find(inc => inc.id === incidentId);
+            if (!incident || !incident.linkedIamId) return;
+            const iamItem = iamItems.find(item => item.id === incident.linkedIamId);
+            if (iamItem) {
+                reviewIamItem(iamItem.id);
+            }
+        }
+        
+        function showConfirmation(action, type) {
+            const title = document.getElementById('confirmationTitle');
+            const message = document.getElementById('confirmationMessage');
+            const reasonContainer = document.getElementById('rejectionReasonContainer');
+
+            if (action === 'approve') {
+                title.textContent = `Confirm Approval`;
+                message.textContent = `Are you sure you want to approve this ${type}?`;
+                reasonContainer.classList.add('hidden');
+            } else {
+                title.textContent = `Confirm Rejection`;
+                message.textContent = `Are you sure you want to reject this ${type}? Please provide a reason.`;
+                reasonContainer.classList.remove('hidden');
+            }
+
+            document.getElementById('confirmYes').dataset.action = action;
+            document.getElementById('confirmYes').dataset.type = type;
+            showModal('confirmationModal');
+        }
+
+        function handleConfirmation() {
+            const action = document.getElementById('confirmYes').dataset.action;
+            const type = document.getElementById('confirmYes').dataset.type;
+            const reason = document.getElementById('rejectionReason').value;
+
+            if (action === 'reject' && !reason.trim()) {
+                showNotification('Rejection reason is required', 'error');
+                return;
+            }
+
+            if (type === 'incident') {
+                handleIncidentConfirmation(action, reason);
+            } else if (type === 'iam') {
+                handleIamConfirmation(action, reason);
+            }
+
+            hideModal('confirmationModal');
+            populateIncidentTable();
+            populateIamTable();
+            updateDashboards();
+        }
+
+        function handleIncidentConfirmation(action, reason) {
+             if (!currentIncident) return;
+            const incident = incidents.find(inc => inc.id === currentIncident.id);
+            if (!incident) return;
+
+            if (action === 'approve') {
+                if (currentRole === 'approver') {
+                    incident.reviewStatus = 'pending-l2';
+                    showNotification('Incident approved and forwarded to L2 approver', 'success');
+                    showNotification('Email sent to L2 approver', 'info');
+                } else if (currentRole === 'administrator') {
+                    incident.reviewStatus = 'approved';
+                    showNotification('Incident finally approved', 'success');
+                }
+            } else {
+                incident.reviewStatus = 'rejected';
+                showNotification('Incident rejected', 'success');
+                showNotification('Email sent to inputter with rejection reason', 'info');
+            }
+            hideModal('incidentDetailsModal');
+        }
+        
+        function handleIamConfirmation(action, reason) {
+             if (!currentIamItem) return;
+            const item = iamItems.find(i => i.id === currentIamItem.id);
+            if (!item) return;
+
+            if (action === 'approve') {
+                if (currentRole === 'approver') {
+                    item.reviewStatus = 'pending-l2';
+                    showNotification('IAM approved and forwarded to L2 approver', 'success');
+                    showNotification('Email sent to L2 approver', 'info');
+                } else if (currentRole === 'administrator') {
+                    item.reviewStatus = 'approved';
+                    showNotification('IAM finally approved', 'success');
+                }
+            } else {
+                item.reviewStatus = 'rejected';
+                showNotification('IAM rejected', 'success');
+                showNotification('Email sent to inputter with rejection reason', 'info');
+            }
+            hideModal('iamDetailsModal');
+        }
+    </script>
+</body>
+</html>

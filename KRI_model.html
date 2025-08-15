@@ -1,0 +1,1973 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Key Risk Indicator Management System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            display: flex;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+        .card {
+            background-color: #ffffff;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .status-green {
+            background-color: #d1fae5;
+            color: #065f46;
+            font-weight: 500;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            display: inline-block;
+        }
+        .status-orange {
+            background-color: #fed7aa;
+            color: #9a3412;
+            font-weight: 500;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            display: inline-block;
+        }
+        .status-red {
+            background-color: #fee2e2;
+            color: #991b1b;
+            font-weight: 500;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            display: inline-block;
+        }
+        .status-pending {
+            background-color: #fef3c7;
+            color: #92400e;
+            font-weight: 500;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            display: inline-block;
+        }
+        .status-approved {
+            background-color: #d1fae5;
+            color: #065f46;
+            font-weight: 500;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            display: inline-block;
+        }
+        .status-rejected {
+            background-color: #fee2e2;
+            color: #991b1b;
+            font-weight: 500;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            display: inline-block;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        th {
+            background-color: #f9fafb;
+            font-weight: 600;
+            color: #4b5563;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+        }
+        tbody tr:hover {
+            background-color: #f3f4f6;
+        }
+        .sidebar {
+            width: 280px;
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 1.5rem 1rem;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            border-radius: 0 0.75rem 0.75rem 0;
+        }
+        .sidebar-menu a {
+            display: block;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 0.5rem;
+            transition: background-color 0.2s ease-in-out;
+            color: #ecf0f1;
+            font-weight: 500;
+            text-decoration: none;
+        }
+        .sidebar-menu a:hover {
+            background-color: #34495e;
+        }
+        .sidebar-menu a.active {
+            background-color: #3498db;
+            color: white;
+            font-weight: 600;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .sidebar-submenu a {
+            padding-left: 2.5rem;
+            font-size: 0.9rem;
+        }
+        .content-area {
+            flex-grow: 1;
+            padding: 1.5rem;
+        }
+        header {
+            height: 5rem;
+            display: flex;
+            align-items: center;
+        }
+        .mt-header {
+            margin-top: 5rem;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 50;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.4);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border-radius: 0.75rem;
+            width: 90%;
+            max-width: 800px;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close:hover {
+            color: black;
+        }
+        .rating-indicator {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+        .rating-green { background-color: #10b981; }
+        .rating-orange { background-color: #f59e0b; }
+        .rating-red { background-color: #ef4444; }
+        .form-section {
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        .threshold-row {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            padding: 0.5rem;
+            background-color: #f9fafb;
+            border-radius: 0.375rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <header class="bg-gradient-to-r from-blue-600 to-indigo-700 text-white px-6 shadow-lg rounded-b-xl fixed top-0 left-0 right-0 z-10 w-full">
+        <div class="container flex justify-between items-center h-full">
+            <h1 class="text-3xl font-bold">Key Risk Indicator Management System</h1>
+            <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-2">
+                    <label class="text-sm">Role:</label>
+                    <select id="roleSelector" class="p-1 rounded-md text-gray-800 text-sm">
+                        <option value="administrator">Administrator</option>
+                        <option value="inputter">Inputter</option>
+                        <option value="approver">Approver</option>
+                    </select>
+                </div>
+                <span class="text-sm">Welcome, <span id="currentUser">Administrator</span></span>
+                <button id="logoutBtn" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md text-sm">Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex flex-1 mt-header">
+        <!-- Left Sidebar -->
+        <aside class="sidebar">
+            <nav class="sidebar-menu">
+                <a href="#" id="menu-kri-management" class="font-bold text-lg mb-2">KRI Management</a>
+                <div class="sidebar-submenu ml-4">
+                    <a href="#" id="menu-dashboard" class="active">Dashboard</a>
+                    <a href="#" id="menu-input-kri">Input KRI</a>
+                    <a href="#" id="menu-configuration" class="admin-only">KRI Configuration</a>
+                </div>
+
+            </nav>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="content-area">
+            <!-- Filters Section -->
+            <section class="card mb-6">
+                <div class="flex flex-wrap gap-4 items-center">
+                    <div>
+                        <label for="departmentFilter" class="block text-sm font-medium text-gray-700 mb-2">Department:</label>
+                        <select id="departmentFilter" class="p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                            <option value="All">All Departments</option>
+                            <option value="Finance">Finance</option>
+                                                    <option value="Operations">Operations</option>
+                        <option value="Risk Management">Risk Management</option>
+                        <option value="IT">IT</option>
+                        <option value="HR">HR</option>
+                        <option value="Legal">Legal</option>
+                        <option value="Compliance">Compliance</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="yearFilter" class="block text-sm font-medium text-gray-700 mb-2">Year:</label>
+                        <select id="yearFilter" class="p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                            <option value="All">All Years</option>
+                            <option value="2023">2023</option>
+                            <option value="2024">2024</option>
+                            <option value="2025" selected>2025</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="monthFilter" class="block text-sm font-medium text-gray-700 mb-2">Month:</label>
+                        <select id="monthFilter" class="p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                            <option value="All">All Months</option>
+                            <option value="01">January</option>
+                            <option value="02">February</option>
+                            <option value="03">March</option>
+                            <option value="04">April</option>
+                            <option value="05" selected>May</option>
+                            <option value="06">June</option>
+                            <option value="07">July</option>
+                            <option value="08">August</option>
+                            <option value="09">September</option>
+                            <option value="10">October</option>
+                            <option value="11">November</option>
+                            <option value="12">December</option>
+                        </select>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Dashboard Section -->
+            <section id="dashboard-content" class="card">
+                <h2 class="text-2xl font-semibold mb-4 text-gray-800">KRI Dashboard</h2>
+                
+                <!-- Summary Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                    <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                        <h3 class="text-lg font-semibold text-green-800">Green KRIs</h3>
+                        <p class="text-3xl font-bold text-green-900" id="greenCount">12</p>
+                    </div>
+                    <div class="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                        <h3 class="text-lg font-semibold text-orange-800">Orange KRIs</h3>
+                        <p class="text-3xl font-bold text-orange-900" id="orangeCount">3</p>
+                    </div>
+                    <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                        <h3 class="text-lg font-semibold text-red-800">Red KRIs</h3>
+                        <p class="text-3xl font-bold text-red-900" id="redCount">1</p>
+                    </div>
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <h3 class="text-lg font-semibold text-blue-800">Pending Approval</h3>
+                        <p class="text-3xl font-bold text-blue-900" id="pendingCount">5</p>
+                    </div>
+                </div>
+
+                <!-- Generate Report Button -->
+                <div class="mb-4">
+                    <button id="generateReportBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg shadow-md">
+                        Generate Final KRI Summary Report
+                    </button>
+                </div>
+
+                <!-- KRI Results Table -->
+                <div class="overflow-x-auto rounded-lg shadow-md">
+                    <table id="kriResultsTable">
+                        <thead>
+                            <tr>
+                                <th>No.</th>
+                                <th>Key Risk Indicator</th>
+                                <th>Department</th>
+                                <th>Data</th>
+                                <th>Rating</th>
+                                <th>Review Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="kriTableBody">
+                            <!-- Data will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Input KRI Section -->
+            <section id="input-kri-content" class="card" style="display:none;">
+                <h2 class="text-2xl font-semibold mb-4 text-gray-800">Input KRI</h2>
+                
+                <!-- List of KRIs for Input -->
+                <div class="overflow-x-auto rounded-lg shadow-md mb-6">
+                    <table id="inputKriTable">
+                        <thead>
+                            <tr>
+                                <th>No.</th>
+                                <th>Key Risk Indicator</th>
+                                <th>Data</th>
+                                <th>Rating</th>
+                                <th>Review Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inputKriTableBody">
+                            <!-- Data will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- KRI Configuration Section -->
+            <section id="configuration-content" class="card admin-only" style="display:none;">
+                <h2 class="text-2xl font-semibold mb-4 text-gray-800">KRI Configuration</h2>
+                
+                <!-- Add New KRI Button -->
+                <div class="mb-6">
+                    <button id="addKriBtn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg shadow-md">
+                        Add New KRI
+                    </button>
+                </div>
+
+                <!-- KRI Configuration Table -->
+                <div class="overflow-x-auto rounded-lg shadow-md">
+                    <table id="configTable">
+                        <thead>
+                            <tr>
+                                <th>No.</th>
+                                <th>KRI Name</th>
+                                <th>Department</th>
+                                <th>Frequency</th>
+                                <th>Inputter</th>
+                                <th>Approver</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="configTableBody">
+                            <!-- Data will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- KRI Input Modal -->
+    <div id="kriInputModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeInputModal">&times;</span>
+            <h2 class="text-2xl font-semibold mb-4">KRI Input Form</h2>
+            
+            <form id="kriInputForm">
+                <input type="hidden" id="inputKriId" />
+                
+                <div class="form-section">
+                    <h3 class="text-lg font-semibold mb-3">KRI Information</h3>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">KRI Name:</label>
+                        <input type="text" id="inputKriName" readonly class="w-full p-2 border border-gray-300 rounded-md bg-gray-50">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Unit of Measurement:</label>
+                        <input type="text" id="inputKriUnit" readonly class="w-full p-2 border border-gray-300 rounded-md bg-gray-50">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Value: <span class="text-red-500">*</span></label>
+                        <input type="number" id="inputKriValue" step="0.01" class="w-full p-2 border border-gray-300 rounded-md" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Current Rating:</label>
+                        <div id="currentRating" class="flex items-center">
+                            <span class="rating-indicator" id="ratingIndicator"></span>
+                            <span id="ratingText">-</span>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Comments:</label>
+                        <textarea id="inputComments" rows="3" class="w-full p-2 border border-gray-300 rounded-md"></textarea>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Attachments:</label>
+                        <input type="file" id="inputAttachments" multiple class="w-full p-2 border border-gray-300 rounded-md">
+                    </div>
+                </div>
+
+                <!-- IAM Section (shown for Orange/Red ratings) -->
+                <div id="iamSection" class="form-section" style="display:none;">
+                    <h3 class="text-lg font-semibold mb-3 text-red-600">Issue & Action Management (Required for Orange/Red KRI)</h3>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Issue Description: <span class="text-red-500">*</span></label>
+                        <textarea id="iamIssue" rows="3" class="w-full p-2 border border-gray-300 rounded-md" placeholder="Describe the identified issue..."></textarea>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Root Cause: <span class="text-red-500">*</span></label>
+                        <textarea id="iamRootCause" rows="3" class="w-full p-2 border border-gray-300 rounded-md" placeholder="Identify the root cause..."></textarea>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Action Plan: <span class="text-red-500">*</span></label>
+                        <textarea id="iamActionPlan" rows="3" class="w-full p-2 border border-gray-300 rounded-md" placeholder="Describe the action plan..."></textarea>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Target Date: <span class="text-red-500">*</span></label>
+                        <input type="date" id="iamTargetDate" class="w-full p-2 border border-gray-300 rounded-md">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Person in Charge: <span class="text-red-500">*</span></label>
+                        <input type="text" id="iamPic" class="w-full p-2 border border-gray-300 rounded-md" placeholder="Enter PIC name">
+                    </div>
+                </div>
+
+                <div class="flex justify-end space-x-3 mt-6">
+                    <button type="button" id="cancelInputBtn" class="bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded-lg">
+                        Cancel
+                    </button>
+                    <button type="button" id="saveDraftBtn" class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg">
+                        Save Draft
+                    </button>
+                    <button type="submit" id="submitInputBtn" class="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg">
+                        Submit for Approval
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- KRI Details Modal (for Approvers/Administrators) -->
+    <div id="kriDetailsModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeDetailsModal">&times;</span>
+            <h2 class="text-2xl font-semibold mb-4">KRI Details</h2>
+            
+            <div class="form-section">
+                <h3 class="text-lg font-semibold mb-3">KRI Information</h3>
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">KRI Name:</label>
+                        <p id="detailsKriName" class="p-2 bg-gray-50 border rounded-md"></p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Department:</label>
+                        <p id="detailsDepartment" class="p-2 bg-gray-50 border rounded-md"></p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Value:</label>
+                        <p id="detailsValue" class="p-2 bg-gray-50 border rounded-md"></p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Rating:</label>
+                        <p id="detailsRating" class="p-2 bg-gray-50 border rounded-md flex items-center"></p>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Comments:</label>
+                    <p id="detailsComments" class="p-2 bg-gray-50 border rounded-md min-h-[60px]"></p>
+                </div>
+            </div>
+
+            <!-- IAM Details Section -->
+            <div id="iamDetailsSection" class="form-section" style="display:none;">
+                <h3 class="text-lg font-semibold mb-3 text-red-600">Issue & Action Management Details</h3>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Issue Description:</label>
+                    <p id="detailsIamIssue" class="p-2 bg-gray-50 border rounded-md min-h-[60px]"></p>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Root Cause:</label>
+                    <p id="detailsIamRootCause" class="p-2 bg-gray-50 border rounded-md min-h-[60px]"></p>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Action Plan:</label>
+                    <p id="detailsIamActionPlan" class="p-2 bg-gray-50 border rounded-md min-h-[60px]"></p>
+                </div>
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Target Date:</label>
+                        <p id="detailsIamTargetDate" class="p-2 bg-gray-50 border rounded-md"></p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Person in Charge:</label>
+                        <p id="detailsIamPic" class="p-2 bg-gray-50 border rounded-md"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Approval Section -->
+            <div id="approvalSection" class="form-section">
+                <h3 class="text-lg font-semibold mb-3">Approval Actions</h3>
+                <div class="mb-4" id="rejectionReasonDiv" style="display:none;">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Reason for Rejection:</label>
+                    <textarea id="rejectionReason" rows="3" class="w-full p-2 border border-gray-300 rounded-md" placeholder="Please provide reason for rejection..."></textarea>
+                </div>
+                <div class="flex justify-end space-x-3 mt-6">
+                    <button type="button" id="backToSummaryBtn" class="bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded-lg">
+                        Back to Summary
+                    </button>
+                    <button type="button" id="rejectBtn" class="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg">
+                        Reject
+                    </button>
+                    <button type="button" id="approveBtn" class="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg">
+                        Approve
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- KRI Configuration Modal -->
+    <div id="kriConfigModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeConfigModal">&times;</span>
+            <h2 class="text-2xl font-semibold mb-4">KRI Configuration</h2>
+            
+            <form id="kriConfigForm">
+                <input type="hidden" id="configKriId" />
+                
+                <div class="form-section">
+                    <h3 class="text-lg font-semibold mb-3">Basic Information</h3>
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">KRI Name: <span class="text-red-500">*</span></label>
+                            <input type="text" id="configKriName" class="w-full p-2 border border-gray-300 rounded-md" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Department: <span class="text-red-500">*</span></label>
+                            <select id="configDepartment" class="w-full p-2 border border-gray-300 rounded-md" required>
+                                <option value="">Select Department</option>
+                                <option value="Finance">Finance</option>
+                                                        <option value="Operations">Operations</option>
+                        <option value="Risk Management">Risk Management</option>
+                        <option value="IT">IT</option>
+                        <option value="HR">HR</option>
+                        <option value="Legal">Legal</option>
+                        <option value="Compliance">Compliance</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Unit of Measurement: <span class="text-red-500">*</span></label>
+                            <select id="configUnit" class="w-full p-2 border border-gray-300 rounded-md" required>
+                                <option value="">Select Unit</option>
+                                <option value="%">Percentage (%)</option>
+                                <option value="#">Number (#)</option>
+                                <option value="Days">Days</option>
+                                <option value="Hours">Hours</option>
+                                <option value="Currency">Currency</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Frequency: <span class="text-red-500">*</span></label>
+                            <select id="configFrequency" class="w-full p-2 border border-gray-300 rounded-md" required>
+                                <option value="">Select Frequency</option>
+                                <option value="Daily">Daily</option>
+                                <option value="Weekly">Weekly</option>
+                                <option value="Monthly">Monthly</option>
+                                <option value="Quarterly">Quarterly</option>
+                                <option value="Annually">Annually</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Responsible Inputter: <span class="text-red-500">*</span></label>
+                            <input type="text" id="configInputter" class="w-full p-2 border border-gray-300 rounded-md" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Approver: <span class="text-red-500">*</span></label>
+                            <input type="text" id="configApprover" class="w-full p-2 border border-gray-300 rounded-md" required>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Description:</label>
+                        <textarea id="configDescription" rows="3" class="w-full p-2 border border-gray-300 rounded-md"></textarea>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3 class="text-lg font-semibold mb-3">Threshold Configuration</h3>
+                    <p class="text-sm text-gray-600 mb-4">Define threshold values for automatic rating calculation. Add multiple thresholds for different rating levels.</p>
+                    
+                    <div id="thresholds-container">
+                        <!-- Threshold rows will be added dynamically -->
+                    </div>
+                    
+                    <button type="button" id="addThresholdBtn" class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg mt-2">
+                        Add Threshold
+                    </button>
+                </div>
+
+                <div class="flex justify-end space-x-3 mt-6">
+                    <button type="button" id="cancelConfigBtn" class="bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded-lg">
+                        Cancel
+                    </button>
+                    <button type="submit" id="saveConfigBtn" class="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg">
+                        Save Configuration
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmModal" class="modal">
+        <div class="modal-content" style="max-width: 400px;">
+            <h3 class="text-lg font-semibold mb-4" id="confirmTitle">Confirm Action</h3>
+            <p id="confirmMessage" class="mb-6"></p>
+            <div class="flex justify-end space-x-3">
+                <button type="button" id="confirmNoBtn" class="bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded-lg">
+                    No
+                </button>
+                <button type="button" id="confirmYesBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg">
+                    Yes
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentUser = 'administrator';
+        let currentKriData = {};
+        let kriData = [];
+        let thresholdCounter = 0;
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeData();
+            initializeEventListeners();
+            updateUIForRole();
+            populateKriTable();
+        });
+
+        // Initialize sample data
+        function initializeData() {
+            kriData = [
+                // 2025 May Data
+                {
+                    id: 1,
+                    name: 'Credit Risk Ratio',
+                    department: 'Finance',
+                    value: 15.5,
+                    unit: '%',
+                    rating: 'Orange',
+                    status: 'Pending Input',
+                    frequency: 'Monthly',
+                    inputter: 'John Doe',
+                    approver: 'Jane Smith',
+                    year: 2025,
+                    month: 5,
+                    thresholds: [
+                        { rating: 'Green', condition: '<', value1: 10 },
+                        { rating: 'Orange', condition: 'Between', value1: 10, value2: 20 },
+                        { rating: 'Red', condition: '>', value1: 20 }
+                    ],
+                    comments: '',
+                    iam: null
+                },
+                {
+                    id: 2,
+                    name: 'Liquidity Risk Indicator',
+                    department: 'Finance',
+                    value: 85.2,
+                    unit: '%',
+                    rating: 'Green',
+                    status: 'Approved',
+                    frequency: 'Monthly',
+                    inputter: 'Alice Johnson',
+                    approver: 'Bob Wilson',
+                    year: 2025,
+                    month: 5,
+                    thresholds: [
+                        { rating: 'Green', condition: '>', value1: 80 },
+                        { rating: 'Orange', condition: 'Between', value1: 60, value2: 80 },
+                        { rating: 'Red', condition: '<', value1: 60 }
+                    ],
+                    comments: 'Liquidity position remains strong',
+                    iam: null
+                },
+                {
+                    id: 3,
+                    name: 'Operational Risk Events',
+                    department: 'Operations',
+                    value: 8,
+                    unit: '#',
+                    rating: 'Red',
+                    status: 'Pending Approval L1',
+                    frequency: 'Monthly',
+                    inputter: 'Charlie Brown',
+                    approver: 'Diana Ross',
+                    year: 2025,
+                    month: 5,
+                    thresholds: [
+                        { rating: 'Green', condition: '<', value1: 3 },
+                        { rating: 'Orange', condition: 'Between', value1: 3, value2: 5 },
+                        { rating: 'Red', condition: '>', value1: 5 }
+                    ],
+                    comments: 'Significant increase in operational incidents',
+                    iam: {
+                        issue: 'Multiple system outages during peak hours',
+                        rootCause: 'Inadequate system monitoring and maintenance procedures',
+                        actionPlan: 'Implement enhanced monitoring system and establish preventive maintenance schedule',
+                        targetDate: '2025-07-30',
+                        pic: 'IT Operations Team'
+                    }
+                },
+                {
+                    id: 4,
+                    name: 'Compliance Score',
+                    department: 'Risk Management',
+                    value: 92,
+                    unit: '#',
+                    rating: 'Green',
+                    status: 'Approved',
+                    frequency: 'Quarterly',
+                    inputter: 'Eva Green',
+                    approver: 'Frank Castle',
+                    year: 2025,
+                    month: 5,
+                    thresholds: [
+                        { rating: 'Green', condition: '>', value1: 90 },
+                        { rating: 'Orange', condition: 'Between', value1: 80, value2: 90 },
+                        { rating: 'Red', condition: '<', value1: 80 }
+                    ],
+                    comments: 'Compliance maintained at excellent level',
+                    iam: null
+                },
+                {
+                    id: 5,
+                    name: 'IT System Downtime',
+                    department: 'IT',
+                    value: 4.5,
+                    unit: 'Hours',
+                    rating: 'Orange',
+                    status: 'Pending Approval L2',
+                    frequency: 'Monthly',
+                    inputter: 'Grace Hopper',
+                    approver: 'Henry Ford',
+                    year: 2025,
+                    month: 5,
+                    thresholds: [
+                        { rating: 'Green', condition: '<', value1: 2 },
+                        { rating: 'Orange', condition: 'Between', value1: 2, value2: 8 },
+                        { rating: 'Red', condition: '>', value1: 8 }
+                    ],
+                    comments: 'Planned maintenance resulted in extended downtime',
+                    iam: {
+                        issue: 'Extended system maintenance window exceeded planned duration',
+                        rootCause: 'Unexpected complications during system upgrade',
+                        actionPlan: 'Improve change management process and create detailed rollback procedures',
+                        targetDate: '2025-06-30',
+                        pic: 'IT Infrastructure Team'
+                    }
+                },
+                // 2025 April Data
+                {
+                    id: 6,
+                    name: 'Credit Risk Ratio',
+                    department: 'Finance',
+                    value: 12.3,
+                    unit: '%',
+                    rating: 'Orange',
+                    status: 'Approved',
+                    frequency: 'Monthly',
+                    inputter: 'John Doe',
+                    approver: 'Jane Smith',
+                    year: 2025,
+                    month: 4,
+                    thresholds: [
+                        { rating: 'Green', condition: '<', value1: 10 },
+                        { rating: 'Orange', condition: 'Between', value1: 10, value2: 20 },
+                        { rating: 'Red', condition: '>', value1: 20 }
+                    ],
+                    comments: 'Credit risk increased due to market volatility',
+                    iam: {
+                        issue: 'Rising default rates in commercial lending portfolio',
+                        rootCause: 'Economic downturn affecting key business sectors',
+                        actionPlan: 'Tighten lending criteria and increase monitoring frequency',
+                        targetDate: '2025-06-15',
+                        pic: 'Credit Risk Team'
+                    }
+                },
+                {
+                    id: 7,
+                    name: 'Market Risk VaR',
+                    department: 'Risk Management',
+                    value: 2.8,
+                    unit: 'Currency',
+                    rating: 'Green',
+                    status: 'Approved',
+                    frequency: 'Daily',
+                    inputter: 'Michael Scott',
+                    approver: 'Pam Beesly',
+                    year: 2025,
+                    month: 4,
+                    thresholds: [
+                        { rating: 'Green', condition: '<', value1: 5 },
+                        { rating: 'Orange', condition: 'Between', value1: 5, value2: 10 },
+                        { rating: 'Red', condition: '>', value1: 10 }
+                    ],
+                    comments: 'VaR within acceptable limits',
+                    iam: null
+                },
+                {
+                    id: 8,
+                    name: 'Employee Turnover Rate',
+                    department: 'HR',
+                    value: 18.5,
+                    unit: '%',
+                    rating: 'Red',
+                    status: 'Approved',
+                    frequency: 'Monthly',
+                    inputter: 'Dwight Schrute',
+                    approver: 'Jim Halpert',
+                    year: 2025,
+                    month: 4,
+                    thresholds: [
+                        { rating: 'Green', condition: '<', value1: 10 },
+                        { rating: 'Orange', condition: 'Between', value1: 10, value2: 15 },
+                        { rating: 'Red', condition: '>', value1: 15 }
+                    ],
+                    comments: 'High turnover in technical departments',
+                    iam: {
+                        issue: 'Excessive employee departures in key technical roles',
+                        rootCause: 'Competitive salary offers from tech companies and limited career progression',
+                        actionPlan: 'Implement retention program and salary benchmarking exercise',
+                        targetDate: '2025-07-01',
+                        pic: 'HR Leadership Team'
+                    }
+                },
+                // 2025 March Data
+                {
+                    id: 9,
+                    name: 'Network Security Incidents',
+                    department: 'IT',
+                    value: 12,
+                    unit: '#',
+                    rating: 'Orange',
+                    status: 'Approved',
+                    frequency: 'Monthly',
+                    inputter: 'Angela Martin',
+                    approver: 'Kevin Malone',
+                    year: 2025,
+                    month: 3,
+                    thresholds: [
+                        { rating: 'Green', condition: '<', value1: 5 },
+                        { rating: 'Orange', condition: 'Between', value1: 5, value2: 15 },
+                        { rating: 'Red', condition: '>', value1: 15 }
+                    ],
+                    comments: 'Increase in phishing attempts',
+                    iam: {
+                        issue: 'Rising number of security incidents and attempted breaches',
+                        rootCause: 'Insufficient employee security awareness and outdated security protocols',
+                        actionPlan: 'Conduct comprehensive security training and update security infrastructure',
+                        targetDate: '2025-05-31',
+                        pic: 'IT Security Team'
+                    }
+                },
+                {
+                    id: 10,
+                    name: 'Customer Satisfaction Score',
+                    department: 'Operations',
+                    value: 4.2,
+                    unit: '#',
+                    rating: 'Green',
+                    status: 'Approved',
+                    frequency: 'Quarterly',
+                    inputter: 'Stanley Hudson',
+                    approver: 'Phyllis Vance',
+                    year: 2025,
+                    month: 3,
+                    thresholds: [
+                        { rating: 'Green', condition: '>', value1: 4.0 },
+                        { rating: 'Orange', condition: 'Between', value1: 3.0, value2: 4.0 },
+                        { rating: 'Red', condition: '<', value1: 3.0 }
+                    ],
+                    comments: 'Customer satisfaction maintained at good level',
+                    iam: null
+                },
+                // 2024 Data
+                {
+                    id: 11,
+                    name: 'Loan Default Rate',
+                    department: 'Finance',
+                    value: 3.2,
+                    unit: '%',
+                    rating: 'Orange',
+                    status: 'Approved',
+                    frequency: 'Monthly',
+                    inputter: 'Toby Flenderson',
+                    approver: 'Creed Bratton',
+                    year: 2024,
+                    month: 12,
+                    thresholds: [
+                        { rating: 'Green', condition: '<', value1: 2.5 },
+                        { rating: 'Orange', condition: 'Between', value1: 2.5, value2: 4.0 },
+                        { rating: 'Red', condition: '>', value1: 4.0 }
+                    ],
+                    comments: 'Default rate slightly elevated',
+                    iam: {
+                        issue: 'Loan default rate exceeding target threshold',
+                        rootCause: 'Economic uncertainty affecting borrower payment capacity',
+                        actionPlan: 'Review and strengthen credit assessment procedures',
+                        targetDate: '2025-02-28',
+                        pic: 'Credit Assessment Team'
+                    }
+                },
+                {
+                    id: 12,
+                    name: 'Data Backup Success Rate',
+                    department: 'IT',
+                    value: 98.5,
+                    unit: '%',
+                    rating: 'Green',
+                    status: 'Approved',
+                    frequency: 'Weekly',
+                    inputter: 'Ryan Howard',
+                    approver: 'Kelly Kapoor',
+                    year: 2024,
+                    month: 11,
+                    thresholds: [
+                        { rating: 'Green', condition: '>', value1: 95 },
+                        { rating: 'Orange', condition: 'Between', value1: 90, value2: 95 },
+                        { rating: 'Red', condition: '<', value1: 90 }
+                    ],
+                    comments: 'Backup processes running smoothly',
+                    iam: null
+                },
+                {
+                    id: 13,
+                    name: 'Regulatory Audit Findings',
+                    department: 'Risk Management',
+                    value: 7,
+                    unit: '#',
+                    rating: 'Orange',
+                    status: 'Approved',
+                    frequency: 'Quarterly',
+                    inputter: 'Oscar Martinez',
+                    approver: 'Meredith Palmer',
+                    year: 2024,
+                    month: 10,
+                    thresholds: [
+                        { rating: 'Green', condition: '<', value1: 5 },
+                        { rating: 'Orange', condition: 'Between', value1: 5, value2: 10 },
+                        { rating: 'Red', condition: '>', value1: 10 }
+                    ],
+                    comments: 'Some minor regulatory issues identified',
+                    iam: {
+                        issue: 'Regulatory audit identified several compliance gaps',
+                        rootCause: 'Inadequate documentation and process controls',
+                        actionPlan: 'Strengthen compliance framework and documentation processes',
+                        targetDate: '2025-01-15',
+                        pic: 'Compliance Team'
+                    }
+                },
+                // 2023 Data
+                {
+                    id: 14,
+                    name: 'Cash Flow Ratio',
+                    department: 'Finance',
+                    value: 1.8,
+                    unit: '#',
+                    rating: 'Green',
+                    status: 'Approved',
+                    frequency: 'Monthly',
+                    inputter: 'Clark Green',
+                    approver: 'Pete Miller',
+                    year: 2023,
+                    month: 12,
+                    thresholds: [
+                        { rating: 'Green', condition: '>', value1: 1.5 },
+                        { rating: 'Orange', condition: 'Between', value1: 1.0, value2: 1.5 },
+                        { rating: 'Red', condition: '<', value1: 1.0 }
+                    ],
+                    comments: 'Strong cash flow position maintained',
+                    iam: null
+                },
+                {
+                    id: 15,
+                    name: 'Process Automation Rate',
+                    department: 'Operations',
+                    value: 75,
+                    unit: '%',
+                    rating: 'Green',
+                    status: 'Approved',
+                    frequency: 'Quarterly',
+                    inputter: 'Nate Nickerson',
+                    approver: 'Gabe Lewis',
+                    year: 2023,
+                    month: 9,
+                    thresholds: [
+                        { rating: 'Green', condition: '>', value1: 70 },
+                        { rating: 'Orange', condition: 'Between', value1: 50, value2: 70 },
+                        { rating: 'Red', condition: '<', value1: 50 }
+                    ],
+                    comments: 'Automation initiatives showing good progress',
+                    iam: null
+                },
+                // Legal Department Data
+                {
+                    id: 16,
+                    name: 'Contract Review Turnaround Time',
+                    department: 'Legal',
+                    value: 12,
+                    unit: 'Days',
+                    rating: 'Orange',
+                    status: 'Pending Approval L1',
+                    frequency: 'Monthly',
+                    inputter: 'Sarah Connor',
+                    approver: 'John Connor',
+                    year: 2025,
+                    month: 5,
+                    thresholds: [
+                        { rating: 'Green', condition: '<', value1: 7 },
+                        { rating: 'Orange', condition: 'Between', value1: 7, value2: 14 },
+                        { rating: 'Red', condition: '>', value1: 14 }
+                    ],
+                    comments: 'Review times exceeding target due to complex contracts',
+                    iam: {
+                        issue: 'Contract review process taking longer than acceptable timeframe',
+                        rootCause: 'Increased complexity of contracts and limited legal staff capacity',
+                        actionPlan: 'Implement contract templates and hire additional legal counsel',
+                        targetDate: '2025-08-15',
+                        pic: 'Legal Operations Manager'
+                    }
+                },
+                {
+                    id: 17,
+                    name: 'Legal Disputes Count',
+                    department: 'Legal',
+                    value: 3,
+                    unit: '#',
+                    rating: 'Green',
+                    status: 'Approved',
+                    frequency: 'Monthly',
+                    inputter: 'Bruce Wayne',
+                    approver: 'Alfred Pennyworth',
+                    year: 2025,
+                    month: 4,
+                    thresholds: [
+                        { rating: 'Green', condition: '<', value1: 5 },
+                        { rating: 'Orange', condition: 'Between', value1: 5, value2: 10 },
+                        { rating: 'Red', condition: '>', value1: 10 }
+                    ],
+                    comments: 'Legal disputes maintained within acceptable limits',
+                    iam: null
+                },
+                // Compliance Department Data
+                {
+                    id: 18,
+                    name: 'Regulatory Training Completion Rate',
+                    department: 'Compliance',
+                    value: 78,
+                    unit: '%',
+                    rating: 'Orange',
+                    status: 'Approved',
+                    frequency: 'Quarterly',
+                    inputter: 'Diana Prince',
+                    approver: 'Steve Trevor',
+                    year: 2025,
+                    month: 3,
+                    thresholds: [
+                        { rating: 'Green', condition: '>', value1: 95 },
+                        { rating: 'Orange', condition: 'Between', value1: 80, value2: 95 },
+                        { rating: 'Red', condition: '<', value1: 80 }
+                    ],
+                    comments: 'Training completion below target, action plan implemented',
+                    iam: {
+                        issue: 'Low completion rate for mandatory regulatory training',
+                        rootCause: 'Insufficient tracking and follow-up on training completion',
+                        actionPlan: 'Implement automated training reminders and manager escalation process',
+                        targetDate: '2025-06-30',
+                        pic: 'Compliance Training Coordinator'
+                    }
+                },
+                {
+                    id: 19,
+                    name: 'Policy Exception Requests',
+                    department: 'Compliance',
+                    value: 25,
+                    unit: '#',
+                    rating: 'Red',
+                    status: 'Pending Approval L2',
+                    frequency: 'Monthly',
+                    inputter: 'Clark Kent',
+                    approver: 'Lois Lane',
+                    year: 2025,
+                    month: 5,
+                    thresholds: [
+                        { rating: 'Green', condition: '<', value1: 10 },
+                        { rating: 'Orange', condition: 'Between', value1: 10, value2: 20 },
+                        { rating: 'Red', condition: '>', value1: 20 }
+                    ],
+                    comments: 'Significant increase in policy exception requests requiring investigation',
+                    iam: {
+                        issue: 'Unusually high number of policy exception requests',
+                        rootCause: 'New business initiatives not aligned with current policy framework',
+                        actionPlan: 'Review and update policy framework to accommodate business needs',
+                        targetDate: '2025-07-31',
+                        pic: 'Policy Review Committee'
+                    }
+                },
+                {
+                    id: 20,
+                    name: 'Anti-Money Laundering Alert Resolution Time',
+                    department: 'Compliance',
+                    value: 8.5,
+                    unit: 'Hours',
+                    rating: 'Green',
+                    status: 'Approved',
+                    frequency: 'Weekly',
+                    inputter: 'Peter Parker',
+                    approver: 'Aunt May',
+                    year: 2024,
+                    month: 12,
+                    thresholds: [
+                        { rating: 'Green', condition: '<', value1: 12 },
+                        { rating: 'Orange', condition: 'Between', value1: 12, value2: 24 },
+                        { rating: 'Red', condition: '>', value1: 24 }
+                    ],
+                    comments: 'AML alert resolution within regulatory requirements',
+                    iam: null
+                }
+            ];
+        }
+
+        // Initialize event listeners
+        function initializeEventListeners() {
+            // Navigation
+            document.getElementById('menu-dashboard').addEventListener('click', (e) => {
+                e.preventDefault();
+                showSection('dashboard');
+            });
+            
+            document.getElementById('menu-input-kri').addEventListener('click', (e) => {
+                e.preventDefault();
+                showSection('input-kri');
+            });
+            
+            document.getElementById('menu-configuration').addEventListener('click', (e) => {
+                e.preventDefault();
+                showSection('configuration');
+            });
+
+            // Role selector (for demo)
+            document.getElementById('roleSelector').addEventListener('change', (e) => {
+                currentUser = e.target.value;
+                document.getElementById('currentUser').textContent = 
+                    currentUser.charAt(0).toUpperCase() + currentUser.slice(1);
+                updateUIForRole();
+                populateKriTable();
+            });
+
+            // Filters
+            document.getElementById('departmentFilter').addEventListener('change', populateKriTable);
+            document.getElementById('yearFilter').addEventListener('change', populateKriTable);
+            document.getElementById('monthFilter').addEventListener('change', populateKriTable);
+
+            // Modals
+            setupModalListeners();
+            
+            // Forms
+            setupFormListeners();
+            
+            // Other buttons
+            document.getElementById('generateReportBtn').addEventListener('click', generateReport);
+            document.getElementById('addKriBtn').addEventListener('click', () => openKriConfigModal());
+            document.getElementById('logoutBtn').addEventListener('click', () => alert('Logout functionality would be implemented here'));
+        }
+
+        // Setup modal event listeners
+        function setupModalListeners() {
+            // Close buttons
+            document.querySelectorAll('.close').forEach(closeBtn => {
+                closeBtn.addEventListener('click', () => {
+                    closeBtn.closest('.modal').style.display = 'none';
+                });
+            });
+
+            // Click outside to close
+            window.addEventListener('click', (e) => {
+                if (e.target.classList.contains('modal')) {
+                    e.target.style.display = 'none';
+                }
+            });
+
+            // Modal specific buttons
+            document.getElementById('cancelInputBtn').addEventListener('click', () => {
+                document.getElementById('kriInputModal').style.display = 'none';
+            });
+            
+            document.getElementById('backToSummaryBtn').addEventListener('click', () => {
+                document.getElementById('kriDetailsModal').style.display = 'none';
+            });
+            
+            document.getElementById('cancelConfigBtn').addEventListener('click', () => {
+                document.getElementById('kriConfigModal').style.display = 'none';
+            });
+        }
+
+        // Setup form event listeners
+        function setupFormListeners() {
+            // KRI Input Form
+            document.getElementById('inputKriValue').addEventListener('input', calculateRating);
+            document.getElementById('kriInputForm').addEventListener('submit', submitKriInput);
+            document.getElementById('saveDraftBtn').addEventListener('click', saveDraft);
+
+            // KRI Config Form
+            document.getElementById('kriConfigForm').addEventListener('submit', saveKriConfig);
+            document.getElementById('addThresholdBtn').addEventListener('click', addThreshold);
+
+            // Approval buttons
+            document.getElementById('approveBtn').addEventListener('click', () => showConfirmation('approve'));
+            document.getElementById('rejectBtn').addEventListener('click', () => showConfirmation('reject'));
+
+            // Confirmation modal
+            document.getElementById('confirmYesBtn').addEventListener('click', handleConfirmation);
+            document.getElementById('confirmNoBtn').addEventListener('click', () => {
+                document.getElementById('confirmModal').style.display = 'none';
+            });
+        }
+
+        // Show/hide sections based on navigation
+        function showSection(sectionId) {
+            // Hide all sections
+            document.getElementById('dashboard-content').style.display = 'none';
+            document.getElementById('input-kri-content').style.display = 'none';
+            document.getElementById('configuration-content').style.display = 'none';
+
+            // Remove active class from all menu items
+            document.querySelectorAll('.sidebar-menu a').forEach(link => {
+                link.classList.remove('active');
+            });
+
+            // Show selected section and activate menu item
+            if (sectionId === 'dashboard') {
+                document.getElementById('dashboard-content').style.display = 'block';
+                document.getElementById('menu-dashboard').classList.add('active');
+                populateKriTable();
+            } else if (sectionId === 'input-kri') {
+                document.getElementById('input-kri-content').style.display = 'block';
+                document.getElementById('menu-input-kri').classList.add('active');
+                populateInputKriTable();
+            } else if (sectionId === 'configuration') {
+                document.getElementById('configuration-content').style.display = 'block';
+                document.getElementById('menu-configuration').classList.add('active');
+                populateConfigTable();
+            }
+        }
+
+        // Update UI based on user role
+        function updateUIForRole() {
+            const adminElements = document.querySelectorAll('.admin-only');
+            const departmentFilter = document.getElementById('departmentFilter');
+
+            if (currentUser === 'administrator') {
+                adminElements.forEach(el => el.style.display = 'block');
+                departmentFilter.disabled = false;
+            } else {
+                adminElements.forEach(el => el.style.display = 'none');
+                departmentFilter.disabled = true;
+                departmentFilter.value = getDepartmentForUser(currentUser);
+            }
+        }
+
+        // Get department for non-admin users
+        function getDepartmentForUser(user) {
+            // In a real application, this would be retrieved from user profile
+            const userDepartments = {
+                'inputter': 'Finance',
+                'approver': 'Finance'
+            };
+            return userDepartments[user] || 'Finance';
+        }
+
+        // Populate main KRI table
+        function populateKriTable() {
+            const tbody = document.getElementById('kriTableBody');
+            const departmentFilter = document.getElementById('departmentFilter').value;
+            const yearFilter = document.getElementById('yearFilter').value;
+            const monthFilter = document.getElementById('monthFilter').value;
+
+            tbody.innerHTML = '';
+
+            let filteredData = kriData.filter(kri => {
+                // Role-based filtering
+                if (currentUser !== 'administrator' && kri.department !== getDepartmentForUser(currentUser)) {
+                    return false;
+                }
+                // Department filtering
+                if (departmentFilter !== 'All' && kri.department !== departmentFilter) {
+                    return false;
+                }
+                // Year filtering
+                if (yearFilter !== 'All' && kri.year.toString() !== yearFilter) {
+                    return false;
+                }
+                // Month filtering
+                if (monthFilter !== 'All' && kri.month.toString().padStart(2, '0') !== monthFilter) {
+                    return false;
+                }
+                return true;
+            });
+
+            filteredData.forEach((kri, index) => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${kri.name}</td>
+                    <td>${kri.department}</td>
+                    <td>${kri.value} ${kri.unit}</td>
+                    <td>
+                        <span class="rating-indicator rating-${kri.rating.toLowerCase()}"></span>
+                        ${kri.rating}
+                    </td>
+                    <td><span class="status-${getStatusClass(kri.status)}">${kri.status}</span></td>
+                    <td>${generateActionButtons(kri)}</td>
+                `;
+            });
+
+            updateSummaryCards(filteredData);
+        }
+
+        // Populate input KRI table for inputter
+        function populateInputKriTable() {
+            const tbody = document.getElementById('inputKriTableBody');
+            const departmentFilter = document.getElementById('departmentFilter').value;
+            const yearFilter = document.getElementById('yearFilter').value;
+            const monthFilter = document.getElementById('monthFilter').value;
+
+            tbody.innerHTML = '';
+
+            let filteredData = kriData.filter(kri => {
+                // Role-based filtering
+                if (currentUser !== 'administrator' && kri.department !== getDepartmentForUser(currentUser)) {
+                    return false;
+                }
+                // Department filtering
+                if (departmentFilter !== 'All' && kri.department !== departmentFilter) {
+                    return false;
+                }
+                // Year filtering
+                if (yearFilter !== 'All' && kri.year.toString() !== yearFilter) {
+                    return false;
+                }
+                // Month filtering
+                if (monthFilter !== 'All' && kri.month.toString().padStart(2, '0') !== monthFilter) {
+                    return false;
+                }
+                return true;
+            });
+
+            filteredData.forEach((kri, index) => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${kri.name}</td>
+                    <td>${kri.value} ${kri.unit}</td>
+                    <td>
+                        <span class="rating-indicator rating-${kri.rating.toLowerCase()}"></span>
+                        ${kri.rating}
+                    </td>
+                    <td><span class="status-${getStatusClass(kri.status)}">${kri.status}</span></td>
+                    <td>${generateInputActionButtons(kri)}</td>
+                `;
+            });
+        }
+
+        // Populate configuration table for administrator
+        function populateConfigTable() {
+            const tbody = document.getElementById('configTableBody');
+            const departmentFilter = document.getElementById('departmentFilter').value;
+
+            tbody.innerHTML = '';
+
+            // Get unique KRIs (by name) for configuration display
+            const uniqueKris = [];
+            const seen = new Set();
+            
+            kriData.forEach(kri => {
+                const key = `${kri.name}-${kri.department}`;
+                if (!seen.has(key)) {
+                    seen.add(key);
+                    uniqueKris.push(kri);
+                }
+            });
+
+            let filteredData = uniqueKris.filter(kri => {
+                if (departmentFilter !== 'All' && kri.department !== departmentFilter) {
+                    return false;
+                }
+                return true;
+            });
+
+            filteredData.forEach((kri, index) => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${kri.name}</td>
+                    <td>${kri.department}</td>
+                    <td>${kri.frequency}</td>
+                    <td>${kri.inputter}</td>
+                    <td>${kri.approver}</td>
+                    <td><span class="status-green">Active</span></td>
+                    <td>
+                        <button class="text-blue-600 hover:underline mr-2" onclick="editKri(${kri.id})">Edit</button>
+                        <button class="text-red-600 hover:underline" onclick="deactivateKri(${kri.id})">Deactivate</button>
+                    </td>
+                `;
+            });
+        }
+
+        // Generate action buttons based on user role and KRI status
+        function generateActionButtons(kri) {
+            let buttons = '';
+            
+            if (currentUser === 'inputter') {
+                if (kri.status === 'Pending Input' || kri.status === 'Rejected') {
+                    buttons += `<button class="text-blue-600 hover:underline mr-2" onclick="openKriInputModal(${kri.id})">Edit</button>`;
+                }
+                if ((kri.rating === 'Orange' || kri.rating === 'Red') && kri.status === 'Approved') {
+                    buttons += `<button class="text-orange-600 hover:underline" onclick="manageIAM(${kri.id})">Manage IAM</button>`;
+                }
+            } else if (currentUser === 'approver') {
+                if (kri.status === 'Pending Approval L1') {
+                    buttons += `<button class="text-green-600 hover:underline mr-2" onclick="openKriDetailsModal(${kri.id})">Review</button>`;
+                }
+                if ((kri.rating === 'Orange' || kri.rating === 'Red') && kri.iam) {
+                    buttons += `<button class="text-blue-600 hover:underline" onclick="viewIAM(${kri.id})">View IAM</button>`;
+                }
+            } else if (currentUser === 'administrator') {
+                if (kri.status === 'Pending Approval L2') {
+                    buttons += `<button class="text-green-600 hover:underline mr-2" onclick="openKriDetailsModal(${kri.id})">Review</button>`;
+                }
+                if ((kri.rating === 'Orange' || kri.rating === 'Red') && kri.iam) {
+                    buttons += `<button class="text-blue-600 hover:underline" onclick="viewIAM(${kri.id})">View IAM</button>`;
+                }
+            }
+
+            return buttons || '-';
+        }
+
+        // Generate action buttons for input KRI section
+        function generateInputActionButtons(kri) {
+            let buttons = '';
+            
+            if (kri.status === 'Pending Input' || kri.status === 'Rejected') {
+                buttons += `<button class="text-blue-600 hover:underline mr-2" onclick="openKriInputModal(${kri.id})">Edit</button>`;
+            }
+            if ((kri.rating === 'Orange' || kri.rating === 'Red') && kri.status === 'Approved') {
+                buttons += `<button class="text-orange-600 hover:underline" onclick="manageIAM(${kri.id})">Manage IAM</button>`;
+            }
+
+            return buttons || '-';
+        }
+
+        // Get CSS class for status
+        function getStatusClass(status) {
+            const statusClasses = {
+                'Pending Input': 'pending',
+                'Pending Approval L1': 'pending',
+                'Pending Approval L2': 'pending',
+                'Approved': 'approved',
+                'Rejected': 'rejected'
+            };
+            return statusClasses[status] || 'pending';
+        }
+
+        // Update summary cards
+        function updateSummaryCards(filteredData = null) {
+            let greenCount = 0, orangeCount = 0, redCount = 0, pendingCount = 0;
+            
+            const dataToAnalyze = filteredData || kriData;
+            
+            dataToAnalyze.forEach(kri => {
+                if (kri.rating === 'Green') greenCount++;
+                else if (kri.rating === 'Orange') orangeCount++;
+                else if (kri.rating === 'Red') redCount++;
+                
+                if (kri.status.includes('Pending')) pendingCount++;
+            });
+
+            document.getElementById('greenCount').textContent = greenCount;
+            document.getElementById('orangeCount').textContent = orangeCount;
+            document.getElementById('redCount').textContent = redCount;
+            document.getElementById('pendingCount').textContent = pendingCount;
+        }
+
+        // Open KRI input modal
+        function openKriInputModal(kriId) {
+            const kri = kriData.find(k => k.id === kriId);
+            if (!kri) return;
+
+            currentKriData = kri;
+
+            document.getElementById('inputKriId').value = kri.id;
+            document.getElementById('inputKriName').value = kri.name;
+            document.getElementById('inputKriUnit').value = kri.unit;
+            document.getElementById('inputKriValue').value = kri.value || '';
+            document.getElementById('inputComments').value = kri.comments || '';
+
+            // Populate IAM fields if they exist
+            if (kri.iam) {
+                document.getElementById('iamIssue').value = kri.iam.issue || '';
+                document.getElementById('iamRootCause').value = kri.iam.rootCause || '';
+                document.getElementById('iamActionPlan').value = kri.iam.actionPlan || '';
+                document.getElementById('iamTargetDate').value = kri.iam.targetDate || '';
+                document.getElementById('iamPic').value = kri.iam.pic || '';
+            }
+
+            calculateRating();
+            document.getElementById('kriInputModal').style.display = 'block';
+        }
+
+        // Open KRI details modal for approval
+        function openKriDetailsModal(kriId) {
+            const kri = kriData.find(k => k.id === kriId);
+            if (!kri) return;
+
+            currentKriData = kri;
+
+            document.getElementById('detailsKriName').textContent = kri.name;
+            document.getElementById('detailsDepartment').textContent = kri.department;
+            document.getElementById('detailsValue').textContent = `${kri.value} ${kri.unit}`;
+            document.getElementById('detailsRating').innerHTML = `
+                <span class="rating-indicator rating-${kri.rating.toLowerCase()}"></span>
+                ${kri.rating}
+            `;
+            document.getElementById('detailsComments').textContent = kri.comments || 'No comments provided';
+
+            // Show/hide IAM section
+            if (kri.iam) {
+                document.getElementById('iamDetailsSection').style.display = 'block';
+                document.getElementById('detailsIamIssue').textContent = kri.iam.issue;
+                document.getElementById('detailsIamRootCause').textContent = kri.iam.rootCause;
+                document.getElementById('detailsIamActionPlan').textContent = kri.iam.actionPlan;
+                document.getElementById('detailsIamTargetDate').textContent = kri.iam.targetDate;
+                document.getElementById('detailsIamPic').textContent = kri.iam.pic;
+            } else {
+                document.getElementById('iamDetailsSection').style.display = 'none';
+            }
+
+            document.getElementById('kriDetailsModal').style.display = 'block';
+        }
+
+        // Open KRI configuration modal
+        function openKriConfigModal(kriId = null) {
+            const modal = document.getElementById('kriConfigModal');
+            const form = document.getElementById('kriConfigForm');
+            form.reset();
+
+            if (kriId) {
+                const kri = kriData.find(k => k.id === kriId);
+                if (kri) {
+                    document.getElementById('configKriId').value = kri.id;
+                    document.getElementById('configKriName').value = kri.name;
+                    document.getElementById('configDepartment').value = kri.department;
+                    document.getElementById('configUnit').value = kri.unit;
+                    document.getElementById('configFrequency').value = kri.frequency;
+                    document.getElementById('configInputter').value = kri.inputter;
+                    document.getElementById('configApprover').value = kri.approver;
+                    document.getElementById('configDescription').value = kri.description || '';
+
+                    // Populate thresholds
+                    const container = document.getElementById('thresholds-container');
+                    container.innerHTML = '';
+                    thresholdCounter = 0;
+                    kri.thresholds.forEach(threshold => {
+                        addThreshold(threshold);
+                    });
+                }
+            } else {
+                document.getElementById('configKriId').value = '';
+                const container = document.getElementById('thresholds-container');
+                container.innerHTML = '';
+                thresholdCounter = 0;
+                addThreshold(); // Add one empty threshold
+            }
+
+            modal.style.display = 'block';
+        }
+
+        // Calculate KRI rating based on value and thresholds
+        function calculateRating() {
+            const value = parseFloat(document.getElementById('inputKriValue').value);
+            const ratingIndicator = document.getElementById('ratingIndicator');
+            const ratingText = document.getElementById('ratingText');
+            const iamSection = document.getElementById('iamSection');
+
+            if (isNaN(value) || !currentKriData.thresholds) {
+                ratingIndicator.className = 'rating-indicator';
+                ratingText.textContent = '-';
+                iamSection.style.display = 'none';
+                return;
+            }
+
+            let rating = 'Green'; // default
+
+            for (const threshold of currentKriData.thresholds) {
+                if (threshold.condition === '<' && value < threshold.value1) {
+                    rating = threshold.rating;
+                    break;
+                } else if (threshold.condition === '>' && value > threshold.value1) {
+                    rating = threshold.rating;
+                    break;
+                } else if (threshold.condition === 'Between' && value >= threshold.value1 && value <= threshold.value2) {
+                    rating = threshold.rating;
+                    break;
+                } else if (threshold.condition === '=' && value === threshold.value1) {
+                    rating = threshold.rating;
+                    break;
+                }
+            }
+
+            ratingIndicator.className = `rating-indicator rating-${rating.toLowerCase()}`;
+            ratingText.textContent = rating;
+
+            // Show/hide IAM section based on rating
+            if (rating === 'Orange' || rating === 'Red') {
+                iamSection.style.display = 'block';
+                // Make IAM fields required
+                document.querySelectorAll('#iamSection input[required], #iamSection textarea[required]').forEach(field => {
+                    field.setAttribute('required', 'required');
+                });
+            } else {
+                iamSection.style.display = 'none';
+                // Remove required from IAM fields
+                document.querySelectorAll('#iamSection input, #iamSection textarea').forEach(field => {
+                    field.removeAttribute('required');
+                });
+            }
+        }
+
+        // Submit KRI input
+        function submitKriInput(e) {
+            e.preventDefault();
+            
+            const form = document.getElementById('kriInputForm');
+            const formData = new FormData(form);
+            
+            // Validate form
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            const kriId = parseInt(document.getElementById('inputKriId').value);
+            const value = parseFloat(document.getElementById('inputKriValue').value);
+            const comments = document.getElementById('inputComments').value;
+
+            // Update KRI data
+            const kriIndex = kriData.findIndex(k => k.id === kriId);
+            if (kriIndex !== -1) {
+                kriData[kriIndex].value = value;
+                kriData[kriIndex].comments = comments;
+                
+                // Calculate rating
+                let rating = calculateKriRating(kriData[kriIndex], value);
+                kriData[kriIndex].rating = rating;
+                
+                // Update IAM if required
+                if (rating === 'Orange' || rating === 'Red') {
+                    kriData[kriIndex].iam = {
+                        issue: document.getElementById('iamIssue').value,
+                        rootCause: document.getElementById('iamRootCause').value,
+                        actionPlan: document.getElementById('iamActionPlan').value,
+                        targetDate: document.getElementById('iamTargetDate').value,
+                        pic: document.getElementById('iamPic').value
+                    };
+                } else {
+                    kriData[kriIndex].iam = null;
+                }
+                
+                kriData[kriIndex].status = 'Pending Approval L1';
+            }
+
+            alert('KRI submitted successfully for approval!');
+            document.getElementById('kriInputModal').style.display = 'none';
+            populateKriTable();
+            populateInputKriTable();
+        }
+
+        // Calculate KRI rating based on thresholds
+        function calculateKriRating(kri, value) {
+            if (!kri.thresholds) return 'Green';
+            
+            for (const threshold of kri.thresholds) {
+                if (threshold.condition === '<' && value < threshold.value1) {
+                    return threshold.rating;
+                } else if (threshold.condition === '>' && value > threshold.value1) {
+                    return threshold.rating;
+                } else if (threshold.condition === 'Between' && value >= threshold.value1 && value <= threshold.value2) {
+                    return threshold.rating;
+                } else if (threshold.condition === '=' && value === threshold.value1) {
+                    return threshold.rating;
+                }
+            }
+            return 'Green';
+        }
+
+        // Save draft
+        function saveDraft() {
+            const kriId = parseInt(document.getElementById('inputKriId').value);
+            const value = document.getElementById('inputKriValue').value;
+            const comments = document.getElementById('inputComments').value;
+
+            // In a real application, this would save to backend
+            alert('Draft saved successfully!');
+        }
+
+        // Add threshold row
+        function addThreshold(thresholdData = null) {
+            const container = document.getElementById('thresholds-container');
+            thresholdCounter++;
+
+            const thresholdRow = document.createElement('div');
+            thresholdRow.className = 'threshold-row';
+            thresholdRow.id = `threshold-${thresholdCounter}`;
+
+            thresholdRow.innerHTML = `
+                <select class="p-2 border border-gray-300 rounded-md" name="rating">
+                    <option value="Green" ${thresholdData && thresholdData.rating === 'Green' ? 'selected' : ''}>Green</option>
+                    <option value="Orange" ${thresholdData && thresholdData.rating === 'Orange' ? 'selected' : ''}>Orange</option>
+                    <option value="Red" ${thresholdData && thresholdData.rating === 'Red' ? 'selected' : ''}>Red</option>
+                </select>
+                <span class="text-sm">if value</span>
+                <select class="p-2 border border-gray-300 rounded-md" name="condition" onchange="updateThresholdInputs(${thresholdCounter})">
+                    <option value="<" ${thresholdData && thresholdData.condition === '<' ? 'selected' : ''}>&lt;</option>
+                    <option value=">" ${thresholdData && thresholdData.condition === '>' ? 'selected' : ''}>&gt;</option>
+                    <option value="Between" ${thresholdData && thresholdData.condition === 'Between' ? 'selected' : ''}>Between</option>
+                    <option value="=" ${thresholdData && thresholdData.condition === '=' ? 'selected' : ''}>=</option>
+                </select>
+                <input type="number" class="p-2 border border-gray-300 rounded-md" name="value1" placeholder="Value 1" step="0.01" 
+                       value="${thresholdData ? thresholdData.value1 || '' : ''}" required>
+                <input type="number" class="p-2 border border-gray-300 rounded-md" name="value2" placeholder="Value 2" step="0.01" 
+                       value="${thresholdData ? thresholdData.value2 || '' : ''}" style="display: ${thresholdData && thresholdData.condition === 'Between' ? 'block' : 'none'}">
+                <button type="button" class="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-md" onclick="removeThreshold(${thresholdCounter})">
+                    Remove
+                </button>
+            `;
+
+            container.appendChild(thresholdRow);
+        }
+
+        // Update threshold inputs based on condition
+        function updateThresholdInputs(thresholdId) {
+            const row = document.getElementById(`threshold-${thresholdId}`);
+            const condition = row.querySelector('select[name="condition"]').value;
+            const value2Input = row.querySelector('input[name="value2"]');
+
+            if (condition === 'Between') {
+                value2Input.style.display = 'block';
+                value2Input.setAttribute('required', 'required');
+            } else {
+                value2Input.style.display = 'none';
+                value2Input.removeAttribute('required');
+                value2Input.value = '';
+            }
+        }
+
+        // Remove threshold row
+        function removeThreshold(thresholdId) {
+            const row = document.getElementById(`threshold-${thresholdId}`);
+            if (row) {
+                row.remove();
+            }
+        }
+
+        // Save KRI configuration
+        function saveKriConfig(e) {
+            e.preventDefault();
+            
+            const form = document.getElementById('kriConfigForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            const kriId = document.getElementById('configKriId').value;
+            const formData = {
+                name: document.getElementById('configKriName').value,
+                department: document.getElementById('configDepartment').value,
+                unit: document.getElementById('configUnit').value,
+                frequency: document.getElementById('configFrequency').value,
+                inputter: document.getElementById('configInputter').value,
+                approver: document.getElementById('configApprover').value,
+                description: document.getElementById('configDescription').value
+            };
+
+            // Collect thresholds
+            const thresholds = [];
+            document.querySelectorAll('.threshold-row').forEach(row => {
+                const rating = row.querySelector('select[name="rating"]').value;
+                const condition = row.querySelector('select[name="condition"]').value;
+                const value1 = parseFloat(row.querySelector('input[name="value1"]').value);
+                const value2Input = row.querySelector('input[name="value2"]');
+                const value2 = value2Input.style.display !== 'none' ? parseFloat(value2Input.value) : null;
+
+                thresholds.push({ rating, condition, value1, value2 });
+            });
+
+            if (kriId) {
+                // Update existing KRI
+                const kriIndex = kriData.findIndex(k => k.id === parseInt(kriId));
+                if (kriIndex !== -1) {
+                    Object.assign(kriData[kriIndex], formData);
+                    kriData[kriIndex].thresholds = thresholds;
+                }
+            } else {
+                // Add new KRI
+                const newId = Math.max(...kriData.map(k => k.id)) + 1;
+                kriData.push({
+                    id: newId,
+                    ...formData,
+                    thresholds,
+                    value: null,
+                    rating: 'Green',
+                    status: 'Pending Input',
+                    comments: '',
+                    iam: null
+                });
+            }
+
+            alert('KRI configuration saved successfully!');
+            document.getElementById('kriConfigModal').style.display = 'none';
+            populateConfigTable();
+            populateKriTable();
+        }
+
+        // Show confirmation dialog
+        function showConfirmation(action) {
+            const modal = document.getElementById('confirmModal');
+            const title = document.getElementById('confirmTitle');
+            const message = document.getElementById('confirmMessage');
+            
+            if (action === 'approve') {
+                title.textContent = 'Approve KRI?';
+                message.textContent = 'Are you sure you want to approve this KRI submission?';
+            } else if (action === 'reject') {
+                title.textContent = 'Reject KRI?';
+                message.textContent = 'Are you sure you want to reject this KRI submission?';
+                document.getElementById('rejectionReasonDiv').style.display = 'block';
+            }
+            
+            modal.dataset.action = action;
+            modal.style.display = 'block';
+        }
+
+        // Handle confirmation
+        function handleConfirmation() {
+            const modal = document.getElementById('confirmModal');
+            const action = modal.dataset.action;
+            
+            if (action === 'approve') {
+                approveKri();
+            } else if (action === 'reject') {
+                const reason = document.getElementById('rejectionReason').value;
+                if (!reason.trim()) {
+                    alert('Please provide a reason for rejection');
+                    return;
+                }
+                rejectKri(reason);
+            }
+            
+            modal.style.display = 'none';
+            document.getElementById('kriDetailsModal').style.display = 'none';
+        }
+
+        // Approve KRI
+        function approveKri() {
+            const kriId = currentKriData.id;
+            const kriIndex = kriData.findIndex(k => k.id === kriId);
+            
+            if (kriIndex !== -1) {
+                if (currentUser === 'approver') {
+                    kriData[kriIndex].status = 'Pending Approval L2';
+                } else if (currentUser === 'administrator') {
+                    kriData[kriIndex].status = 'Approved';
+                }
+            }
+            
+            alert('KRI approved successfully!');
+            populateKriTable();
+        }
+
+        // Reject KRI
+        function rejectKri(reason) {
+            const kriId = currentKriData.id;
+            const kriIndex = kriData.findIndex(k => k.id === kriId);
+            
+            if (kriIndex !== -1) {
+                kriData[kriIndex].status = 'Rejected';
+                kriData[kriIndex].rejectionReason = reason;
+            }
+            
+            alert('KRI rejected. Notification sent to inputter.');
+            populateKriTable();
+        }
+
+        // Edit KRI (for configuration table)
+        function editKri(kriId) {
+            openKriConfigModal(kriId);
+        }
+
+        // Deactivate KRI
+        function deactivateKri(kriId) {
+            if (confirm('Are you sure you want to deactivate this KRI?')) {
+                alert('KRI deactivated successfully!');
+                // In real application, would update status to inactive
+            }
+        }
+
+        // Manage IAM
+        function manageIAM(kriId) {
+            alert('This would open the Issue & Action Management module for this KRI');
+        }
+
+        // View IAM
+        function viewIAM(kriId) {
+            const kri = kriData.find(k => k.id === kriId);
+            if (kri && kri.iam) {
+                alert(`IAM Details:\nIssue: ${kri.iam.issue}\nAction Plan: ${kri.iam.actionPlan}\nTarget Date: ${kri.iam.targetDate}`);
+            }
+        }
+
+        // Generate report
+        function generateReport() {
+            alert('Generating KRI Summary Report... This would download an Excel file with all approved KRIs.');
+        }
+    </script>
+</body>
+</html>
