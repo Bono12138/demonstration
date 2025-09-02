@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>摸鱼模拟器</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #e0f7fa;
+            font-family: 'Arial', sans-serif;
+            color: #333;
+            overflow: hidden;
+        }
+
+        #counter-container {
+            position: absolute;
+            top: 20px;
+            font-size: 2em;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+        }
+
+        #counter {
+            margin-left: 10px;
+            color: #00796b;
+        }
+
+        #pond {
+            width: 80vw;
+            height: 60vh;
+            background-color: #00a0d4;
+            border-radius: 50%;
+            border: 10px solid #00796b;
+            box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.3);
+            position: relative;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            flex-wrap: wrap;
+        }
+
+        .fish {
+            font-size: 3em;
+            position: absolute;
+            transition: transform 5s ease-in-out;
+            will-change: transform;
+            pointer-events: none;
+        }
+
+        .plus-one {
+            position: absolute;
+            color: #d32f2f;
+            font-size: 2em;
+            font-weight: bold;
+            animation: fade-out 1s forwards;
+            pointer-events: none;
+        }
+
+        @keyframes fade-out {
+            from {
+                transform: translateY(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+        }
+
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fff;
+            padding: 30px 40px;
+            border: 5px solid #ff5722;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            z-index: 1000;
+        }
+
+        .popup p {
+            font-size: 1.5em;
+            margin: 0;
+            color: #d32f2f;
+            font-weight: bold;
+        }
+
+        #footer {
+            position: absolute;
+            bottom: 20px;
+            text-align: center;
+            font-size: 0.8em;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="counter-container">
+        摸鱼次数: <span id="counter">0</span>
+    </div>
+
+    <div id="pond"></div>
+
+    <div id="warning-popup" class="popup">
+        <p>还摸？再摸炸了你电脑⚠</p>
+    </div>
+
+    <div id="footer">
+        作者：bono12138，日期：2025年9月2日
+    </div>
+
+    <script>
+        const pond = document.getElementById('pond');
+        const counterSpan = document.getElementById('counter');
+        const popup = document.getElementById('warning-popup');
+        let counter = 0;
+
+        // 生成随机鱼
+        function createFish() {
+            const fishCount = 30; // 鱼的数量
+            for (let i = 0; i < fishCount; i++) {
+                const fish = document.createElement('div');
+                fish.className = 'fish';
+                fish.textContent = '🐟';
+                setFishPosition(fish);
+                pond.appendChild(fish);
+                animateFish(fish);
+            }
+        }
+
+        function setFishPosition(fish) {
+            const pondWidth = pond.offsetWidth;
+            const pondHeight = pond.offsetHeight;
+            const x = Math.random() * (pondWidth * 0.8) - (pondWidth * 0.4);
+            const y = Math.random() * (pondHeight * 0.8) - (pondHeight * 0.4);
+            fish.style.transform = `translate(${x}px, ${y}px)`;
+        }
+
+        function animateFish(fish) {
+            setInterval(() => {
+                setFishPosition(fish);
+            }, 5000 + Math.random() * 2000); // 5-7秒随机移动一次
+        }
+
+        // 处理点击事件
+        pond.addEventListener('click', (event) => {
+            counter++;
+            counterSpan.textContent = counter;
+
+            // 浮现 "+1"
+            const plusOne = document.createElement('div');
+            plusOne.className = 'plus-one';
+            plusOne.textContent = '+1';
+            plusOne.style.left = `${event.clientX}px`;
+            plusOne.style.top = `${event.clientY}px`;
+            document.body.appendChild(plusOne);
+
+            // 移除 "+1"
+            setTimeout(() => {
+                plusOne.remove();
+            }, 1000);
+
+            // 达到10次后弹窗
+            if (counter >= 10) {
+                popup.style.display = 'block';
+                // 阻止继续点击
+                pond.style.pointerEvents = 'none';
+            }
+        });
+
+        // 初始化
+        createFish();
+    </script>
+
+</body>
+</html>
