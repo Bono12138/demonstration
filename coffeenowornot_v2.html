@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>咖啡因代谢计算器 ☕</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        coffee: {
+                            light: '#e6d2b5',
+                            DEFAULT: '#c8a985',
+                            dark: '#8b6b4e',
+                        },
+                        cream: '#f8f0e3',
+                        accent: '#d97706',
+                    },
+                    fontFamily: {
+                        sans: ['Nunito', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .shadow-soft {
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            }
+            .animate-float {
+                animation: float 3s ease-in-out infinite;
+            }
+            @keyframes float {
+                0% { transform: translateY(0px); }
+                50% { transform: translateY(-10px); }
+                100% { transform: translateY(0px); }
+            }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-cream min-h-screen font-sans text-gray-800">
+    <div class="container mx-auto px-4 py-8 max-w-2xl">
+        <!-- 标题区域 -->
+        <header class="text-center mb-10">
+            <h1 class="text-[clamp(2rem,5vw,3rem)] font-bold text-coffee-dark mb-2">
+                ☕ 咖啡因代谢计算器
+            </h1>
+            <p class="text-gray-600 text-lg">记录你的咖啡，掌握清醒时间 ✨</p>
+        </header>
+
+        <!-- 主要内容区域 -->
+        <main class="bg-white rounded-2xl shadow-soft p-6 mb-8">
+            <!-- 咖啡输入区域 -->
+            <section class="mb-8">
+                <h2 class="text-xl font-semibold text-coffee-dark mb-4 flex items-center">
+                    <i class="fa fa-plus-circle text-accent mr-2"></i> 添加咖啡
+                </h2>
+                
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="coffee-time" class="block text-sm font-medium text-gray-700 mb-1">
+                            饮用时间 ⏰
+                        </label>
+                        <input type="datetime-local" id="coffee-time" 
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-coffee transition-all">
+                    </div>
+                    
+                    <div>
+                        <label for="coffee-amount" class="block text-sm font-medium text-gray-700 mb-1">
+                            咖啡因含量 (mg) ☕
+                        </label>
+                        <select id="coffee-amount" 
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-coffee transition-all">
+                            <option value="30">少量 (30mg) - 一小杯拿铁</option>
+                            <option value="80" selected>中量 (80mg) - 一杯美式</option>
+                            <option value="150">大量 (150mg) - 一杯浓缩</option>
+                            <option value="200">超大量 (200mg) - 能量饮料</option>
+                            <option value="custom">自定义...</option>
+                        </select>
+                        <input type="number" id="custom-amount" placeholder="输入毫克数" min="1"
+                            class="w-full mt-2 px-3 py-2 border border-gray-300 rounded-lg hidden focus:outline-none focus:ring-2 focus:ring-coffee transition-all">
+                    </div>
+                </div>
+                
+                <button id="add-coffee" class="mt-4 bg-coffee hover:bg-coffee-dark text-white py-2 px-6 rounded-full transition-all transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-coffee focus:ring-offset-2">
+                    <i class="fa fa-coffee mr-1"></i> 添加
+                </button>
+            </section>
+            
+            <!-- 咖啡列表区域 -->
+            <section class="mb-8">
+                <h2 class="text-xl font-semibold text-coffee-dark mb-4 flex items-center">
+                    <i class="fa fa-list-alt text-accent mr-2"></i> 你的咖啡记录
+                </h2>
+                
+                <div id="coffee-list" class="space-y-3 max-h-60 overflow-y-auto pr-2">
+                    <p class="text-gray-500 italic text-center py-4">还没有添加咖啡哦~</p>
+                </div>
+            </section>
+            
+            <!-- 结果显示区域 -->
+            <section>
+                <h2 class="text-xl font-semibold text-coffee-dark mb-4 flex items-center">
+                    <i class="fa fa-clock-o text-accent mr-2"></i> 代谢结果
+                </h2>
+                
+                <div id="result" class="bg-coffee-light/30 rounded-xl p-4 text-center hidden">
+                    <p class="text-lg mb-2">体内咖啡因将在 <span id="all-clear-time" class="font-bold text-accent text-xl"></span> 完全代谢</p>
+                    <p id="current-level" class="text-md mb-2">当前估算咖啡因水平: <span class="font-bold"></span></p>
+                    <p id="status-message" class="mt-3 text-lg"></p>
+                </div>
+                
+                <div id="no-coffee-message" class="bg-coffee-light/30 rounded-xl p-4 text-center">
+                    <p class="text-gray-500">添加咖啡后将显示代谢时间哦~</p>
+                </div>
+            </section>
+        </main>
+        
+        <!-- 信息说明区域 -->
+        <section class="bg-white rounded-2xl shadow-soft p-5 mb-8">
+            <h3 class="font-semibold text-coffee-dark mb-2 flex items-center">
+                <i class="fa fa-info-circle text-accent mr-2"></i> 小知识
+            </h3>
+            <p class="text-sm text-gray-600 mb-2">咖啡因的半衰期约为5小时，即每过5小时，体内的咖啡因含量会减少一半。</p>
+            <p class="text-sm text-gray-600">计算结果仅供参考，实际代谢情况因人而异哦~</p>
+        </section>
+        
+        <!-- 页脚 -->
+        <footer class="text-center text-gray-500 text-sm">
+            <p>☕ 好好享受咖啡时光，但也要注意休息哦~ ☕</p>
+        </footer>
+    </div>
+    
+    <!-- 提示弹窗 -->
+    <div id="alert-modal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-2xl p-6 max-w-md w-full mx-4 transform transition-all animate-float">
+            <div class="text-center">
+                <div class="text-5xl mb-4">😱</div>
+                <h3 class="text-xl font-bold text-coffee-dark mb-2">咖啡过量提醒</h3>
+                <p class="text-gray-700 mb-6">"班是公司的，命是自己的，不行咱就歇歇吧姐妹~"</p>
+                <button id="close-alert" class="bg-accent hover:bg-amber-700 text-white py-2 px-6 rounded-full transition-all">
+                    知道啦~
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 存储咖啡数据的数组
+        let coffees = [];
+        const HALF_LIFE_HOURS = 5;
+        const CLEAR_THRESHOLD = 5; // 低于此值视为完全代谢 (mg)
+        
+        // DOM 元素
+        const coffeeTimeInput = document.getElementById('coffee-time');
+        const coffeeAmountSelect = document.getElementById('coffee-amount');
+        const customAmountInput = document.getElementById('custom-amount');
+        const addCoffeeButton = document.getElementById('add-coffee');
+        const coffeeListElement = document.getElementById('coffee-list');
+        const resultElement = document.getElementById('result');
+        const noCoffeeMessage = document.getElementById('no-coffee-message');
+        const allClearTimeElement = document.getElementById('all-clear-time');
+        const currentLevelElement = document.querySelector('#current-level span');
+        const statusMessageElement = document.getElementById('status-message');
+        const alertModal = document.getElementById('alert-modal');
+        const closeAlertButton = document.getElementById('close-alert');
+        
+        // 初始化设置当前时间
+        function setDefaultTime() {
+            const now = new Date();
+            // 格式化到分钟，去掉秒数
+            now.setMinutes(now.getMinutes() - (now.getMinutes() % 5), 0, 0);
+            coffeeTimeInput.value = now.toISOString().slice(0, 16);
+        }
+        
+        // 显示/隐藏自定义输入框
+        coffeeAmountSelect.addEventListener('change', () => {
+            if (coffeeAmountSelect.value === 'custom') {
+                customAmountInput.classList.remove('hidden');
+                customAmountInput.required = true;
+            } else {
+                customAmountInput.classList.add('hidden');
+                customAmountInput.required = false;
+            }
+        });
+        
+        // 添加咖啡
+        addCoffeeButton.addEventListener('click', () => {
+            const time = new Date(coffeeTimeInput.value);
+            let amount;
+            
+            if (coffeeAmountSelect.value === 'custom') {
+                amount = parseInt(customAmountInput.value);
+                if (isNaN(amount) || amount <= 0) {
+                    alert('请输入有效的咖啡因含量');
+                    return;
+                }
+            } else {
+                amount = parseInt(coffeeAmountSelect.value);
+            }
+            
+            // 添加到数组
+            coffees.push({
+                id: Date.now(),
+                time: time,
+                amount: amount
+            });
+            
+            // 检查是否过量 (超过 600mg 视为过量)
+            const totalAmount = coffees.reduce((sum, coffee) => sum + coffee.amount, 0);
+            if (totalAmount > 600) {
+                alertModal.classList.remove('hidden');
+            }
+            
+            // 更新显示
+            updateCoffeeList();
+            calculateAndDisplayResults();
+            
+            // 重置表单
+            setDefaultTime();
+            coffeeAmountSelect.value = '80';
+            customAmountInput.classList.add('hidden');
+            customAmountInput.value = '';
+        });
+        
+        // 关闭弹窗
+        closeAlertButton.addEventListener('click', () => {
+            alertModal.classList.add('hidden');
+        });
+        
+        // 更新咖啡列表
+        function updateCoffeeList() {
+            if (coffees.length === 0) {
+                coffeeListElement.innerHTML = '<p class="text-gray-500 italic text-center py-4">还没有添加咖啡哦~</p>';
+                return;
+            }
+            
+            // 按时间排序（最新的在前）
+            coffees.sort((a, b) => b.time - a.time);
+            
+            coffeeListElement.innerHTML = '';
+            
+            coffees.forEach(coffee => {
+                const coffeeItem = document.createElement('div');
+                coffeeItem.className = 'bg-cream rounded-lg p-3 flex justify-between items-center';
+                
+                const timeStr = formatDateTime(coffee.time);
+                const emoji = getCoffeeEmoji(coffee.amount);
+                
+                coffeeItem.innerHTML = `
+                    <div>
+                        <p class="font-medium">${emoji} ${coffee.amount} mg</p>
+                        <p class="text-sm text-gray-500">${timeStr}</p>
+                    </div>
+                    <button class="delete-coffee text-gray-400 hover:text-red-500 transition-colors" data-id="${coffee.id}">
+                        <i class="fa fa-trash-o"></i>
+                    </button>
+                `;
+                
+                coffeeListElement.appendChild(coffeeItem);
+            });
+            
+            // 添加删除事件监听
+            document.querySelectorAll('.delete-coffee').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const id = parseInt(e.currentTarget.dataset.id);
+                    coffees = coffees.filter(coffee => coffee.id !== id);
+                    updateCoffeeList();
+                    calculateAndDisplayResults();
+                });
+            });
+        }
+        
+        // 计算并显示结果 - 修复后的逻辑
+        function calculateAndDisplayResults() {
+            if (coffees.length === 0) {
+                resultElement.classList.add('hidden');
+                noCoffeeMessage.classList.remove('hidden');
+                return;
+            }
+            
+            resultElement.classList.remove('hidden');
+            noCoffeeMessage.classList.add('hidden');
+            
+            // 计算当前体内咖啡因总量
+            const now = new Date();
+            let currentTotal = 0;
+            
+            coffees.forEach(coffee => {
+                const hoursPassed = (now - coffee.time) / (1000 * 60 * 60);
+                if (hoursPassed >= 0) {
+                    // 计算剩余量：初始量 × (0.5)^(小时数/半衰期)
+                    currentTotal += coffee.amount * Math.pow(0.5, hoursPassed / HALF_LIFE_HOURS);
+                }
+            });
+            
+            // 显示当前咖啡因水平
+            currentLevelElement.textContent = Math.round(currentTotal) + ' mg';
+            
+            // 计算完全代谢时间（考虑所有咖啡的累积效应）
+            let allClearTime = calculateCompleteClearanceTime();
+            
+            // 显示结果
+            allClearTimeElement.textContent = formatDateTime(allClearTime);
+            
+            // 设置状态消息和emoji
+            setStatusMessage(allClearTime);
+        }
+        
+        // 计算所有咖啡因完全代谢的时间（修复的核心逻辑）
+        function calculateCompleteClearanceTime() {
+            // 按时间顺序处理咖啡
+            const sortedCoffees = [...coffees].sort((a, b) => a.time - b.time);
+            const now = new Date();
+            
+            // 找到最后一杯咖啡的时间
+            const lastCoffeeTime = sortedCoffees.length > 0 
+                ? new Date(sortedCoffees[sortedCoffees.length - 1].time) 
+                : now;
+            
+            // 从最后一杯咖啡时间开始计算
+            let currentTime = new Date(lastCoffeeTime);
+            let totalCaffeine;
+            
+            // 循环计算直到咖啡因水平低于阈值
+            do {
+                totalCaffeine = 0;
+                
+                // 计算当前时间体内的咖啡因总量
+                sortedCoffees.forEach(coffee => {
+                    const hoursPassed = (currentTime - coffee.time) / (1000 * 60 * 60);
+                    if (hoursPassed >= 0) {
+                        totalCaffeine += coffee.amount * Math.pow(0.5, hoursPassed / HALF_LIFE_HOURS);
+                    }
+                });
+                
+                // 如果还没代谢完，增加15分钟继续计算
+                if (totalCaffeine > CLEAR_THRESHOLD) {
+                    currentTime.setMinutes(currentTime.getMinutes() + 15);
+                }
+            } while (totalCaffeine > CLEAR_THRESHOLD);
+            
+            return currentTime;
+        }
+        
+        // 设置状态消息
+        function setStatusMessage(clearTime) {
+            const now = new Date();
+            const hoursDiff = (clearTime - now) / (1000 * 60 * 60);
+            
+            let message, emoji;
+            
+            if (hoursDiff < 1) {
+                emoji = '😴';
+                message = '很快就能安心睡觉啦~';
+            } else if (hoursDiff < 4) {
+                emoji = '😌';
+                message = '几个小时后就能代谢完啦';
+            } else if (hoursDiff < 8) {
+                emoji = '😐';
+                message = '还需要一段时间才能完全代谢哦';
+            } else if (hoursDiff < 12) {
+                emoji = '😮';
+                message = '咖啡因会在体内停留较长时间呢';
+            } else {
+                emoji = '😱';
+                message = '今晚可能要失眠了...';
+            }
+            
+            statusMessageElement.innerHTML = `${emoji} ${message}`;
+        }
+        
+        // 格式化日期时间
+        function formatDateTime(date) {
+            const options = { 
+                month: 'short', 
+                day: 'numeric', 
+                hour: '2-digit', 
+                minute: '2-digit',
+                hour12: false
+            };
+            return date.toLocaleString('zh-CN', options);
+        }
+        
+        // 根据咖啡量返回相应的emoji
+        function getCoffeeEmoji(amount) {
+            if (amount < 50) return '☕';
+            if (amount < 100) return '☕☕';
+            if (amount < 150) return '☕☕☕';
+            return '☕☕☕☕';
+        }
+        
+        // 初始化
+        setDefaultTime();
+    </script>
+</body>
+</html>
