@@ -79,8 +79,8 @@
                         </label>
                         <select id="coffee-amount" 
                             class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-coffee transition-all">
-                            <option value="30">少量 (30mg) - 一小杯拿铁</option>
-                            <option value="80" selected>中量 (80mg) - 一杯美式</option>
+                            <option value="30" selected>少量 (30mg) - 一小杯拿铁</option>
+                            <option value="80">中量 (80mg) - 一杯美式</option>
                             <option value="150">大量 (150mg) - 一杯浓缩</option>
                             <option value="200">超大量 (200mg) - 能量饮料</option>
                             <option value="custom">自定义...</option>
@@ -113,7 +113,7 @@
                 </h2>
                 
                 <div id="result" class="bg-coffee-light/30 rounded-xl p-4 text-center hidden">
-                    <p class="text-lg mb-2">体内咖啡因将在 <span id="all-clear-time" class="font-bold text-accent text-xl"></span> 完全代谢</p>
+                    <p class="text-lg mb-2">体内咖啡因将在 <span id="all-clear-time" class="font-bold text-accent text-xl"></span> 降低至不影响睡眠的浓度</p>
                     <p id="current-level" class="text-md mb-2">当前估算咖啡因水平: <span class="font-bold"></span></p>
                     <p id="status-message" class="mt-3 text-lg"></p>
                 </div>
@@ -124,12 +124,39 @@
             </section>
         </main>
         
+        <!-- 智能推荐区域 -->
+        <section class="bg-white rounded-2xl shadow-soft p-6 mb-8">
+            <h2 class="text-xl font-semibold text-coffee-dark mb-4 flex items-center">
+                <i class="fa fa-lightbulb-o text-accent mr-2"></i> 智能推荐
+            </h2>
+
+            <div class="grid md:grid-cols-2 gap-4">
+                <div>
+                    <label for="rest-time" class="block text-sm font-medium text-gray-700 mb-1">
+                        准备休息时间 🛌（默认 24:00）
+                    </label>
+                    <input type="datetime-local" id="rest-time" 
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-coffee transition-all">
+                </div>
+            </div>
+
+            <p class="text-xs text-gray-500 mt-2">若未添加任何记录，将按默认已摄入：今天 09:00 一小杯拿铁 30mg 进行计算。</p>
+
+            <button id="get-recommendation" class="mt-4 bg-coffee hover:bg-coffee-dark text-white py-2 px-6 rounded-full transition-all transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-coffee focus:ring-offset-2">
+                <i class="fa fa-magic mr-1"></i> 获取推荐
+            </button>
+
+            <div id="recommendation-result" class="mt-4 bg-coffee-light/30 rounded-xl p-4 text-center text-gray-700">
+                <p class="text-gray-500">设置休息时间后点击“获取推荐”～</p>
+            </div>
+        </section>
+        
         <!-- 信息说明区域 -->
         <section class="bg-white rounded-2xl shadow-soft p-5 mb-8">
             <h3 class="font-semibold text-coffee-dark mb-2 flex items-center">
                 <i class="fa fa-info-circle text-accent mr-2"></i> 小知识
             </h3>
-            <p class="text-sm text-gray-600 mb-2">咖啡因的半衰期约为5小时，即每过5小时，体内的咖啡因含量会减少一半。</p>
+            <p class="text-sm text-gray-600 mb-2">咖啡因的半衰期约为4小时，即每过4小时，体内的咖啡因含量会减少一半。</p>
             <p class="text-sm text-gray-600">计算结果仅供参考，实际代谢情况因人而异哦~</p>
         </section>
         
@@ -145,7 +172,7 @@
             <div class="text-center">
                 <div class="text-5xl mb-4">😱</div>
                 <h3 class="text-xl font-bold text-coffee-dark mb-2">咖啡过量提醒</h3>
-                <p class="text-gray-700 mb-6">"班是公司的，命是自己的，不行咱就歇歇吧姐妹~"</p>
+                <p class="text-gray-700 mb-6">"班是公司的，命是自己的，不行咱就歇歇吧小同志~"</p>
                 <button id="close-alert" class="bg-accent hover:bg-amber-700 text-white py-2 px-6 rounded-full transition-all">
                     知道啦~
                 </button>
@@ -156,8 +183,8 @@
     <script>
         // 存储咖啡数据的数组
         let coffees = [];
-        const HALF_LIFE_HOURS = 5;
-        const CLEAR_THRESHOLD = 5; // 低于此值视为完全代谢 (mg)
+        const HALF_LIFE_HOURS = 4;
+        const CLEAR_THRESHOLD = 20; // 低于此值视为安全，不影响睡眠 (mg)
         
         // DOM 元素
         const coffeeTimeInput = document.getElementById('coffee-time');
@@ -172,13 +199,27 @@
         const statusMessageElement = document.getElementById('status-message');
         const alertModal = document.getElementById('alert-modal');
         const closeAlertButton = document.getElementById('close-alert');
+        const restTimeInput = document.getElementById('rest-time');
+        const getRecommendationButton = document.getElementById('get-recommendation');
+        const recommendationResult = document.getElementById('recommendation-result');
         
-        // 初始化设置当前时间
+        // 初始化设置当前时间 - 默认为当日09:00
         function setDefaultTime() {
+            const d = new Date();
+            d.setHours(9, 0, 0, 0); // 设置为当日09:00
+            coffeeTimeInput.value = toLocalInputValue(d);
+        }
+        
+        // 初始化休息时间默认值（当日 23:59）
+        function setDefaultRestTime() {
             const now = new Date();
-            // 格式化到分钟，去掉秒数
-            now.setMinutes(now.getMinutes() - (now.getMinutes() % 5), 0, 0);
-            coffeeTimeInput.value = now.toISOString().slice(0, 16);
+            now.setHours(23, 59, 0, 0); // 设置为当日23:59
+            restTimeInput.value = toLocalInputValue(now);
+        }
+
+        function toLocalInputValue(d) {
+            const p = n => String(n).padStart(2, '0');
+            return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;
         }
         
         // 显示/隐藏自定义输入框
@@ -224,11 +265,10 @@
             updateCoffeeList();
             calculateAndDisplayResults();
             
-            // 重置表单
-            setDefaultTime();
-            coffeeAmountSelect.value = '80';
-            customAmountInput.classList.add('hidden');
-            customAmountInput.value = '';
+            // 不重置用户选择，仅在自定义模式下清空自定义输入框
+            if (coffeeAmountSelect.value === 'custom') {
+                customAmountInput.value = '';
+            }
         });
         
         // 关闭弹窗
@@ -305,7 +345,7 @@
             // 显示当前咖啡因水平
             currentLevelElement.textContent = Math.round(currentTotal) + ' mg';
             
-            // 计算完全代谢时间（考虑所有咖啡的累积效应）
+            // 计算降低至不影响睡眠的浓度时间（考虑所有咖啡的累积效应）
             let allClearTime = calculateCompleteClearanceTime();
             
             // 显示结果
@@ -314,8 +354,153 @@
             // 设置状态消息和emoji
             setStatusMessage(allClearTime);
         }
+
+        // 计算指定时间点体内咖啡因总量
+        function computeTotalAt(targetTime, coffeeEvents) {
+            let total = 0;
+            coffeeEvents.forEach(coffee => {
+                const hoursPassed = (targetTime - coffee.time) / (1000 * 60 * 60);
+                if (hoursPassed >= 0) {
+                    total += coffee.amount * Math.pow(0.5, hoursPassed / HALF_LIFE_HOURS);
+                }
+            });
+            return total;
+        }
+
+        // 推荐候选
+        const PRODUCT_OPTIONS = [
+            { key: 'free', label: '时间充裕，随便喝', mg: 90, url: 'http://dpurl.cn/gmH3136z' },
+            { key: 'control', label: '控制下，就一杯', mg: 60, url: 'http://dpurl.cn/n2BgC4Uz' },
+            { key: 'stop', label: '不能喝咖啡了哦，再喝影响休息了哦', mg: 20, url: 'http://dpurl.cn/EUAfDSaz' }
+        ];
+
+        const PRODUCT_XPATH = {
+            image: '//*[@id="detailPage"]/mt-view/mt-view/mt-view/mt-view/mt-view/u-banner/mt-view/mt-view/mt-swiper/div/div[1]/div/mt-swiper-item/u-mp-img/mt-view/mt-image/div',
+            name: '//*[@id="goodsInfo"]/u-gooditeminfo/mt-view[1]/mt-view/mt-view[2]/mt-text'
+        };
+
+        async function getRecommendation() {
+            // 休息时间
+            const restTime = restTimeInput.value ? new Date(restTimeInput.value) : (() => {
+                const d = new Date(); d.setHours(23,59,0,0); return d;
+            })();
+
+            // 计算基准咖啡列表：若没有记录，默认今天 09:00 30mg（一小杯拿铁）
+            const baseCoffees = coffees.length > 0 ? coffees : (() => {
+                const d = new Date(); d.setHours(9, 0, 0, 0);
+                return [{ time: d, amount: 30 }];
+            })();
+
+            const now = new Date();
+
+            // 依次尝试从大到小的候选，寻找在休息时间总量不超过阈值的最大推荐
+            let chosen = null;
+            for (const option of PRODUCT_OPTIONS) {
+                const testEvents = [
+                    ...baseCoffees.map(c => ({ time: new Date(c.time), amount: c.amount })),
+                    { time: now, amount: option.mg }
+                ];
+                const totalAtRest = computeTotalAt(restTime, testEvents);
+                if (totalAtRest <= CLEAR_THRESHOLD) {
+                    chosen = option;
+                    break;
+                }
+            }
+
+            // 若全部不满足，则提示不建议再摄入（仍展示“不能喝”卡片，但标记为不推荐）
+            if (!chosen) {
+                chosen = { ...PRODUCT_OPTIONS[2], notRecommended: true };
+            }
+
+            // 尝试抓取产品信息（名称与图片）
+            const info = await fetchProductInfo(chosen.url).catch(() => null);
+            updateRecommendationUI({ ...chosen, productName: info?.name, productImage: info?.image });
+        }
+
+        async function fetchProductInfo(url) {
+            try {
+                // 使用 CORS 代理以规避跨域限制（只读、公共代理；若失效将回退）
+                const proxied = `https://r.jina.ai/http://cors.isomorphic-git.org/${encodeURIComponent(url)}`;
+                const resp = await fetch(proxied, { method: 'GET' });
+                if (!resp.ok) throw new Error('proxy-failed');
+                const html = await resp.text();
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+
+                // 多选择器兜底，优先使用提供的 XPath
+                let name = '';
+                try {
+                    const nameNode = doc.evaluate(PRODUCT_XPATH.name, doc, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+                    if (nameNode) name = (nameNode.textContent || nameNode.getAttribute('title') || '').trim();
+                } catch {}
+                if (!name) {
+                    const titleEl = doc.querySelector('h1, h2, [class*="title"], [class*="goods"], [class*="name"]');
+                    if (titleEl) name = titleEl.textContent.trim();
+                }
+
+                let image = '';
+                try {
+                    const imageNode = doc.evaluate(PRODUCT_XPATH.image, doc, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+                    if (imageNode) {
+                        const imgEl = imageNode.querySelector && imageNode.querySelector('img');
+                        if (imgEl && (imgEl.src || imgEl.getAttribute('src'))) image = imgEl.src || imgEl.getAttribute('src');
+                        if (!image) {
+                            const bg = imageNode.getAttribute && imageNode.getAttribute('style');
+                            if (bg) {
+                                const match = bg.match(/url\(([^)]+)\)/i);
+                                if (match && match[1]) image = match[1].replace(/['"]/g, '');
+                            }
+                        }
+                    }
+                } catch {}
+                if (!image) {
+                    const firstImg = doc.querySelector('img');
+                    if (firstImg) image = firstImg.src || firstImg.getAttribute('src') || '';
+                }
+
+                if (!name && !image) throw new Error('no-data');
+                return { name, image };
+            } catch (e) {
+                // 兜底静态映射
+                const m = {
+                    'gmH3136z': { name: '桃桃冰茶兑换券·1张', image: null },
+                    'n2BgC4Uz': { name: '控制款咖啡产品', image: null },
+                    'EUAfDSaz': { name: '低咖啡因产品', image: null }
+                };
+                for (const k in m) {
+                    if (url.includes(k)) return m[k];
+                }
+                return null;
+            }
+        }
+
+        function updateRecommendationUI(rec) {
+            const badge = rec.notRecommended
+                ? '<span class="inline-block text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full ml-2">不建议摄入</span>'
+                : '';
+
+            const nameText = rec.productName ? rec.productName : '正在为你准备好选择…';
+            const imgHtml = rec.productImage 
+                ? `<img src="${rec.productImage}" alt="产品图" class="w-full h-40 object-cover rounded-lg mb-3">`
+                : '<div class="w-full h-40 bg-cream rounded-lg mb-3 flex items-center justify-center text-gray-400">暂无图片</div>';
+
+            recommendationResult.innerHTML = `
+                <div class="text-left">
+                    <p class="font-semibold text-coffee-dark mb-2">${rec.label}${badge}</p>
+                    <a href="${rec.url}" target="_blank" rel="noopener" class="block">
+                        ${imgHtml}
+                        <p class="text-sm text-gray-700 truncate">${nameText}</p>
+                        <p class="text-xs text-gray-500 mt-1">建议摄入量：${rec.mg} mg</p>
+                    </a>
+                </div>
+            `;
+        }
+
+        if (getRecommendationButton) {
+            getRecommendationButton.addEventListener('click', getRecommendation);
+        }
         
-        // 计算所有咖啡因完全代谢的时间（修复的核心逻辑）
+        // 计算所有咖啡因降低至不影响睡眠的浓度的时间（修复的核心逻辑）
         function calculateCompleteClearanceTime() {
             // 按时间顺序处理咖啡
             const sortedCoffees = [...coffees].sort((a, b) => a.time - b.time);
@@ -366,7 +551,7 @@
                 message = '几个小时后就能代谢完啦';
             } else if (hoursDiff < 8) {
                 emoji = '😐';
-                message = '还需要一段时间才能完全代谢哦';
+                message = '还需要一段时间才能降低至不影响睡眠的浓度哦';
             } else if (hoursDiff < 12) {
                 emoji = '😮';
                 message = '咖啡因会在体内停留较长时间呢';
@@ -400,6 +585,7 @@
         
         // 初始化
         setDefaultTime();
+        setDefaultRestTime();
     </script>
 </body>
 </html>
