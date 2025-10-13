@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>午餐选择器</title>
+  <!-- 引入Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- 引入Font Awesome -->
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  
+  <!-- 配置Tailwind -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#FF7A00',
+            secondary: '#36B37E',
+            accent: '#FF5630',
+            neutral: '#F4F5F7',
+            dark: '#333F51'
+          },
+          fontFamily: {
+            inter: ['Inter', 'system-ui', 'sans-serif'],
+          },
+        },
+      }
+    }
+  </script>
+  
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      .text-shadow {
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      }
+      .animate-bounce-slow {
+        animation: bounce 2s infinite;
+      }
+      .animate-spin-slow {
+        animation: spin 3s linear infinite;
+      }
+      .card-hover {
+        @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
+      }
+    }
+  </style>
+</head>
+<body class="font-inter bg-gray-50 min-h-screen text-dark">
+  <!-- 页面容器 -->
+  <div class="container mx-auto px-4 py-8 max-w-4xl">
+    <!-- 标题区域 -->
+    <header class="text-center mb-10">
+      <h1 class="text-[clamp(2rem,5vw,3rem)] font-bold text-primary mb-2 text-shadow">
+        午餐选择器
+      </h1>
+      <p class="text-gray-600 text-lg">纠结中午吃什么？让运气来决定吧！</p>
+    </header>
+    
+    <!-- 主要内容区 -->
+    <main class="grid md:grid-cols-3 gap-8">
+      <!-- 左侧：输入区域 -->
+      <section class="md:col-span-2 space-y-6">
+        <div class="bg-white rounded-xl shadow-md p-6 card-hover">
+          <h2 class="text-xl font-semibold mb-4 flex items-center">
+            <i class="fa fa-list-ul text-primary mr-2"></i>输入选项
+          </h2>
+          <p class="text-gray-500 mb-4 text-sm">每行输入一个选项（例如餐厅名称）</p>
+          
+          <textarea 
+            id="optionsInput" 
+            class="w-full h-40 p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all resize-none"
+            placeholder="麦当劳&#10;肯德基&#10;必胜客&#10;..."
+          ></textarea>
+          
+          <div class="flex justify-between mt-4">
+            <span id="countDisplay" class="text-sm text-gray-500">0个选项</span>
+            <button id="clearBtn" class="text-sm text-accent hover:text-accent/80 transition-colors">
+              <i class="fa fa-trash-o mr-1"></i>清空
+            </button>
+          </div>
+        </div>
+        
+        <!-- 结果展示区域 -->
+        <div class="bg-white rounded-xl shadow-md p-6 card-hover">
+          <h2 class="text-xl font-semibold mb-4 flex items-center">
+            <i class="fa fa-lightbulb-o text-primary mr-2"></i>选择结果
+          </h2>
+          
+          <div id="resultContainer" class="flex flex-col items-center justify-center py-12 border-2 border-dashed border-gray-200 rounded-lg min-h-[160px]">
+            <p id="resultText" class="text-center text-gray-500">
+              点击下方按钮开始随机选择
+            </p>
+          </div>
+          
+          <div class="flex justify-center mt-6">
+            <button id="selectBtn" class="bg-primary hover:bg-primary/90 text-white font-medium py-3 px-8 rounded-full transition-all shadow-md hover:shadow-lg flex items-center disabled:opacity-50 disabled:cursor-not-allowed">
+              <i class="fa fa-random mr-2"></i>随机选择
+            </button>
+          </div>
+        </div>
+      </section>
+      
+      <!-- 右侧：保存的菜单 -->
+      <section class="space-y-6">
+        <div class="bg-white rounded-xl shadow-md p-6 card-hover">
+          <h2 class="text-xl font-semibold mb-4 flex items-center">
+            <i class="fa fa-bookmark text-primary mr-2"></i>常用菜单
+          </h2>
+          
+          <div class="mb-4">
+            <input 
+              id="menuName" 
+              class="w-full p-2 mb-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-sm"
+              placeholder="菜单名称"
+            >
+            <button id="saveMenuBtn" class="w-full bg-secondary hover:bg-secondary/90 text-white text-sm font-medium py-2 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+              <i class="fa fa-save mr-1"></i>保存当前选项
+            </button>
+          </div>
+          
+          <div class="border-t border-gray-100 pt-4">
+            <h3 class="text-sm font-medium text-gray-500 mb-3">已保存的菜单</h3>
+            <div id="savedMenus" class="space-y-2 max-h-[300px] overflow-y-auto pr-1">
+              <!-- 保存的菜单将在这里显示 -->
+              <p class="text-gray-400 text-sm text-center py-6">暂无保存的菜单</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+    
+    <!-- 页脚 -->
+    <footer class="mt-12 text-center text-gray-500 text-sm">
+      <p>午餐选择器 &copy; 2023 | 让选择不再困难</p>
+    </footer>
+  </div>
+  
+  <!-- 成功提示 -->
+  <div id="toast" class="fixed bottom-6 right-6 bg-secondary text-white px-4 py-2 rounded-lg shadow-lg transform translate-y-20 opacity-0 transition-all duration-300 flex items-center">
+    <i class="fa fa-check-circle mr-2"></i>
+    <span id="toastMessage"></span>
+  </div>
+
+  <script>
+    // 获取DOM元素
+    const optionsInput = document.getElementById('optionsInput');
+    const countDisplay = document.getElementById('countDisplay');
+    const clearBtn = document.getElementById('clearBtn');
+    const selectBtn = document.getElementById('selectBtn');
+    const resultContainer = document.getElementById('resultContainer');
+    const resultText = document.getElementById('resultText');
+    const menuName = document.getElementById('menuName');
+    const saveMenuBtn = document.getElementById('saveMenuBtn');
+    const savedMenus = document.getElementById('savedMenus');
+    const toast = document.getElementById('toast');
+    const toastMessage = document.getElementById('toastMessage');
+    
+    // 显示提示消息
+    function showToast(message) {
+      toastMessage.textContent = message;
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+      
+      setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('translate-y-20', 'opacity-0');
+      }, 2000);
+    }
+    
+    // 更新选项计数
+    function updateCount() {
+      const options = getOptions();
+      countDisplay.textContent = `${options.length}个选项`;
+      
+      // 启用/禁用按钮
+      selectBtn.disabled = options.length < 2;
+      saveMenuBtn.disabled = options.length < 1 || !menuName.value.trim();
+    }
+    
+    // 获取输入的选项
+    function getOptions() {
+      return optionsInput.value
+        .split('\n')
+        .map(option => option.trim())
+        .filter(option => option);
+    }
+    
+    // 清空输入
+    clearBtn.addEventListener('click', () => {
+      optionsInput.value = '';
+      updateCount();
+    });
+    
+    // 随机选择
+    selectBtn.addEventListener('click', () => {
+      const options = getOptions();
+      if (options.length < 2) return;
+      
+      // 禁用按钮防止重复点击
+      selectBtn.disabled = true;
+      
+      // 添加动画效果
+      resultContainer.classList.add('bg-gray-50');
+      resultText.classList.add('animate-pulse');
+      resultText.textContent = '选择中...';
+      
+      // 模拟随机选择过程
+      let iterations = 0;
+      const maxIterations = 20;
+      const interval = setInterval(() => {
+        const randomIndex = Math.floor(Math.random() * options.length);
+        resultText.textContent = options[randomIndex];
+        iterations++;
+        
+        if (iterations >= maxIterations) {
+          clearInterval(interval);
+          // 最终选择
+          const finalIndex = Math.floor(Math.random() * options.length);
+          resultText.textContent = options[finalIndex];
+          
+          // 移除动画，添加结果效果
+          resultText.classList.remove('animate-pulse');
+          resultText.classList.add('text-primary', 'font-bold', 'text-xl');
+          resultContainer.classList.remove('bg-gray-50');
+          resultContainer.classList.add('bg-primary/5');
+          
+          // 1秒后恢复样式
+          setTimeout(() => {
+            resultText.classList.remove('text-primary', 'font-bold', 'text-xl');
+            resultContainer.classList.remove('bg-primary/5');
+            selectBtn.disabled = false;
+          }, 1000);
+        }
+      }, 80);
+    });
+    
+    // 保存菜单
+    saveMenuBtn.addEventListener('click', () => {
+      const options = getOptions();
+      const name = menuName.value.trim();
+      
+      if (options.length < 1 || !name) return;
+      
+      // 创建菜单对象
+      const menu = {
+        id: Date.now().toString(),
+        name,
+        options,
+        createdAt: new Date().toISOString()
+      };
+      
+      // 从本地存储获取现有菜单
+      const saved = JSON.parse(localStorage.getItem('lunchMenus') || '[]');
+      saved.push(menu);
+      
+      // 保存到本地存储
+      localStorage.setItem('lunchMenus', JSON.stringify(saved));
+      
+      // 刷新显示
+      renderSavedMenus();
+      
+      // 清空输入
+      menuName.value = '';
+      showToast('菜单保存成功！');
+      updateCount();
+    });
+    
+    // 渲染保存的菜单
+    function renderSavedMenus() {
+      const saved = JSON.parse(localStorage.getItem('lunchMenus') || '[]');
+      
+      if (saved.length === 0) {
+        savedMenus.innerHTML = '<p class="text-gray-400 text-sm text-center py-6">暂无保存的菜单</p>';
+        return;
+      }
+      
+      // 按创建时间排序（最新的在前）
+      saved.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      
+      savedMenus.innerHTML = saved.map(menu => `
+        <div class="bg-neutral rounded-lg p-3 flex justify-between items-center">
+          <div>
+            <p class="font-medium text-sm">${menu.name}</p>
+            <p class="text-gray-500 text-xs">${menu.options.length}个选项</p>
+          </div>
+          <div class="flex space-x-1">
+            <button class="load-menu text-secondary hover:text-secondary/80 p-1" data-id="${menu.id}">
+              <i class="fa fa-load"></i>
+            </button>
+            <button class="delete-menu text-accent hover:text-accent/80 p-1" data-id="${menu.id}">
+              <i class="fa fa-trash-o"></i>
+            </button>
+          </div>
+        </div>
+      `).join('');
+      
+      // 添加加载菜单事件
+      document.querySelectorAll('.load-menu').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const menuId = e.currentTarget.dataset.id;
+          const menu = saved.find(m => m.id === menuId);
+          
+          if (menu) {
+            optionsInput.value = menu.options.join('\n');
+            updateCount();
+            showToast(`已加载菜单: ${menu.name}`);
+          }
+        });
+      });
+      
+      // 添加删除菜单事件
+      document.querySelectorAll('.delete-menu').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const menuId = e.currentTarget.dataset.id;
+          const filtered = saved.filter(m => m.id !== menuId);
+          
+          localStorage.setItem('lunchMenus', JSON.stringify(filtered));
+          renderSavedMenus();
+          showToast('菜单已删除');
+        });
+      });
+    }
+    
+    // 初始化
+    optionsInput.addEventListener('input', updateCount);
+    menuName.addEventListener('input', updateCount);
+    
+    // 页面加载时渲染保存的菜单
+    window.addEventListener('DOMContentLoaded', () => {
+      renderSavedMenus();
+      updateCount();
+    });
+  </script>
+</body>
+</html>
