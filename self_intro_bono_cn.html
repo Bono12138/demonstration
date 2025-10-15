@@ -1,353 +1,499 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>马铭泽 - 个人主页</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
-    <style>
-        :root {
-            --primary-color: #007bff; /* 蓝色 */
-            --secondary-color: #6c757d; /* 灰色 */
-            --accent-color: #28a745; /* 绿色 */
-            --text-color: #343a40; /* 深灰 */
-            --bg-light: #f8f9fa; /* 浅灰背景 */
-            --bg-white: #ffffff; /* 白色背景 */
-            --border-color: #e9ecef; /* 边框色 */
-            --shadow-light: rgba(0, 0, 0, 0.05);
-            --shadow-medium: rgba(0, 0, 0, 0.1);
-        }
-
-        body {
-            font-family: 'Noto Sans SC', 'Roboto', sans-serif;
-            line-height: 1.6;
-            margin: 0;
-            padding: 0;
-            background-color: var(--bg-light);
-            color: var(--text-color);
-            display: flex;
-            /* 移除 justify-content: center; */
-            /* 更改 align-items 为 flex-start，让内容从顶部开始排列 */
-            align-items: flex-start;
-            min-height: 100vh; /* 确保body占满视口高度 */
-            box-sizing: border-box;
-            position: relative; /* 用于粒子背景定位 */
-            overflow-x: hidden; /* 防止横向滚动条 */
-            overflow-y: auto; /* 允许纵向滚动条 */
-        }
-
-        /* Particles.js 容器 */
-        #particles-js {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            z-index: -1; /* 确保在内容之下 */
-            background-color: transparent; /* 背景色由body控制 */
-        }
-
-        .container {
-            display: flex;
-            background-color: var(--bg-white);
-            border-radius: 12px;
-            box-shadow: 0 8px 25px var(--shadow-medium);
-            max-width: 1100px; /* 进一步增加宽度 */
-            width: 90%; /* 适应性宽度 */
-            /* 移除 height: 90vh; 让高度自适应内容 */
-            min-height: 650px; /* 最小高度，避免内容少时页面过短 */
-            /* 移除 overflow: hidden; 让内容可以溢出并滚动 */
-            z-index: 1; /* 确保内容在粒子之上 */
-            margin: 20px auto; /* 添加上下边距并水平居中 */
-            flex-direction: column; /* 默认垂直堆叠，适用于小屏幕 */
-        }
-
-        .left-panel, .right-panel {
-            padding: 40px;
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            overflow-y: auto; /* 允许内容滚动 */
-            /* 针对滚动条的样式，可选 */
-            scrollbar-width: thin; /* Firefox */
-            scrollbar-color: var(--primary-color) var(--bg-light); /* Firefox */
-        }
-        .left-panel::-webkit-scrollbar,
-        .right-panel::-webkit-scrollbar {
-            width: 8px;
-        }
-        .left-panel::-webkit-scrollbar-track,
-        .right-panel::-webkit-scrollbar-track {
-            background: var(--bg-light);
-            border-radius: 10px;
-        }
-        .left-panel::-webkit-scrollbar-thumb,
-        .right-panel::-webkit-scrollbar-thumb {
-            background-color: var(--primary-color);
-            border-radius: 10px;
-            border: 2px solid var(--bg-light);
-        }
-
-        .left-panel {
-            flex: 1.5; /* 左侧更宽 */
-            border-right: 1px solid var(--border-color);
-            background: linear-gradient(135deg, #e0f7fa 0%, #ffffff 100%); /* 浅蓝色渐变 */
-            position: relative;
-            align-items: flex-start;
-            text-align: left;
-        }
-        /* 左侧背景SVG动画 */
-        .left-panel::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml;utf8,<svg width="100%" height="100%" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="20" cy="20" r="10" fill-opacity="0.1" fill="%23007bff"/><circle cx="80" cy="50" r="15" fill-opacity="0.08" fill="%23007bff"/><circle cx="40" cy="90" r="8" fill-opacity="0.12" fill="%23007bff"/></svg>') no-repeat center center / 100% 100%;
-            opacity: 0.1;
-            z-index: 0;
-        }
-        .left-panel > * {
-            position: relative;
-            z-index: 1;
-        }
-
-        .right-panel {
-            flex: 0.8; /* 右侧更窄 */
-            background-color: var(--bg-white);
-            display: flex;
-            flex-direction: column;
-            justify-content: center; /* 垂直居中内容 */
-            align-items: center; /* 水平居中内容 */
-            text-align: center; /* 文本居中 */
-        }
-
-        h1 {
-            font-size: 2.8em;
-            color: var(--primary-color);
-            margin-bottom: 20px;
-            font-weight: 700;
-        }
-        h1 span {
-            color: var(--accent-color);
-            font-size: 0.8em;
-            margin-left: 10px;
-            animation: bounceIn 1s ease-out;
-        }
-        @keyframes bounceIn {
-            0% { transform: scale(0.3); opacity: 0; }
-            50% { transform: scale(1.1); opacity: 1; }
-            70% { transform: scale(0.9); }
-            100% { transform: scale(1); }
-        }
-
-        .intro {
-            font-size: 1.1em;
-            color: var(--text-color);
-            margin-bottom: 30px;
-            line-height: 1.8;
-            text-align: left;
-        }
-        .intro p {
-            margin-bottom: 12px;
-        }
-        .intro strong {
-            color: var(--primary-color);
-            font-weight: 600;
-        }
-        .intro small {
-            font-size: 0.85em;
-            color: var(--secondary-color);
-            display: block;
-            margin-top: 5px;
-        }
-
-        .link-section h2, .contact-section h2 {
-            font-size: 1.8em;
-            color: var(--primary-color);
-            border-bottom: 2px solid var(--primary-color);
-            padding-bottom: 8px;
-            margin-bottom: 25px;
-            font-weight: 700;
-            display: inline-block;
-        }
-
-        .link-section ul {
-            list-style: none;
-            padding: 0;
-            margin-bottom: 30px;
-        }
-        .link-section li {
-            margin-bottom: 12px;
-        }
-        .link-section a {
-            display: flex;
-            align-items: center;
-            background-color: var(--primary-color);
-            color: white;
-            padding: 12px 20px;
-            text-decoration: none;
-            border-radius: 8px;
-            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
-            font-size: 1em;
-            box-shadow: 0 4px 10px var(--shadow-light);
-        }
-        .link-section a:hover {
-            background-color: #0056b3;
-            transform: translateY(-3px);
-            box-shadow: 0 6px 15px var(--shadow-medium);
-        }
-        .link-section a .icon {
-            margin-right: 12px;
-            font-size: 1.2em;
-        }
-
-        .contact-info-text {
-            font-size: 1em;
-            color: var(--secondary-color);
-            margin-top: auto;
-            padding-top: 20px;
-            border-top: 1px dashed var(--border-color);
-            text-align: left;
-        }
-        .contact-info-text p {
-            margin: 8px 0;
-        }
-        .emoji {
-            margin-right: 8px;
-        }
-
-        /* 留言按钮新样式 */
-        .message-button {
-            display: inline-block;
-            background-color: var(--accent-color);
-            color: white;
-            padding: 14px 30px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1.1em;
-            font-weight: 600;
-            text-decoration: none; /* 确保是链接样式 */
-            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
-            box-shadow: 0 4px 10px rgba(40, 167, 69, 0.2);
-            margin-top: 20px;
-        }
-        .message-button:hover {
-            background-color: #218838;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(40, 167, 69, 0.3);
-        }
-
-        /* 语言切换按钮 */
-        .lang-button {
-            display: flex;
-            align-items: center;
-            background-color: var(--secondary-color);
-            color: white;
-            padding: 10px 18px;
-            text-decoration: none;
-            border-radius: 8px;
-            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
-            font-size: 0.95em;
-            margin-top: 30px; /* 与上方内容保持距离 */
-            box-shadow: 0 3px 8px var(--shadow-light);
-        }
-        .lang-button:hover {
-            background-color: #5a6268;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 12px var(--shadow-medium);
-        }
-        .lang-button .icon {
-            margin-right: 8px;
-            font-size: 1em;
-        }
-
-
-        /* 响应式调整 */
-        @media (max-width: 900px) {
-            .container {
-                flex-direction: column;
-                max-width: 95%;
-                height: auto; /* 小屏幕下高度自适应 */
-                min-height: unset;
-                padding: 0; /* 移除容器内边距，让面板自身控制 */
-                margin: 10px auto; /* 调整手机端的间距 */
+    <title>马铭泽 - 全面风险管理与内控建设</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <!-- 添加particles.js用于背景效果 -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#1e40af', // 金融专业蓝
+                        secondary: '#3b82f6', // 辅助蓝
+                        dark: '#0f172a', // 深色背景
+                        light: '#f8fafc', // 浅色文本
+                        accent: '#93c5fd', // 强调色
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
             }
-            .left-panel {
-                border-right: none;
-                border-bottom: 1px solid var(--border-color);
-                padding: 30px;
-                overflow-y: visible; /* 小屏幕下取消滚动 */
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.1);
             }
-            .right-panel {
-                padding: 30px;
-                overflow-y: visible; /* 小屏幕下取消滚动 */
+            .card-hover {
+                transition: all 0.3s ease;
             }
-            body {
-                padding: 10px; /* 调整手机端的内边距 */
-                overflow-y: auto; /* 确保在手机端body可以滚动 */
+            .card-hover:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 25px -5px rgba(30, 64, 175, 0.1), 0 8px 10px -6px rgba(30, 64, 175, 0.1);
+            }
+            .link-hover {
+                position: relative;
+                transition: all 0.3s ease;
+            }
+            .link-hover::after {
+                content: '';
+                position: absolute;
+                width: 0;
+                height: 2px;
+                bottom: -2px;
+                left: 0;
+                background-color: #93c5fd;
+                transition: width 0.3s ease;
+            }
+            .link-hover:hover::after {
+                width: 100%;
+            }
+            .content-auto {
+                content-visibility: auto;
+            }
+            .sticky-sidebar {
+                position: sticky;
+                top: 80px;
+            }
+            .qr-container {
+                border: 4px solid #f8fafc;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.05);
             }
         }
     </style>
 </head>
-<body>
-    <div id="particles-js"></div>
-
-    <div class="container">
-        <div class="left-panel">
-            <div>
-                <a href="https://bono12138.github.io/demonstration/self_intro_bono_eng.html" target="_blank" class="lang-button">
-                    <span class="icon">🌐</span> View in English
+<body class="bg-gray-50 font-sans text-gray-800">
+    <!-- 粒子背景 -->
+    <div id="particles-js" class="fixed inset-0 z-0 opacity-30"></div>
+    
+    <!-- 顶部导航 -->
+    <header class="sticky top-0 z-50 bg-primary text-white shadow-md">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center max-w-7xl">
+            <h1 class="text-xl md:text-2xl font-bold">马铭泽 | 全面风险管理与内控建设</h1>
+            <div class="flex items-center gap-4">
+                
+                <nav class="hidden md:flex space-x-6">
+                    <a href="#overview" class="hover:text-accent transition-colors link-hover"><i class="fa fa-user mr-1"></i> 职业概述</a>
+                    <a href="#specialties" class="hover:text-accent transition-colors link-hover"><i class="fa fa-tags mr-1"></i> 专业领域</a>
+                    <a href="#competencies" class="hover:text-accent transition-colors link-hover"><i class="fa fa-tasks mr-1"></i> 核心能力</a>
+                    <a href="#experience" class="hover:text-accent transition-colors link-hover"><i class="fa fa-briefcase mr-1"></i> 工作经历</a>
+                    <a href="#skills" class="hover:text-accent transition-colors link-hover"><i class="fa fa-cogs mr-1"></i> 技能矩阵</a>
+                    <a href="#education" class="hover:text-accent transition-colors link-hover"><i class="fa fa-graduation-cap mr-1"></i> 教育背景</a>
+                </nav>
+                <a href="https://bono12138.github.io/demonstration/self_intro_bono_eng.html" class="hidden md:inline-flex items-center text-white hover:text-accent transition-colors link-hover px-2">
+                    <i class="fa fa-globe mr-1"></i> English Version
                 </a>
-                <h1>关于我<span>👋</span></h1>
-                <div class="intro">
-                    <p>
-                        你好！我叫马铭泽，大家喜欢叫我Bono，本科毕业于<strong style="color: var(--primary-color);">香港理工大学金融系</strong>。专注于<strong style="color: #e67e22;">内控与风险管理</strong>领域，对探索<strong style="color: var(--accent-color);">新技术优化内控管理流程</strong>充满热情。
-                    </p>
-                    <p>
-                        典型<strong style="color: #9b59b6;">ESTJ</strong>人格。喜欢<strong style="color: #f1c40f;">结构化思考</strong>，钟爱写文档，享受在团队中共同解决问题的过程。
-                    </p>
-
-                    <p>
-                        我喜欢健身💪，喜欢摇摆舞Lindy Hop💃🕺，喜欢棋牌桌游麻将扑克牌🃏，不过最喜欢的还是和人交流😊，尤其是和不同专业的人交流各自的工作
-                        <small>欢迎有缘人来约健身、约跳舞、约打牌，聊聊天</small>
-                        <small>base：📍深圳南山</small>
-                    </p>
-                </div>
-
-                <div class="link-section">
-                    <h2>🔗 快速链接</h2>
-                    <ul>
-                        <li><a href="https://bono12138.github.io/demonstration/resume_cn.html" target="_blank"><span class="icon">📝</span> 我的中文简历</a></li>
-                        <li><a href="https://bono12138.github.io/demonstration/resume_eng.html" target="_blank"><span class="icon">🎅</span> My English Resume</a></li>
-                        <li><a href="https://bono12138.github.io/demonstration/tks_demo_1629v4_eng_published.html" target="_blank"><span class="icon">📊</span> 全风管理系统TKS指标模块DEMO</a></li>
-                        <li><a href="https://bono12138.github.io/demonstration/rcsa_demo_1513v3_eng_published.html" target="_blank"><span class="icon">📈</span> 全风管理系统RCSA模块DEMO</a></li>
-                        <li><a href="https://www.linkedin.com/in/mingze-ma-950a78179/" target="_blank"><span class="icon">💼</span> 我的LinkedIn主页</a></li>
-                    </ul>
-                </div>
-            </div>
-
-
-        </div>
-
-        <div class="right-panel">
-            <div class="contact-section">
-                <h2>🤝 寻求合作/交流</h2>
-                <p>有任何问题、合作意向或单纯想找人倾计？</p>
-                <p>欢迎填写留言表单联系我！</p>
-                <p>
-                    <a href="https://docs.qq.com/form/page/DU2dNeExNQ1RucWVC" target="_blank" class="message-button">前往留言表单 🚀</a>
-                </p>
+                <button class="md:hidden text-white" id="menuBtn">
+                    <i class="fa fa-bars text-xl"></i>
+                </button>
             </div>
         </div>
-    </div>
+        <!-- 移动端菜单 -->
+        <div id="mobileMenu" class="hidden md:hidden bg-primary/95 px-4 py-2">
+            <a href="https://bono12138.github.io/demonstration/self_intro_bono_eng.html" class="block py-2 hover:text-accent transition-colors">
+                <i class="fa fa-globe mr-1"></i> English Version
+            </a>
+            <a href="#overview" class="block py-2 hover:text-accent transition-colors"><i class="fa fa-user mr-1"></i> 职业概述</a>
+            <a href="#specialties" class="block py-2 hover:text-accent transition-colors"><i class="fa fa-tags mr-1"></i> 专业领域</a>
+            <a href="#competencies" class="block py-2 hover:text-accent transition-colors"><i class="fa fa-tasks mr-1"></i> 核心能力</a>
+            <a href="#experience" class="block py-2 hover:text-accent transition-colors"><i class="fa fa-briefcase mr-1"></i> 工作经历</a>
+            <a href="#skills" class="block py-2 hover:text-accent transition-colors"><i class="fa fa-cogs mr-1"></i> 技能矩阵</a>
+            <a href="#education" class="block py-2 hover:text-accent transition-colors"><i class="fa fa-graduation-cap mr-1"></i> 教育背景</a>
+        </div>
+    </header>
 
+    <main class="container mx-auto px-4 py-8 max-w-7xl relative z-10">
+        <!-- 采用响应式布局，在大屏幕上分为主内容区和侧边栏 -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <!-- 主要内容区 - 占据8/12宽度 -->
+            <div class="lg:col-span-8 space-y-12">
+                <!-- 个人信息与职业概述、专业领域在同一行 -->
+                <section class="grid grid-cols-1 md:grid-cols-12 gap-6">
+                    <!-- 个人信息卡片 - 稍微变宽 -->
+                    <div class="md:col-span-5 bg-white rounded-lg shadow-lg p-6 card-hover flex flex-col">
+                        <div class="flex flex-col items-center text-center">
+                            <div class="w-32 h-32 rounded-full overflow-hidden mb-4 border-4 border-primary/10">
+                                <img src="https://bono12138.github.io/demonstration/profile_pics.png" alt="马铭泽的个人照片" class="w-full h-full object-cover">
+                            </div>
+                            <h2 class="text-2xl font-bold text-dark mb-1">马铭泽 (Mingze MA)</h2>
+                            <p class="text-gray-600 mb-4">全面风险管理 | 消费金融 | 监管合规</p>
+                            <div class="space-y-2 w-full text-left">
+                                <p><i class="fa fa-phone text-primary mr-2"></i> +86 176 8894 9041</p>
+                                <p><i class="fa fa-whatsapp text-primary mr-2"></i> <a href="https://wa.me/8618902001867?text=Hello+Bono%21" class="text-primary hover:underline">WhatsApp联系我</a></p>
+                                <p><i class="fa fa-envelope text-primary mr-2"></i> m18902001867@163.com</p>
+                                <p><i class="fa fa-envelope text-primary mr-2"></i> mmz1218bono@gmail.com</p>
+                                <p><i class="fa fa-id-card text-primary mr-2"></i> 香港工作签证（有效）</p>
+                            </div>
+                            
+                            <!-- 新增微信二维码 -->
+                            <div class="mt-6 w-full">
+                                <p class="text-sm text-gray-600 mb-2 text-center">扫码添加微信交流</p>
+                                <div class="flex justify-center">
+                                    <div class="qr-container rounded-lg overflow-hidden">
+                                        <img src="https://bono12138.github.io/demonstration/wechatqrcode.jpg" alt="微信二维码" class="w-36 h-36 object-contain">
+                                    </div>
+                                </div>
+                                <p class="text-xs text-gray-500 mt-2 text-center">微信ID: bono12138</p>
+                            </div>
+                        </div>
+                        <!-- 填充空间使高度匹配右侧内容 -->
+                        <div class="flex-grow"></div>
+                    </div>
+
+                    <!-- 右侧组合：职业概述 + 专业领域 -->
+                    <div class="md:col-span-7 flex flex-col gap-6">
+                        <!-- 职业概述卡片 -->
+                        <div class="bg-white rounded-lg shadow-lg p-6 card-hover flex-grow">
+                            <h2 class="text-xl font-bold text-primary mb-4 flex items-center">
+                                <i class="fa fa-file-text-o mr-2"></i> 职业概述
+                            </h2>
+                            <p class="text-gray-700 leading-relaxed mb-4">
+                                拥有<span class="font-semibold text-primary">4年+消费金融与银行业风险管理与内控优化经验</span>，擅长建立全面风险与内控机制，主导IFRS 9预期信用减值体系、关键风险指标（KRI）监测体系落地，深度参与互联网信贷业务风险管控，具备全流程项目管理经验。
+                            </p>
+                            <p class="text-gray-700 leading-relaxed">
+                                具备<span class="font-semibold text-primary">独立风险分析与报告能力</span>，具有丰富的内外部审计沟通经验与跨境监管落地经验，利用Python/SQL/Superset等工具实现风险数据可视化与自动化监测，可高效支撑消费金融公司全面风险管理委员会运作，确保监管合规与业务风险可控。
+                            </p>
+                        </div>
+
+                        <!-- 专业领域 -->
+                        <div id="specialties" class="bg-white rounded-lg shadow-lg p-6 card-hover flex-grow">
+                            <h2 class="text-xl font-bold text-primary mb-4 flex items-center">
+                                <i class="fa fa-tags mr-2"></i> 专业领域
+                            </h2>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm">全面风险管理</span>
+                                <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm">消费金融</span>
+                                <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm">IFRS 9</span>
+                                <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm">风险建模</span>
+                                <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm">Basel III</span>
+                                <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm">压力测试</span>
+                                <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm">监管合规</span>
+                                <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm">数据分析</span>
+                                <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm">IT审计</span>
+                                <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm">内部控制</span>
+                                <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm">COSO框架</span>
+                                <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm">信用风险</span>
+                                <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm">风险指标</span>
+                                <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm">跨境金融</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 核心能力（匹配岗位需求） -->
+                <section id="competencies">
+                    <h2 class="text-2xl font-bold text-primary mb-6 flex items-center">
+                        <i class="fa fa-tasks mr-2"></i> 核心能力 · 岗位匹配
+                    </h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- 能力1：全面风险与内控机制 -->
+                        <div class="bg-white rounded-lg shadow-lg p-6 card-hover border-l-4 border-primary">
+                            <h3 class="text-lg font-bold mb-3 flex items-center">
+                                <i class="fa fa-shield text-primary mr-2"></i> 全面风险管理与内控建设
+                            </h3>
+                            <ul class="space-y-2 text-gray-700 list-disc list-inside">
+                                <li>主导<span class="font-semibold">IFRS 9预期信用减值体系全流程建设</span>（方案设计→模型开发→SOP内控→系统落地），覆盖PD/LGD/EAD及前瞻调整</li>
+                                <li>建立<span class="font-semibold">关键风险指标（KRI）监测机制</span>（不良率、迁徙率等），维护风险计量模型迭代，优化RCSA管理流程</li>
+                                <li>制定<span class="font-semibold">资产风险分类制度</span>，完善资产质量监测体系，可支撑风险管理委员会风险分析与报告提交</li>
+                            </ul>
+                        </div>
+
+                        <!-- 能力2：新产品内控与信贷风控 -->
+                        <div class="bg-white rounded-lg shadow-lg p-6 card-hover border-l-4 border-secondary">
+                            <h3 class="text-lg font-bold mb-3 flex items-center">
+                                <i class="fa fa-lightbulb-o text-primary mr-2"></i> 新产品内控与互联网信贷风控
+                            </h3>
+                            <ul class="space-y-2 text-gray-700 list-disc list-inside">
+                                <li>基于巴塞尔协议、监管指引，设计<span class="font-semibold">消费信贷业务风险管控方案</span>，覆盖模型参数与内控流程</li>
+                                <li>通过访谈梳理内控流程、设计风险矩阵，执行ITGC/ITAC测试，<span class="font-semibold">评估并优化业务内控有效性</span></li>
+                                <li>负责<span class="font-semibold">1.4亿美元信贷组合压力测试</span>，提供风险应对建议</li>
+                            </ul>
+                        </div>
+
+                        <!-- 能力3：数据分析与风险处置 -->
+                        <div class="bg-white rounded-lg shadow-lg p-6 card-hover border-l-4 border-primary">
+                            <h3 class="text-lg font-bold mb-3 flex items-center">
+                                <i class="fa fa-bar-chart text-primary mr-2"></i> 数据分析与风险全周期管控
+                            </h3>
+                            <ul class="space-y-2 text-gray-700 list-disc list-inside">
+                                <li>利用Python/SQL/Superset构建<span class="font-semibold">风险数据可视化仪表盘</span>，实现1.4亿美元资产的KRI实时监测与归因分析</li>
+                                <li>通过数据挖掘与趋势分析，<span class="font-semibold">体系化开展风险感知、预警与处置</span>，支撑数据驱动决策</li>
+                                <li>协调内外部审计问题整改，<span class="font-semibold">推动改进落地与定期跟踪</span>（如中方/印尼团队监管差异调研与培训）</li>
+                            </ul>
+                        </div>
+
+                        <!-- 能力4：监管合规支持 -->
+                        <div class="bg-white rounded-lg shadow-lg p-6 card-hover border-l-4 border-secondary">
+                            <h3 class="text-lg font-bold mb-3 flex items-center">
+                                <i class="fa fa-gavel text-primary mr-2"></i> 监管合规与跨团队协作
+                            </h3>
+                            <ul class="space-y-2 text-gray-700 list-disc list-inside">
+                                <li>熟悉<span class="font-semibold">Basel III、IFRS 9、商业银行资本管理办法、消费金融公司管理办法</span>等合规框架，对接监管机构与外部审计</li>
+                                <li>负责<span class="font-semibold">监管要求解读与跨境合规差异分析</span>（如印尼当地监管），组织培训确保团队合规认知</li>
+                                <li>协调中印两地开发、财务、审计等多团队，<span class="font-semibold">推进风险系统落地与项目管理</span>（含供应商管理）</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 工作经历 -->
+                <section id="experience">
+                    <h2 class="text-2xl font-bold text-primary mb-6 flex items-center">
+                        <i class="fa fa-briefcase mr-2"></i> 工作经历 · 项目成果
+                    </h2>
+                    <div class="space-y-6">
+                        <!-- Akulaku 经历 -->
+                        <div class="bg-white rounded-lg shadow-lg p-6 card-hover">
+                            <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-4">
+                                <div>
+                                    <h3 class="text-lg font-bold text-dark">Akulaku | 全面风险管理岗（风险量化分析师）</h3>
+                                    <p class="text-gray-500">2023年12月 至今 | 深圳</p>
+                                </div>
+                                <span class="bg-primary/10 text-primary text-sm font-semibold px-3 py-1 rounded-full mt-2 md:mt-0">主导项目</span>
+                            </div>
+                            <div class="space-y-6 text-gray-700">
+                                <div>
+                                    <h4 class="font-semibold mb-2 text-primary">IFRS 9 ECL减值管理流程体系建设</h4>
+                                    <p>依据Basel III、财政部指引，设计PD/LGD/EAD模型与前瞻调整方案，对接财务部、外部审计与印尼监管，编写文档并协调开发落地系统，完成UAT验收，确保符合监管要求。</p>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold mb-2 text-primary">风险监测与汇报</h4>
+                                    <p>建立KRI监测机制（不良率、迁徙率），开发Superset风险仪表盘；设计1.4亿美元信贷组合压力测试场景，分析KRI影响，汇报风险状况并提交管理层应对建议，优化资产质量监测流程。</p>
+                                </div>
+                                
+                            </div>
+                        </div>
+
+                        <!-- 安永经历 -->
+                        <div class="bg-white rounded-lg shadow-lg p-6 card-hover">
+                            <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-4">
+                                <div>
+                                    <h3 class="text-lg font-bold text-dark">安永(中国) | 金融服务组（FSO）风险咨询师</h3>
+                                    <p class="text-gray-500">2021年10月 - 2023年12月 | 深圳</p>
+                                </div>
+                                <span class="bg-secondary/10 text-secondary text-sm font-semibold px-3 py-1 rounded-full mt-2 md:mt-0">审计与内控</span>
+                            </div>
+                            <div class="space-y-6 text-gray-700">
+                                <div>
+                                    <h4 class="font-semibold mb-2 text-primary">IT审计与内控审计</h4>
+                                    <p>通过访谈梳理内控流程，设计风险矩阵，执行ITGC/ITAC测试，评估并优化内控有效性。</p>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold mb-2 text-primary">IFRS9准则下减值模型审计</h4>
+                                    <p>审计上市银行IFRS 9减值模型（企业贷款、债券、信用卡），审阅预期信用损失计量结果。</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 实习经历 -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="bg-white rounded-lg shadow-lg p-6 card-hover">
+                                <h3 class="text-lg font-bold text-dark">罗兵咸永道(PwC HK) | 审计师（实习）</h3>
+                                <p class="text-gray-500 mb-3">2020年1月 - 2020年4月 | 香港</p>
+                                <p class="text-gray-700">负责浙商银行香港分行年报审计，执行货币资金审计与贷款内控流程测试</p>
+                            </div>
+                            <div class="bg-white rounded-lg shadow-lg p-6 card-hover">
+                                <h3 class="text-lg font-bold text-dark">上海银行 | 市场部对公业务助理（实习）</h3>
+                                <p class="text-gray-500 mb-3">2019年6月 - 2019年8月 | 上海</p>
+                                <p class="text-gray-700">参与地铁延长线建设项目授信审批，撰写尽职调查报告并完成财务比率分析</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 技能矩阵 -->
+                <section id="skills">
+                    <h2 class="text-2xl font-bold text-primary mb-6 flex items-center">
+                        <i class="fa fa-cogs mr-2"></i> 技能矩阵 · 工具与框架
+                    </h2>
+                    <div class="bg-white rounded-lg shadow-lg p-6">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                            <!-- 风险管理工具 -->
+                            <div class="text-center">
+                                <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3">
+                                    <i class="fa fa-line-chart text-xl text-primary"></i>
+                                </div>
+                                <h3 class="font-semibold mb-2">全面风险管理工具</h3>
+                                <p class="text-gray-600 text-sm">COSO内部控制框架<br>IFRS 9 ECL模型<br>PD/LGD/EAD计量<br>压力测试<br>KRI监测<br>RCSA流程</p>
+                            </div>
+
+                            <!-- 数据分析技术 -->
+                            <div class="text-center">
+                                <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3">
+                                    <i class="fa fa-code text-xl text-primary"></i>
+                                </div>
+                                <h3 class="font-semibold mb-2">数据分析技术</h3>
+                                <p class="text-gray-600 text-sm">Python/R<br>SQL(Presto/SAS/MySQL)<br>VBA<br>Superset/Tableau<br>Power BI</p>
+                            </div>
+
+                            <!-- 监管合规框架 -->
+                            <div class="text-center">
+                                <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3">
+                                    <i class="fa fa-book text-xl text-primary"></i>
+                                </div>
+                                <h3 class="font-semibold mb-2">监管合规框架</h3>
+                                <p class="text-gray-600 text-sm">Basel III<br>IFRS 9/17<br>商业银行资本管理办法<br>消费金融公司管理办法<br>预期信用损失法实施指引<br>跨境监管差异分析</p>
+                            </div>
+
+                            <!-- 办公与数据工具 -->
+                            <div class="text-center">
+                                <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3">
+                                    <i class="fa fa-desktop text-xl text-primary"></i>
+                                </div>
+                                <h3 class="font-semibold mb-2">办公与数据工具</h3>
+                                <p class="text-gray-600 text-sm">Microsoft Office<br>Bloomberg<br>Wind<br>Statista</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 教育背景 -->
+                <section id="education">
+                    <h2 class="text-2xl font-bold text-primary mb-6 flex items-center">
+                        <i class="fa fa-graduation-cap mr-2"></i> 教育背景
+                    </h2>
+                    <div class="bg-white rounded-lg shadow-lg p-6 card-hover">
+                        <div class="flex flex-col md:flex-row md:items-center justify-between">
+                            <div>
+                                <h3 class="text-lg font-bold text-dark">香港理工大学</h3>
+                                <p class="text-gray-600">工商管理学学士学位 · 金融服务专业</p>
+                            </div>
+                            <p class="text-gray-500 mt-2 md:mt-0">2017年9月 - 2021年9月 | 香港</p>
+                        </div>
+                        <div class="mt-4 text-gray-700">
+                            <p><i class="fa fa-language text-primary mr-2"></i> 语言能力：英语（商务会谈）、普通话（母语）、粤语（日常沟通）</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- 侧边栏 - 占据4/12宽度，固定定位 -->
+            <div class="lg:col-span-4">
+                <div class="sticky-sidebar">
+                    <!-- 快速链接部分 - 尺寸减小 -->
+                    <section id="links" class="bg-white rounded-lg shadow-lg p-5 card-hover mb-6">
+                        <h2 class="text-lg font-bold text-primary mb-3 flex items-center">
+                            <i class="fa fa-link mr-2"></i> 快速链接
+                        </h2>
+                        <ul class="space-y-2 text-sm">
+                            <li>
+                                <a href="https://bono12138.github.io/demonstration/resume_cn.html" target="_blank" 
+                                   class="flex items-center text-gray-700 hover:text-primary transition-colors">
+                                    <span class="icon w-6 text-primary"><i class="fa fa-file-text-o"></i></span>
+                                    <span>我的中文简历</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://bono12138.github.io/demonstration/resume_eng.html" target="_blank" 
+                                   class="flex items-center text-gray-700 hover:text-primary transition-colors">
+                                    <span class="icon w-6 text-primary"><i class="fa fa-file-text-o"></i></span>
+                                    <span>My English Resume</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://bono12138.github.io/demonstration/tks_demo_1629v4_eng_published.html" target="_blank" 
+                                   class="flex items-center text-gray-700 hover:text-primary transition-colors">
+                                    <span class="icon w-6 text-primary"><i class="fa fa-bar-chart"></i></span>
+                                    <span>全风管理系统TKS指标模块DEMO</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://bono12138.github.io/demonstration/rcsa_demo_1513v3_eng_published.html" target="_blank" 
+                                   class="flex items-center text-gray-700 hover:text-primary transition-colors">
+                                    <span class="icon w-6 text-primary"><i class="fa fa-pie-chart"></i></span>
+                                    <span>全风管理系统RCSA模块DEMO</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://www.linkedin.com/in/mingze-ma-950a78179/" target="_blank" 
+                                   class="flex items-center text-gray-700 hover:text-primary transition-colors">
+                                    <span class="icon w-6 text-primary"><i class="fa fa-linkedin"></i></span>
+                                    <span>我的LinkedIn主页</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </section>
+
+                    <!-- 联系部分 - 尺寸减小，与上方有间隙 -->
+                    <section class="bg-white rounded-lg shadow-lg p-5 card-hover">
+                        <h2 class="text-lg font-bold text-primary mb-3 flex items-center">
+                            <i class="fa fa-comments mr-2"></i> 寻求合作/交流
+                        </h2>
+                        <p class="text-gray-700 mb-3 text-sm">有任何问题、合作意向或单纯想交流？</p>
+                        <p class="text-gray-700 mb-4 text-sm">欢迎通过以下方式联系我！</p>
+                        
+                        <a href="https://docs.qq.com/form/page/DU2dNeExNQ1RucWVC" target="_blank" 
+                           class="block w-full py-2 px-3 bg-primary text-white text-center rounded-lg font-medium hover:bg-primary/90 transition-colors mb-3 text-sm">
+                            前往留言表单 <i class="fa fa-paper-plane ml-1"></i>
+                        </a>
+                        
+                        <div class="space-y-2 text-gray-700 text-sm">
+                            <p class="flex items-center">
+                                <i class="fa fa-envelope text-primary mr-2 w-5"></i>
+                                <span>m18902001867@163.com</span>
+                            </p>
+                            <p class="flex items-center">
+                                <i class="fa fa-envelope text-primary mr-2 w-5"></i>
+                                <span>mmz1218bono@gmail.com</span>
+                            </p>
+                            <p class="flex items-center">
+                                <i class="fa fa-phone text-primary mr-2 w-5"></i>
+                                <span>+86 176 8894 9041</span>
+                            </p>
+                            <p class="flex items-center">
+                                <i class="fa fa-whatsapp text-primary mr-2 w-5"></i>
+                                <a href="https://wa.me/8618902001867?text=Hello+Bono%21" class="text-primary hover:underline">WhatsApp联系我</a>
+                            </p>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-dark text-white py-6 relative z-10 mt-12">
+        <div class="container mx-auto px-4 text-center max-w-7xl">
+            <p class="mb-2">马铭泽 | 全面风险管理与内控建设</p>
+            <p class="text-gray-400 text-sm">联系方式：+86 176 8894 9041 | <a href="https://wa.me/8618902001867?text=Hello+Bono%21" class="text-accent hover:underline">WhatsApp联系我</a> | m18902001867@163.com</p>
+            <p class="text-gray-500 text-xs mt-4">© 马铭泽个人展示页 | 专注消费金融风险管理与内控建设</p>
+        </div>
+    </footer>
+
+    <!-- 脚本 -->
     <script>
-        // particles.js 配置
+        // 移动端菜单切换
+        document.getElementById('menuBtn').addEventListener('click', function() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 70, // 避开固定导航
+                        behavior: 'smooth'
+                    });
+                    // 移动端菜单关闭
+                    document.getElementById('mobileMenu').classList.add('hidden');
+                }
+            });
+        });
+
+        // particles.js 配置 - 背景粒子效果
         particlesJS('particles-js', {
             "particles": {
                 "number": {
@@ -358,58 +504,34 @@
                     }
                 },
                 "color": {
-                    "value": "#007bff"
+                    "value": "#1e40af" // 使用主色调
                 },
                 "shape": {
-                    "type": "circle",
-                    "stroke": {
-                        "width": 0,
-                        "color": "#000000"
-                    },
-                    "polygon": {
-                        "nb_sides": 5
-                    }
+                    "type": "circle"
                 },
                 "opacity": {
                     "value": 0.5,
-                    "random": false,
-                    "anim": {
-                        "enable": false,
-                        "speed": 1,
-                        "opacity_min": 0.1,
-                        "sync": false
-                    }
+                    "random": false
                 },
                 "size": {
                     "value": 3,
-                    "random": true,
-                    "anim": {
-                        "enable": false,
-                        "speed": 40,
-                        "size_min": 0.1,
-                        "sync": false
-                    }
+                    "random": true
                 },
                 "line_linked": {
                     "enable": true,
                     "distance": 150,
-                    "color": "#007bff",
+                    "color": "#1e40af",
                     "opacity": 0.4,
                     "width": 1
                 },
                 "move": {
                     "enable": true,
-                    "speed": 6,
+                    "speed": 1,
                     "direction": "none",
                     "random": false,
                     "straight": false,
                     "out_mode": "out",
-                    "bounce": false,
-                    "attract": {
-                        "enable": false,
-                        "rotateX": 600,
-                        "rotateY": 1200
-                    }
+                    "bounce": false
                 }
             },
             "interactivity": {
@@ -432,26 +554,24 @@
                             "opacity": 1
                         }
                     },
-                    "bubble": {
-                        "distance": 400,
-                        "size": 40,
-                        "duration": 2,
-                        "opacity": 8,
-                        "speed": 3
-                    },
-                    "repulse": {
-                        "distance": 200,
-                        "duration": 0.4
-                    },
                     "push": {
                         "particles_nb": 4
-                    },
-                    "remove": {
-                        "particles_nb": 2
                     }
                 }
             },
             "retina_detect": true
+        });
+
+        // 滚动时导航栏样式变化
+        window.addEventListener('scroll', function() {
+            const header = document.querySelector('header');
+            if (window.scrollY > 50) {
+                header.classList.add('bg-primary/95', 'shadow-lg');
+                header.classList.remove('bg-primary', 'shadow-md');
+            } else {
+                header.classList.add('bg-primary', 'shadow-md');
+                header.classList.remove('bg-primary/95', 'shadow-lg');
+            }
         });
     </script>
 </body>
