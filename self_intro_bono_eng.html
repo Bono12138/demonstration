@@ -3,366 +3,497 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mingze Ma - Personal Homepage</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
-    <style>
-        :root {
-            --primary-color: #007bff; /* Blue */
-            --secondary-color: #6c757d; /* Gray */
-            --accent-color: #28a745; /* Green */
-            --text-color: #343a40; /* Dark Gray */
-            --bg-light: #f8f9fa; /* Light Gray Background */
-            --bg-white: #ffffff; /* White Background */
-            --border-color: #e9ecef; /* Border Color */
-            --shadow-light: rgba(0, 0, 0, 0.05);
-            --shadow-medium: rgba(0, 0, 0, 0.1);
-        }
-
-        body {
-            font-family: 'Roboto', 'Noto Sans SC', sans-serif; /* English font first */
-            line-height: 1.6;
-            margin: 0;
-            padding: 0;
-            background-color: var(--bg-light);
-            color: var(--text-color);
-            display: flex;
-            /* Changed align-items to flex-start for better vertical flow */
-            /* Removed justify-content: center; */
-            align-items: flex-start; /* Changed from center */
-            min-height: 100vh;
-            box-sizing: border-box;
-            position: relative;
-            overflow-x: hidden; /* Prevent horizontal scrolling */
-            overflow-y: auto; /* Allow vertical scrolling for the whole page if needed */
-        }
-
-        #particles-js {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            z-index: -1;
-            background-color: transparent;
-        }
-
-        .container {
-            display: flex;
-            background-color: var(--bg-white);
-            border-radius: 12px;
-            box-shadow: 0 8px 25px var(--shadow-medium);
-            max-width: 1100px;
-            width: 90%;
-            /* Removed fixed height for better responsiveness, especially on mobile */
-            /* height: 90vh; */
-            min-height: 650px;
-            /* Removed overflow: hidden; to allow scrolling within the container if needed */
-            /* Also, for better mobile behavior, let the body handle overall scroll */
-            z-index: 1;
-            margin: 20px auto; /* Add margin to center it and give some space */
-            flex-direction: column; /* Ensure vertical stacking on smaller screens */
-        }
-
-        .left-panel, .right-panel {
-            padding: 40px;
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            overflow-y: auto; /* Keep this for internal panel scrolling if content is too long */
-            scrollbar-width: thin;
-            scrollbar-color: var(--primary-color) var(--bg-light);
-        }
-        .left-panel::-webkit-scrollbar,
-        .right-panel::-webkit-scrollbar {
-            width: 8px;
-        }
-        .left-panel::-webkit-scrollbar-track,
-        .right-panel::-webkit-scrollbar-track {
-            background: var(--bg-light);
-            border-radius: 10px;
-        }
-        .left-panel::-webkit-scrollbar-thumb,
-        .right-panel::-webkit-scrollbar-thumb {
-            background-color: var(--primary-color);
-            border-radius: 10px;
-            border: 2px solid var(--bg-light);
-        }
-
-        .left-panel {
-            flex: 1.5;
-            border-right: 1px solid var(--border-color);
-            background: linear-gradient(135deg, #e0f7fa 0%, #ffffff 100%);
-            position: relative;
-            align-items: flex-start;
-            text-align: left;
-        }
-        .left-panel::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml;utf8,<svg width="100%" height="100%" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="20" cy="20" r="10" fill-opacity="0.1" fill="%23007bff"/><circle cx="80" cy="50" r="15" fill-opacity="0.08" fill="%23007bff"/><circle cx="40" cy="90" r="8" fill-opacity="0.12" fill="%23007bff"/></svg>') no-repeat center center / 100% 100%;
-            opacity: 0.1;
-            z-index: 0;
-        }
-        .left-panel > * {
-            position: relative;
-            z-index: 1;
-        }
-
-        .right-panel {
-            flex: 0.8;
-            background-color: var(--bg-white);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-        }
-
-        h1 {
-            font-size: 2.8em;
-            color: var(--primary-color);
-            margin-bottom: 20px;
-            font-weight: 700;
-        }
-        h1 span {
-            color: var(--accent-color);
-            font-size: 0.8em;
-            margin-left: 10px;
-            animation: bounceIn 1s ease-out;
-        }
-        @keyframes bounceIn {
-            0% { transform: scale(0.3); opacity: 0; }
-            50% { transform: scale(1.1); opacity: 1; }
-            70% { transform: scale(0.9); }
-            100% { transform: scale(1); }
-        }
-
-        .intro {
-            font-size: 1.1em;
-            color: var(--text-color);
-            margin-bottom: 30px;
-            line-height: 1.8;
-            text-align: left;
-        }
-        .intro p {
-            margin-bottom: 12px;
-        }
-        .intro strong {
-            color: var(--primary-color);
-            font-weight: 600;
-        }
-        .intro small {
-            font-size: 0.85em;
-            color: var(--secondary-color);
-            display: block;
-            margin-top: 5px;
-        }
-
-        .link-section h2, .contact-section h2 {
-            font-size: 1.8em;
-            color: var(--primary-color);
-            border-bottom: 2px solid var(--primary-color);
-            padding-bottom: 8px;
-            margin-bottom: 25px;
-            font-weight: 700;
-            display: inline-block;
-        }
-
-        .link-section ul {
-            list-style: none;
-            padding: 0;
-            margin-bottom: 30px;
-        }
-        .link-section li {
-            margin-bottom: 12px;
-        }
-        .link-section a {
-            display: flex;
-            align-items: center;
-            background-color: var(--primary-color);
-            color: white;
-            padding: 12px 20px;
-            text-decoration: none;
-            border-radius: 8px;
-            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
-            font-size: 1em;
-            box-shadow: 0 4px 10px var(--shadow-light);
-        }
-        .link-section a:hover {
-            background-color: #0056b3;
-            transform: translateY(-3px);
-            box-shadow: 0 6px 15px var(--shadow-medium);
-        }
-        .link-section a .icon {
-            margin-right: 12px;
-            font-size: 1.2em;
-        }
-
-        .contact-info-text {
-            font-size: 1em;
-            color: var(--secondary-color);
-            margin-top: auto;
-            padding-top: 20px;
-            border-top: 1px dashed var(--border-color);
-            text-align: left;
-        }
-        .contact-info-text p {
-            margin: 8px 0;
-        }
-        .emoji {
-            margin-right: 8px;
-        }
-
-        .message-button {
-            display: inline-block;
-            background-color: var(--accent-color);
-            color: white;
-            padding: 14px 30px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1.1em;
-            font-weight: 600;
-            text-decoration: none;
-            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
-            box-shadow: 0 4px 10px rgba(40, 167, 69, 0.2);
-            margin-top: 20px;
-        }
-        .message-button:hover {
-            background-color: #218838;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(40, 167, 69, 0.3);
-        }
-
-        /* Language Toggle Button */
-        .lang-button {
-            display: flex;
-            align-items: center;
-            background-color: var(--secondary-color);
-            color: white;
-            padding: 10px 18px;
-            text-decoration: none;
-            border-radius: 8px;
-            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
-            font-size: 0.95em;
-            margin-top: 30px;
-            box-shadow: 0 3px 8px var(--shadow-light);
-        }
-        .lang-button:hover {
-            background-color: #5a6268;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 12px var(--shadow-medium);
-        }
-        .lang-button .icon {
-            margin-right: 8px;
-            font-size: 1em;
-        }
-
-        /* Responsive adjustments */
-        @media (max-width: 900px) {
-            .container {
-                flex-direction: column;
-                max-width: 95%;
-                height: auto; /* Ensure height adjusts to content */
-                min-height: unset;
-                padding: 0;
-                margin: 10px auto; /* Adjust margin for mobile */
+    <title>Enterprise Risk Management & Internal Controls</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <!-- Add particles.js for background effect -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#1e40af', // Financial professional blue
+                        secondary: '#3b82f6', // Secondary blue
+                        dark: '#0f172a', // Dark background
+                        light: '#f8fafc', // Light text
+                        accent: '#93c5fd', // Accent color
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
             }
-            .left-panel {
-                border-right: none;
-                border-bottom: 1px solid var(--border-color);
-                padding: 30px;
-                overflow-y: visible; /* Let content overflow to allow body scroll */
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.1);
             }
-            .right-panel {
-                padding: 30px;
-                overflow-y: visible; /* Let content overflow to allow body scroll */
+            .card-hover {
+                transition: all 0.3s ease;
             }
-            body {
-                padding: 10px; /* Adjust padding for mobile */
-                /* Ensure body itself can scroll vertically */
-                overflow-y: auto;
+            .card-hover:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 25px -5px rgba(30, 64, 175, 0.1), 0 8px 10px -6px rgba(30, 64, 175, 0.1);
+            }
+            .link-hover {
+                position: relative;
+                transition: all 0.3s ease;
+            }
+            .link-hover::after {
+                content: '';
+                position: absolute;
+                width: 0;
+                height: 2px;
+                bottom: -2px;
+                left: 0;
+                background-color: #93c5fd;
+                transition: width 0.3s ease;
+            }
+            .link-hover:hover::after {
+                width: 100%;
+            }
+            .content-auto {
+                content-visibility: auto;
+            }
+            .sticky-sidebar {
+                position: sticky;
+                top: 80px;
+            }
+            .qr-container {
+                border: 4px solid #f8fafc;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.05);
             }
         }
     </style>
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-739M9E1J12"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-
-      gtag('config', 'G-739M9E1J12');
-    </script>
 </head>
-<body>
-    <div id="particles-js"></div>
-
-    <div class="container">
-        <div class="left-panel">
-            <div>
-                <a href="https://bono12138.github.io/demonstration/self_intro_bono_cn.html" target="_blank" class="lang-button">
-                    <span class="icon">🌐</span> 查看中文版本
+<body class="bg-gray-50 font-sans text-gray-800">
+    <!-- Particle background -->
+    <div id="particles-js" class="fixed inset-0 z-0 opacity-30"></div>
+    
+    <!-- Top navigation -->
+    <header class="sticky top-0 z-50 bg-primary text-white shadow-md">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center max-w-7xl">
+            <h1 class="text-xl md:text-2xl font-bold">Enterprise Risk Management</h1>
+            <div class="flex items-center gap-4">
+                
+                <nav class="hidden md:flex space-x-6">
+                    <a href="#overview" class="hover:text-accent transition-colors link-hover"><i class="fa fa-user mr-1"></i> Profile</a>
+                    <a href="#specialties" class="hover:text-accent transition-colors link-hover"><i class="fa fa-tags mr-1"></i> Expertise</a>
+                    <a href="#competencies" class="hover:text-accent transition-colors link-hover"><i class="fa fa-tasks mr-1"></i> Core Competencies</a>
+                    <a href="#experience" class="hover:text-accent transition-colors link-hover"><i class="fa fa-briefcase mr-1"></i> Experience</a>
+                    <a href="#skills" class="hover:text-accent transition-colors link-hover"><i class="fa fa-cogs mr-1"></i> Skills Matrix</a>
+                    <a href="#education" class="hover:text-accent transition-colors link-hover"><i class="fa fa-graduation-cap mr-1"></i> Education</a>
+                </nav>
+                <a href="https://bono12138.github.io/demonstration/self_intro_bono_cn.html" class="hidden md:inline-flex items-center text-white hover:text-accent transition-colors link-hover px-2">
+                    <i class="fa fa-globe mr-1"></i> 中文版
                 </a>
-                <div style="display: flex; align-items: flex-start; justify-content: space-between;">
-                    <div>
-                        <h1>About Me<span>👋</span></h1>
-                        <div class="contact-info-text">
-                            <p><span class="emoji">💬</span> <a href="https://wa.me/8618902001867?text=Hello+Bono%21" target="_blank" >WhatsApp: +86 189 0200 1867</a></p>
+                <button class="md:hidden text-white" id="menuBtn">
+                    <i class="fa fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+        <!-- Mobile menu -->
+        <div id="mobileMenu" class="hidden md:hidden bg-primary/95 px-4 py-2">
+            <a href="https://bono12138.github.io/demonstration/self_intro_bono_cn.html" class="block py-2 hover:text-accent transition-colors">
+                <i class="fa fa-globe mr-1"></i> 中文版本
+            </a>
+            <a href="#overview" class="block py-2 hover:text-accent transition-colors"><i class="fa fa-user mr-1"></i> Profile</a>
+            <a href="#specialties" class="block py-2 hover:text-accent transition-colors"><i class="fa fa-tags mr-1"></i> Expertise</a>
+            <a href="#competencies" class="block py-2 hover:text-accent transition-colors"><i class="fa fa-tasks mr-1"></i> Core Competencies</a>
+            <a href="#experience" class="block py-2 hover:text-accent transition-colors"><i class="fa fa-briefcase mr-1"></i> Experience</a>
+            <a href="#skills" class="block py-2 hover:text-accent transition-colors"><i class="fa fa-cogs mr-1"></i> Skills Matrix</a>
+            <a href="#education" class="block py-2 hover:text-accent transition-colors"><i class="fa fa-graduation-cap mr-1"></i> Education</a>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-8 max-w-7xl relative z-10">
+        <!-- Responsive layout with main content and sidebar on large screens -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <!-- Main content area - 8/12 width -->
+            <div class="lg:col-span-8 space-y-12">
+                <!-- Personal info, profile and expertise in one row -->
+                <section class="grid grid-cols-1 md:grid-cols-12 gap-6">
+                    <!-- Personal info card - slightly wider -->
+                    <div class="md:col-span-5 bg-white rounded-lg shadow-lg p-6 card-hover flex flex-col">
+                        <div class="flex flex-col items-center text-center">
+                            <div class="w-32 h-32 rounded-full overflow-hidden mb-4 border-4 border-primary/10">
+                                <img src="https://bono12138.github.io/demonstration/profile_pics.png" alt="Mingze MA's profile photo" class="w-full h-full object-cover">
+                            </div>
+                            <h2 class="text-2xl font-bold text-dark mb-1">Mingze MA</h2>
+                            <p class="text-gray-600 mb-4">Enterprise Risk Management | Consumer Finance | Compliance</p>
+                            <div class="space-y-2 w-full text-left">
+                                <p><i class="fa fa-phone text-primary mr-2"></i> +86 176 8894 9041</p>
+                                <p><i class="fa fa-whatsapp text-primary mr-2"></i> <a href="https://wa.me/8618902001867?text=Hello+Bono%21" class="text-primary hover:underline">Contact me on WhatsApp</a></p>
+                                <p><i class="fa fa-envelope text-primary mr-2"></i> m18902001867@163.com</p>
+                                <p><i class="fa fa-envelope text-primary mr-2"></i> mmz1218bono@gmail.com</p>
+                                <p><i class="fa fa-id-card text-primary mr-2"></i> Hong Kong Work Visa (Valid)</p>
+                            </div>
+                            
+                            <!-- WhatsApp QR code -->
+                            <div class="mt-6 w-full">
+                                <p class="text-sm text-gray-600 mb-2 text-center">Scan to contact me on WhatsApp</p>
+                                <div class="flex justify-center">
+                                    <div class="qr-container rounded-lg overflow-hidden">
+                                        <img src="https://bono12138.github.io/demonstration/whatsapp.png" alt="WhatsApp QR code" class="w-36 h-36 object-contain">
+                                    </div>
+                                </div>
+                                <p class="text-xs text-gray-500 mt-2 text-center">WhatsApp ID: bono12138</p>
+                            </div>
+                        </div>
+                        <!-- Fill space to match right content height -->
+                        <div class="flex-grow"></div>
+                    </div>
+
+                    <!-- Right combination: Profile + Expertise -->
+                    <div class="md:col-span-7 flex flex-col gap-6">
+                        <!-- Profile card -->
+                        <div id="overview" class="bg-white rounded-lg shadow-lg p-6 card-hover flex-grow">
+                            <h2 class="text-xl font-bold text-primary mb-4 flex items-center">
+                                <i class="fa fa-file-text-o mr-2"></i> Professional Profile
+                            </h2>
+                            <p class="text-gray-700 leading-relaxed mb-4">
+                                With <span class="font-semibold text-primary">4+ years of experience in risk management and internal control optimization in consumer finance and banking</span>, proficient in establishing comprehensive risk and internal control mechanisms. Led implementation of IFRS 9 expected credit loss system and key risk indicator (KRI) monitoring system, with deep involvement in internet credit business risk management and full-cycle project management experience.
+                            </p>
+                            <p class="text-gray-700 leading-relaxed">
+                                Possesses <span class="font-semibold text-primary">independent risk analysis and reporting capabilities</span>, with extensive experience in internal and external audit communication and cross-border regulatory compliance. Utilizes Python/SQL/Superset and other tools to achieve risk data visualization and automated monitoring, efficiently supporting the operation of consumer finance companies' enterprise risk management committees to ensure regulatory compliance and controllable business risks.
+                            </p>
+                        </div>
+
+                        <!-- Expertise -->
+                        <div id="specialties" class="bg-white rounded-lg shadow-lg p-6 card-hover flex-grow">
+                            <h2 class="text-xl font-bold text-primary mb-4 flex items-center">
+                                <i class="fa fa-tags mr-2"></i> Areas of Expertise
+                            </h2>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm">Enterprise Risk Management</span>
+                                <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm">Consumer Finance</span>
+                                <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm">IFRS 9</span>
+                                <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm">Risk Modeling</span>
+                                <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm">Basel III</span>
+                                <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm">Stress Testing</span>
+                                <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm">Regulatory Compliance</span>
+                                <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm">Data Analysis</span>
+                                <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm">IT Audit</span>
+                                <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm">Internal Controls</span>
+                                <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm">COSO Framework</span>
+                                <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm">Credit Risk</span>
+                                <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm">Risk Indicators</span>
+                                <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm">Cross-border Finance</span>
+                            </div>
                         </div>
                     </div>
-            
-                </div>
-                <div class="intro">
-                    <p>
-                        Hello! I'm Ma Mingze, a Risk Management professional with five years of experience. I'm passionate about exploring new technologies and sharing knowledge, with a particular focus on innovative <strong style="color: var(--accent-color);">AI solutions</strong> for <strong style="color: var(--primary-color);">credit risk</strong> and <strong style="color: var(--primary-color);">internal control management</strong> in the financial industry.
-                    </p>
-                    <p>
-                        Previously, I worked as a <strong style="color: #e67e22;">consultant at EY</strong>, where I participated in and led <strong style="color: #9b59b6;">IFRS 9 impairment solution consulting</strong> and <strong style="color: #9b59b6;">internal control management audit projects</strong> for insurance, banking, and Fintech clients. Currently, I'm dedicated to helping more people learn about these areas through <span style="font-weight: 600; color: var(--accent-color);">writing and project sharing</span>.
-                    </p>
-                    <p>
-                        My expertise includes <strong style="color: var(--primary-color);">IFRS 9 and Basel Accords implementation</strong>, <strong style="color: var(--primary-color);">Risk-Weighted Assets (RWA)</strong>, and <strong style="color: var(--primary-color);">internal control management and process optimization</strong>. My blog covers these topics from theoretical concepts to implementation details, drawing from insights across mainland China, Hong Kong, and Indonesia. I believe <span style="font-weight: 600; color: var(--accent-color);">sharing is the best way to grow</span>, and I hope my articles and projects can be helpful to you.
-                    </p>
-                </div>
+                </section>
 
-                <div class="link-section">
-                    <h2>🔗 Quick Links</h2>
-                    <ul>
-                        <li><a href="https://bono12138.github.io/demonstration/resume_cn.html" target="_blank"><span class="icon">📝</span> My Chinese Resume</a></li>
-                        <li><a href="https://bono12138.github.io/demonstration/resume_eng.html" target="_blank"><span class="icon">🎅</span> My English Resume</a></li>
-                        <li><a href="https://bono12138.github.io/demonstration/tks_demo_1629v4_eng_published.html" target="_blank"><span class="icon">📊</span> Comprehensive Risk Management System TKS Module DEMO</a></li>
-                        <li><a href="https://bono12138.github.io/demonstration/rcsa_demo_1513v3_eng_published.html" target="_blank"><span class="icon">📈</span> Comprehensive Risk Management System RCSA Module DEMO</a></li>
-                        <li><a href="https://www.linkedin.com/in/mingze-ma-950a78179/" target="_blank"><span class="icon">💼</span> My LinkedIn Profile</a></li>
-                    </ul>
-                </div>
+                <!-- Core competencies (job matching) -->
+                <section id="competencies">
+                    <h2 class="text-2xl font-bold text-primary mb-6 flex items-center">
+                        <i class="fa fa-tasks mr-2"></i> Core Competencies · Job Matching
+                    </h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Competency 1: Comprehensive risk and internal control mechanisms -->
+                        <div class="bg-white rounded-lg shadow-lg p-6 card-hover border-l-4 border-primary">
+                            <h3 class="text-lg font-bold mb-3 flex items-center">
+                                <i class="fa fa-shield text-primary mr-2"></i> Enterprise Risk Management & Internal Control
+                            </h3>
+                            <ul class="space-y-2 text-gray-700 list-disc list-inside">
+                                <li>Led <span class="font-semibold">full-cycle development of IFRS 9 expected credit loss system</span> (solution design → model development → SOP internal controls → system implementation), covering PD/LGD/EAD and forward-looking adjustments</li>
+                                <li>Established <span class="font-semibold">key risk indicator (KRI) monitoring mechanisms</span> (non-performing rates, migration rates, etc.), maintained risk measurement model iterations, and optimized RCSA management processes</li>
+                                <li>Developed <span class="font-semibold">asset risk classification systems</span>, improved asset quality monitoring frameworks, supporting risk analysis and report submission for risk management committees</li>
+                            </ul>
+                        </div>
+
+                        <!-- Competency 2: New product internal controls and credit risk management -->
+                        <div class="bg-white rounded-lg shadow-lg p-6 card-hover border-l-4 border-secondary">
+                            <h3 class="text-lg font-bold mb-3 flex items-center">
+                                <i class="fa fa-lightbulb-o text-primary mr-2"></i> New Product Controls & Internet Credit Risk
+                            </h3>
+                            <ul class="space-y-2 text-gray-700 list-disc list-inside">
+                                <li>Designed <span class="font-semibold">consumer credit business risk management solutions</span> based on Basel Accords and regulatory guidelines, covering model parameters and internal control processes</li>
+                                <li>Evaluated and optimized <span class="font-semibold">business internal control effectiveness</span> through process mapping, risk matrix design, and ITGC/ITAC testing</li>
+                                <li>Responsible for <span class="font-semibold">US$140 million credit portfolio stress testing</span>, providing risk response recommendations</li>
+                            </ul>
+                        </div>
+
+                        <!-- Competency 3: Data analysis and risk management -->
+                        <div class="bg-white rounded-lg shadow-lg p-6 card-hover border-l-4 border-primary">
+                            <h3 class="text-lg font-bold mb-3 flex items-center">
+                                <i class="fa fa-bar-chart text-primary mr-2"></i> Data Analysis & Full-cycle Risk Control
+                            </h3>
+                            <ul class="space-y-2 text-gray-700 list-disc list-inside">
+                                <li>Built <span class="font-semibold">risk data visualization dashboards</span> using Python/SQL/Superset, enabling real-time KRI monitoring and attribution analysis for US$140 million in assets</li>
+                                <li>Systematically conducted <span class="font-semibold">risk identification, early warning, and mitigation</span> through data mining and trend analysis, supporting data-driven decision making</li>
+                                <li>Coordinated internal and external audit issue remediation, <span class="font-semibold">driving improvement implementation and regular tracking</span> (e.g., regulatory difference research and training between Chinese and Indonesian teams)</li>
+                            </ul>
+                        </div>
+
+                        <!-- Competency 4: Regulatory compliance support -->
+                        <div class="bg-white rounded-lg shadow-lg p-6 card-hover border-l-4 border-secondary">
+                            <h3 class="text-lg font-bold mb-3 flex items-center">
+                                <i class="fa fa-gavel text-primary mr-2"></i> Regulatory Compliance & Cross-team Collaboration
+                            </h3>
+                            <ul class="space-y-2 text-gray-700 list-disc list-inside">
+                                <li>Familiar with <span class="font-semibold">Basel III, IFRS 9, Commercial Bank Capital Management Measures, Consumer Finance Company Management Measures</span> and other compliance frameworks, interfacing with regulatory authorities and external auditors</li>
+                                <li>Responsible for <span class="font-semibold">regulatory requirement interpretation and cross-border compliance difference analysis</span> (e.g., local Indonesian regulations), organizing training to ensure team compliance awareness</li>
+                                <li>Coordinated multi-team efforts between China and Indonesia (development, finance, audit), <span class="font-semibold">promoting risk system implementation and project management</span> (including vendor management)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Work experience -->
+                <section id="experience">
+                    <h2 class="text-2xl font-bold text-primary mb-6 flex items-center">
+                        <i class="fa fa-briefcase mr-2"></i> Professional Experience · Project Achievements
+                    </h2>
+                    <div class="space-y-6">
+                        <!-- Akulaku experience -->
+                        <div class="bg-white rounded-lg shadow-lg p-6 card-hover">
+                            <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-4">
+                                <div>
+                                    <h3 class="text-lg font-bold text-dark">Akulaku | Enterprise Risk Management (Risk Quantitative Analyst)</h3>
+                                    <p class="text-gray-500">December 2023 - Present | Shenzhen</p>
+                                </div>
+                                <span class="bg-primary/10 text-primary text-sm font-semibold px-3 py-1 rounded-full mt-2 md:mt-0">Leading Projects</span>
+                            </div>
+                            <div class="space-y-6 text-gray-700">
+                                <div>
+                                    <h4 class="font-semibold mb-2 text-primary">IFRS 9 ECL Impairment Management Process System Construction</h4>
+                                    <p>Based on Basel III and Ministry of Finance guidelines, designed PD/LGD/EAD models and forward-looking adjustment plans. Collaborated with finance department, external auditors, and Indonesian regulators, prepared documentation, coordinated development and system implementation, completed UAT acceptance, ensuring regulatory compliance.</p>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold mb-2 text-primary">Risk Monitoring and Reporting</h4>
+                                    <p>Established KRI monitoring mechanisms (non-performing rates, migration rates), developed Superset risk dashboards; designed stress testing scenarios for US$140 million credit portfolio, analyzed KRI impacts, reported risk status and submitted management response recommendations, optimized asset quality monitoring processes.</p>
+                                </div>
+                                
+                            </div>
+                        </div>
+
+                        <!-- EY experience -->
+                        <div class="bg-white rounded-lg shadow-lg p-6 card-hover">
+                            <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-4">
+                                <div>
+                                    <h3 class="text-lg font-bold text-dark">Ernst & Young (China) | Financial Services Office (FSO) Risk Consultant</h3>
+                                    <p class="text-gray-500">October 2021 - December 2023 | Shenzhen</p>
+                                </div>
+                                <span class="bg-secondary/10 text-secondary text-sm font-semibold px-3 py-1 rounded-full mt-2 md:mt-0">Audit & Internal Controls</span>
+                            </div>
+                            <div class="space-y-6 text-gray-700">
+                                <div>
+                                    <h4 class="font-semibold mb-2 text-primary">IT Audit and Internal Control Audit</h4>
+                                    <p>Mapped internal control processes through interviews, designed risk matrices, performed ITGC/ITAC testing, evaluated and optimized internal control effectiveness.</p>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold mb-2 text-primary">Impairment Model Audit under IFRS 9</h4>
+                                    <p>Audited listed banks' IFRS 9 impairment models (corporate loans, bonds, credit cards), reviewed expected credit loss measurement results.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Internship experience -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="bg-white rounded-lg shadow-lg p-6 card-hover">
+                                <h3 class="text-lg font-bold text-dark">PricewaterhouseCoopers (PwC HK) | Auditor (Intern)</h3>
+                                <p class="text-gray-500 mb-3">January 2020 - April 2020 | Hong Kong</p>
+                                <p class="text-gray-700">Responsible for annual report audit of China Zheshang Bank Hong Kong Branch, performed cash audit and loan internal control process testing</p>
+                            </div>
+                            <div class="bg-white rounded-lg shadow-lg p-6 card-hover">
+                                <h3 class="text-lg font-bold text-dark">Bank of Shanghai | Corporate Banking Marketing Assistant (Intern)</h3>
+                                <p class="text-gray-500 mb-3">June 2019 - August 2019 | Shanghai</p>
+                                <p class="text-gray-700">Participated in metro extension construction project credit approval, prepared due diligence reports and completed financial ratio analysis</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Skills matrix -->
+                <section id="skills">
+                    <h2 class="text-2xl font-bold text-primary mb-6 flex items-center">
+                        <i class="fa fa-cogs mr-2"></i> Skills Matrix · Tools & Frameworks
+                    </h2>
+                    <div class="bg-white rounded-lg shadow-lg p-6">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                            <!-- Risk management tools -->
+                            <div class="text-center">
+                                <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3">
+                                    <i class="fa fa-line-chart text-xl text-primary"></i>
+                                </div>
+                                <h3 class="font-semibold mb-2">Risk Management Tools</h3>
+                                <p class="text-gray-600 text-sm">COSO Internal Control Framework<br>IFRS 9 ECL Models<br>PD/LGD/EAD Measurement<br>Stress Testing<br>KRI Monitoring<br>RCSA Processes</p>
+                            </div>
+
+                            <!-- Data analysis techniques -->
+                            <div class="text-center">
+                                <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3">
+                                    <i class="fa fa-code text-xl text-primary"></i>
+                                </div>
+                                <h3 class="font-semibold mb-2">Data Analysis Skills</h3>
+                                <p class="text-gray-600 text-sm">Python/R<br>SQL(Presto/SAS/MySQL)<br>VBA<br>Superset/Tableau<br>Power BI</p>
+                            </div>
+
+                            <!-- Regulatory compliance frameworks -->
+                            <div class="text-center">
+                                <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3">
+                                    <i class="fa fa-book text-xl text-primary"></i>
+                                </div>
+                                <h3 class="font-semibold mb-2">Regulatory Frameworks</h3>
+                                <p class="text-gray-600 text-sm">Basel III<br>IFRS 9/17<br>Commercial Bank Capital Measures<br>Consumer Finance Regulations<br>ECL Implementation Guidelines<br>Cross-border Regulatory Analysis</p>
+                            </div>
+
+                            <!-- Office and data tools -->
+                            <div class="text-center">
+                                <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3">
+                                    <i class="fa fa-desktop text-xl text-primary"></i>
+                                </div>
+                                <h3 class="font-semibold mb-2">Office & Data Tools</h3>
+                                <p class="text-gray-600 text-sm">Microsoft Office<br>Bloomberg<br>Wind<br>Statista</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Education background -->
+                <section id="education">
+                    <h2 class="text-2xl font-bold text-primary mb-6 flex items-center">
+                        <i class="fa fa-graduation-cap mr-2"></i> Educational Background
+                    </h2>
+                    <div class="bg-white rounded-lg shadow-lg p-6 card-hover">
+                        <div class="flex flex-col md:flex-row md:items-center justify-between">
+                            <div>
+                                <h3 class="text-lg font-bold text-dark">The Hong Kong Polytechnic University</h3>
+                                <p class="text-gray-600">BBA · Financial Services</p>
+                            </div>
+                            <p class="text-gray-500 mt-2 md:mt-0">September 2017 - September 2021 | Hong Kong</p>
+                        </div>
+                        <div class="mt-4 text-gray-700">
+                            <p><i class="fa fa-language text-primary mr-2"></i> Language Proficiency: English (Fluent), Mandarin (Native), Cantonese (Conversational)</p>
+                        </div>
+                    </div>
+                </section>
             </div>
 
+            <!-- Sidebar - 4/12 width, fixed positioning -->
+            <div class="lg:col-span-4">
+                <div class="sticky-sidebar">
+                    <!-- Quick links section - reduced size -->
+                    <section id="links" class="bg-white rounded-lg shadow-lg p-5 card-hover mb-6">
+                        <h2 class="text-lg font-bold text-primary mb-3 flex items-center">
+                            <i class="fa fa-link mr-2"></i> Quick Links
+                        </h2>
+                        <ul class="space-y-2 text-sm">
+                            <li>
+                                <a href="https://bono12138.github.io/demonstration/resume_eng.html" target="_blank" 
+                                   class="flex items-center text-gray-700 hover:text-primary transition-colors">
+                                    <span class="icon w-6 text-primary"><i class="fa fa-file-text-o"></i></span>
+                                    <span>My English Resume</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://bono12138.github.io/demonstration/resume_cn.html" target="_blank" 
+                                   class="flex items-center text-gray-700 hover:text-primary transition-colors">
+                                    <span class="icon w-6 text-primary"><i class="fa fa-file-text-o"></i></span>
+                                    <span>中文简历</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://bono12138.github.io/demonstration/tks_demo_1629v4_eng_published.html" target="_blank" 
+                                   class="flex items-center text-gray-700 hover:text-primary transition-colors">
+                                    <span class="icon w-6 text-primary"><i class="fa fa-bar-chart"></i></span>
+                                    <span>ERM System TKS Module Demo</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://bono12138.github.io/demonstration/rcsa_demo_1513v3_eng_published.html" target="_blank" 
+                                   class="flex items-center text-gray-700 hover:text-primary transition-colors">
+                                    <span class="icon w-6 text-primary"><i class="fa fa-pie-chart"></i></span>
+                                    <span>ERM System RCSA Module Demo</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://www.linkedin.com/in/mingze-ma-950a78179/" target="_blank" 
+                                   class="flex items-center text-gray-700 hover:text-primary transition-colors">
+                                    <span class="icon w-6 text-primary"><i class="fa fa-linkedin"></i></span>
+                                    <span>My LinkedIn Profile</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </section>
 
+                    <!-- Contact section - reduced size, with spacing above -->
+                    <section class="bg-white rounded-lg shadow-lg p-5 card-hover">
+                        <h2 class="text-lg font-bold text-primary mb-3 flex items-center">
+                            <i class="fa fa-comments mr-2"></i> For Collaboration/Inquiry
+                        </h2>
+                        <p class="text-gray-700 mb-3 text-sm">Have any questions, collaboration ideas or just want to connect?</p>
+                        <p class="text-gray-700 mb-4 text-sm">Feel free to contact me through the following methods!</p>
+                        
+                        <a href="https://docs.qq.com/form/page/DU0RsR0dvendNSUFD#/fill" target="_blank" 
+                           class="block w-full py-2 px-3 bg-primary text-white text-center rounded-lg font-medium hover:bg-primary/90 transition-colors mb-3 text-sm">
+                            Go to Contact Form <i class="fa fa-paper-plane ml-1"></i>
+                        </a>
+                        
+                        <div class="space-y-2 text-gray-700 text-sm">
+                            <p class="flex items-center">
+                                <i class="fa fa-envelope text-primary mr-2 w-5"></i>
+                                <span>m18902001867@163.com</span>
+                            </p>
+                            <p class="flex items-center">
+                                <i class="fa fa-envelope text-primary mr-2 w-5"></i>
+                                <span>mmz1218bono@gmail.com</span>
+                            </p>
+                            <p class="flex items-center">
+                                <i class="fa fa-phone text-primary mr-2 w-5"></i>
+                                <span>+86 176 8894 9041</span>
+                            </p>
+                            <p class="flex items-center">
+                                <i class="fa fa-whatsapp text-primary mr-2 w-5"></i>
+                                <a href="https://wa.me/8618902001867?text=Hello+Bono%21" class="text-primary hover:underline">Contact me on WhatsApp</a>
+                            </p>
+                        </div>
+                    </section>
+                </div>
+            </div>
         </div>
+    </main>
 
-        <div class="right-panel">
-            <div class="contact-section">
-                <h2>🤝 Collaboration / Communication</h2>
-                <p>Have any questions, collaboration intentions, or just want to chat?</p>
-                <p>Feel free to contact me by filling out the message form!</p>
-                <small>🤫If you're too shy to add my linkedin</small>
-                <p><a href="https://docs.qq.com/form/page/DU0RsR0dvendNSUFD" target="_blank" class="message-button">Go to Message Form 🚀</a>
-                </p>
-            </div>
-            <div class="contact-info-text">
-                <p><span class="emoji">💬</span> <a href="https://wa.me/8618902001867?text=Hello+Bono%21" target="_blank">WhatsApp: +86 189 0200 1867</a></p>
-                <img src="https://bono12138.github.io/demonstration/whatsapp.png" alt="WhatsApp" style="width: 150px; height: auto; margin-left: 55px;">
-            </div>
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-6 relative z-10 mt-12">
+        <div class="container mx-auto px-4 text-center max-w-7xl">
+            <p class="mb-2">Mingze MA | Enterprise Risk Management & Internal Controls</p>
+            <p class="text-gray-400 text-sm">Contact: +86 176 8894 9041 | <a href="https://wa.me/8618902001867?text=Hello+Bono%21" class="text-accent hover:underline">Contact me on WhatsApp</a> | m18902001867@163.com</p>
+            <p class="text-gray-500 text-xs mt-4">© Mingze MA Personal Profile | Specializing in Consumer Finance Risk Management & Internal Controls</p>
         </div>
-    </div>
+    </footer>
 
+    <!-- Scripts -->
     <script>
-        // particles.js Configuration
+        // Mobile menu toggle
+        document.getElementById('menuBtn').addEventListener('click', function() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // Smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 70, // Avoid fixed navigation
+                        behavior: 'smooth'
+                    });
+                    // Close mobile menu
+                    document.getElementById('mobileMenu').classList.add('hidden');
+                }
+            });
+        });
+
+        // particles.js configuration - background particle effect
         particlesJS('particles-js', {
             "particles": {
                 "number": {
@@ -373,58 +504,34 @@
                     }
                 },
                 "color": {
-                    "value": "#007bff"
+                    "value": "#1e40af" // Use primary color
                 },
                 "shape": {
-                    "type": "circle",
-                    "stroke": {
-                        "width": 0,
-                        "color": "#000000"
-                    },
-                    "polygon": {
-                        "nb_sides": 5
-                    }
+                    "type": "circle"
                 },
                 "opacity": {
                     "value": 0.5,
-                    "random": false,
-                    "anim": {
-                        "enable": false,
-                        "speed": 1,
-                        "opacity_min": 0.1,
-                        "sync": false
-                    }
+                    "random": false
                 },
                 "size": {
                     "value": 3,
-                    "random": true,
-                    "anim": {
-                        "enable": false,
-                        "speed": 40,
-                        "size_min": 0.1,
-                        "sync": false
-                    }
+                    "random": true
                 },
                 "line_linked": {
                     "enable": true,
                     "distance": 150,
-                    "color": "#007bff",
+                    "color": "#1e40af",
                     "opacity": 0.4,
                     "width": 1
                 },
                 "move": {
                     "enable": true,
-                    "speed": 6,
+                    "speed": 1,
                     "direction": "none",
                     "random": false,
                     "straight": false,
                     "out_mode": "out",
-                    "bounce": false,
-                    "attract": {
-                        "enable": false,
-                        "rotateX": 600,
-                        "rotateY": 1200
-                    }
+                    "bounce": false
                 }
             },
             "interactivity": {
@@ -447,26 +554,24 @@
                             "opacity": 1
                         }
                     },
-                    "bubble": {
-                        "distance": 400,
-                        "size": 40,
-                        "duration": 2,
-                        "opacity": 8,
-                        "speed": 3
-                    },
-                    "repulse": {
-                        "distance": 200,
-                        "duration": 0.4
-                    },
                     "push": {
                         "particles_nb": 4
-                    },
-                    "remove": {
-                        "particles_nb": 2
                     }
                 }
             },
             "retina_detect": true
+        });
+
+        // Navigation bar style change on scroll
+        window.addEventListener('scroll', function() {
+            const header = document.querySelector('header');
+            if (window.scrollY > 50) {
+                header.classList.add('bg-primary/95', 'shadow-lg');
+                header.classList.remove('bg-primary', 'shadow-md');
+            } else {
+                header.classList.add('bg-primary', 'shadow-md');
+                header.classList.remove('bg-primary/95', 'shadow-lg');
+            }
         });
     </script>
 </body>
