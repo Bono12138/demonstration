@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎃 Halloween Party 2025 | 深圳万圣节派对</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        halloween: {
+                            orange: '#FF6B35',
+                            purple: '#6A0572',
+                            black: '#1A1423',
+                            white: '#F7F7F9'
+                        }
+                    },
+                    fontFamily: {
+                        display: ['"system-ui"', 'cursive'],
+                        sans: ['"Nunito"', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .text-shadow {
+                text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            }
+            .text-shadow-glow {
+                text-shadow: 0 0 10px rgba(255, 107, 53, 0.6);
+            }
+            .animate-float {
+                animation: float 3s ease-in-out infinite;
+            }
+            .animate-bounce-slow {
+                animation: bounce 4s infinite;
+            }
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-halloween-black text-halloween-white font-sans overflow-x-hidden">
+    <!-- 导航栏 -->
+    <nav class="fixed top-0 left-0 right-0 bg-halloween-black/80 backdrop-blur-md z-50 transition-all duration-300">
+        <div class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <div class="text-halloween-orange font-display text-xl md:text-2xl">
+                <i class="fa fa-pumpkin-o mr-2"></i>Halloween Fun
+            </div>
+            <div class="hidden md:flex space-x-6">
+                <a href="#about" class="hover:text-halloween-orange transition-colors">关于派对</a>
+                <a href="#activities" class="hover:text-halloween-orange transition-colors">活动内容</a>
+                <a href="#schedule" class="hover:text-halloween-orange transition-colors">活动流程</a>
+                <a href="#gallery" class="hover:text-halloween-orange transition-colors">往期照片</a>
+                <a href="#register" class="hover:text-halloween-orange transition-colors">立即报名</a>
+            </div>
+            <button class="md:hidden text-halloween-orange text-xl" id="menuToggle">
+                <i class="fa fa-bars"></i>
+            </button>
+        </div>
+        <!-- 移动端菜单 -->
+        <div id="mobileMenu" class="hidden md:hidden bg-halloween-black/95 backdrop-blur-md">
+            <div class="container mx-auto px-6 py-3 flex flex-col space-y-4">
+                <a href="#about" class="hover:text-halloween-orange transition-colors py-2">关于派对</a>
+                <a href="#activities" class="hover:text-halloween-orange transition-colors py-2">活动内容</a>
+                <a href="#schedule" class="hover:text-halloween-orange transition-colors py-2">活动流程</a>
+                <a href="#gallery" class="hover:text-halloween-orange transition-colors py-2">往期照片</a>
+                <a href="#register" class="hover:text-halloween-orange transition-colors py-2">立即报名</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 英雄区域 -->
+    <header class="pt-24 pb-16 md:pt-32 md:pb-24 relative overflow-hidden">
+        <div class="absolute inset-0 z-0">
+            <div class="absolute inset-0 bg-gradient-to-b from-halloween-black/50 to-halloween-black z-10"></div>
+            <img src="https://bono12138.github.io/demonstration/HP_sample_photo.png" alt="Halloween Background" class="w-full h-full object-cover">
+        </div>
+        <div class="container mx-auto px-6 relative z-20">
+            <div class="max-w-2xl">
+                <h1 class="font-display text-[clamp(2.5rem,8vw,5rem)] text-halloween-orange leading-none text-shadow-glow mb-4">
+                    Halloween <br>Party 2025
+                </h1>
+                <p class="text-[clamp(1.2rem,4vw,1.8rem)] font-bold mb-6 text-shadow">
+                    2025年10月31日 · 周五 · 19:30-21:30
+                </p>
+                <p class="text-lg md:text-xl mb-8 max-w-lg">
+                    一场充满欢乐的万圣节派对，适合家庭参与，带上孩子一起来体验节日氛围！
+                </p>
+                <a href="#register" class="inline-block bg-halloween-orange hover:bg-halloween-orange/80 text-white font-bold py-3 px-8 rounded-full transition-all transform hover:scale-105 shadow-lg shadow-halloween-orange/30">
+                    立即报名 <i class="fa fa-arrow-right ml-2"></i>
+                </a>
+            </div>
+        </div>
+        <div class="absolute -bottom-10 -right-10 w-40 h-40 md:w-64 md:h-64 bg-halloween-purple/20 rounded-full blur-3xl"></div>
+        <div class="absolute top-20 -left-10 w-32 h-32 md:w-48 md:h-48 bg-halloween-orange/20 rounded-full blur-3xl"></div>
+    </header>
+
+    <!-- 关于派对 -->
+    <section id="about" class="py-16 md:py-24 relative">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="font-display text-[clamp(1.8rem,5vw,3rem)] text-white mb-4 text-shadow-glow">关于派对 <span class="text-white">About The Party</span></h2>
+                <div class="w-20 h-1 bg-halloween-orange mx-auto"></div>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div class="relative">
+                    <div class="absolute -inset-4 bg-halloween-purple/20 rounded-lg transform rotate-3"></div>
+                    <img src="https://bono12138.github.io/demonstration/sets.png" alt="Halloween Party" class="w-full h-auto rounded-lg relative z-10 shadow-xl">
+                    <div class="absolute -bottom-6 -right-6 bg-halloween-orange text-white p-4 rounded-lg shadow-lg z-20 animate-float">
+                        <p class="font-bold">限50人</p>
+                        <p class="text-sm">名额有限</p>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="space-y-6">
+                        <div class="flex items-start">
+                            <div class="bg-halloween-purple/20 p-3 rounded-full mr-4">
+                                <i class="fa fa-map-marker text-halloween-purple text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold mb-2">地点 · Location</h3>
+                                <p class="text-gray-300">深圳市内（详细地址将在报名确认后通知）</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start">
+                            <div class="bg-halloween-purple/20 p-3 rounded-full mr-4">
+                                <i class="fa fa-users text-halloween-purple text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold mb-2">适合人群 · For Who</h3>
+                                <p class="text-gray-300">有小学生和初中生的家庭、外籍教师、青少年产品服务提供商</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start">
+                            <div class="bg-halloween-purple/20 p-3 rounded-full mr-4">
+                                <i class="fa fa-lightbulb-o text-halloween-purple text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold mb-2">氛围 · Atmosphere</h3>
+                                <p class="text-gray-300">温馨灯光，万圣节主题装饰，黑色、橘色、紫色为主色调，室内派对</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 活动内容 -->
+    <section id="activities" class="py-16 md:py-24 bg-gradient-to-b from-halloween-black to-halloween-black/95">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="font-display text-[clamp(1.8rem,5vw,3rem)] text-white mb-4 text-shadow-glow">活动内容 <span class="text-white">Activities</span></h2>
+                <div class="w-20 h-1 bg-halloween-orange mx-auto"></div>
+                <p class="mt-4 text-gray-300 max-w-2xl mx-auto">丰富多彩的活动，适合全家参与，带来难忘的万圣节体验</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Workshop -->
+                <div class="bg-halloween-black border border-halloween-purple/30 rounded-xl overflow-hidden shadow-lg hover:shadow-purple-500/20 transition-all transform hover:-translate-y-2">
+                    <div class="h-48 overflow-hidden">
+                        <img src="https://bono12138.github.io/demonstration/making_cakes.png" alt="Workshop" class="w-full h-full object-cover transition-transform hover:scale-110 duration-500">
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-halloween-purple/20 p-2 rounded-full mr-3">
+                                <i class="fa fa-paint-brush text-halloween-purple"></i>
+                            </div>
+                            <h3 class="text-xl font-bold">创意工坊 · Workshop</h3>
+                        </div>
+                        <ul class="space-y-2 text-gray-300">
+                            <li class="flex items-center">
+                                <i class="fa fa-check text-halloween-orange mr-2"></i>
+                                DIY绘制万圣节面具
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fa fa-check text-halloween-orange mr-2"></i>
+                                制作万圣节小蛋糕
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fa fa-check text-halloween-orange mr-2"></i>
+                                万圣节小饰品购买
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- 吧台 -->
+                <div class="bg-halloween-black border border-halloween-purple/30 rounded-xl overflow-hidden shadow-lg hover:shadow-purple-500/20 transition-all transform hover:-translate-y-2">
+                    <div class="h-48 overflow-hidden">
+                        <img src="https://bono12138.github.io/demonstration/bar_pic.png" alt="Bar" class="w-full h-full object-cover transition-transform hover:scale-110 duration-500">
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-halloween-purple/20 p-2 rounded-full mr-3">
+                                <i class="fa fa-glass text-halloween-purple"></i>
+                            </div>
+                            <h3 class="text-xl font-bold">小吧台 · Bar</h3>
+                        </div>
+                        <ul class="space-y-2 text-gray-300">
+                            <li class="flex items-center">
+                                <i class="fa fa-check text-halloween-orange mr-2"></i>
+                                凭票免费赠饮一杯酒精饮品
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fa fa-check text-halloween-orange mr-2"></i>
+                                额外饮品需收费
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fa fa-check text-halloween-orange mr-2"></i>
+                                购买酒精饮品需出示身份证
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- 游戏区 -->
+                <div class="bg-halloween-black border border-halloween-purple/30 rounded-xl overflow-hidden shadow-lg hover:shadow-purple-500/20 transition-all transform hover:-translate-y-2">
+                    <div class="h-48 overflow-hidden">
+                        <img src="https://bono12138.github.io/demonstration/lucky_draw.png" alt="Games" class="w-full h-full object-cover transition-transform hover:scale-110 duration-500">
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-halloween-purple/20 p-2 rounded-full mr-3">
+                                <i class="fa fa-gamepad text-halloween-purple"></i>
+                            </div>
+                            <h3 class="text-xl font-bold">游戏环节 · Games</h3>
+                        </div>
+                        <ul class="space-y-2 text-gray-300">
+                            <li class="flex items-center">
+                                <i class="fa fa-check text-halloween-orange mr-2"></i>
+                                听歌猜歌曲
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fa fa-check text-halloween-orange mr-2"></i>
+                                看梗图猜作品
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fa fa-check text-halloween-orange mr-2"></i>
+                                盲盒拍卖会 & 抽奖
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 活动流程 -->
+    <section id="schedule" class="py-16 md:py-24 relative">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="font-display text-[clamp(1.8rem,5vw,3rem)] text-white mb-4 text-shadow-glow">活动流程 <span class="text-white">Schedule</span></h2>
+                <div class="w-20 h-1 bg-halloween-orange mx-auto"></div>
+            </div>
+
+            <div class="max-w-3xl mx-auto">
+                <div class="relative">
+                    <!-- 时间线 -->
+                    <div class="absolute left-4 md:left-1/2 top-0 bottom-0 w-0.5 bg-halloween-purple/50 transform md:translate-x-px"></div>
+
+                    <!-- 步骤1 -->
+                    <div class="relative pl-12 md:pl-0 md:flex mb-12">
+                        <div class="md:w-1/2 md:pr-12 md:text-right mb-6 md:mb-0">
+                            <h3 class="text-xl font-bold text-halloween-orange mb-2">签到 & 自由活动</h3>
+                            <p class="text-gray-300">19:30 - 19:50</p>
+                            <p class="mt-2">签到入场，自由游览workshop区域，开始体验各种DIY活动</p>
+                        </div>
+                        <div class="absolute left-0 md:left-1/2 w-8 h-8 rounded-full bg-halloween-purple flex items-center justify-center transform md:-translate-x-1/2 z-10">
+                            <span class="font-bold">1</span>
+                        </div>
+                        <div class="md:w-1/2 md:pl-12 hidden md:block"></div>
+                    </div>
+
+                    <!-- 步骤2 -->
+                    <div class="relative pl-12 md:pl-0 md:flex mb-12">
+                        <div class="md:w-1/2 md:pr-12 hidden md:block"></div>
+                        <div class="absolute left-0 md:left-1/2 w-8 h-8 rounded-full bg-halloween-purple flex items-center justify-center transform md:-translate-x-1/2 z-10">
+                            <span class="font-bold">2</span>
+                        </div>
+                        <div class="md:w-1/2 md:pl-12">
+                            <h3 class="text-xl font-bold text-halloween-orange mb-2">主持游戏环节</h3>
+                            <p class="text-gray-300">19:50 - 21:10</p>
+                            <ul class="mt-2 space-y-1 text-gray-300">
+                                <li>• 听歌猜歌曲</li>
+                                <li>• 看梗图猜作品</li>
+                                <li>• 盲盒拍卖会（酒水为筹码）</li>
+                                <li>• 抽奖环节</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- 步骤3 -->
+                    <div class="relative pl-12 md:pl-0 md:flex">
+                        <div class="md:w-1/2 md:pr-12 md:text-right mb-6 md:mb-0">
+                            <h3 class="text-xl font-bold text-halloween-orange mb-2">社交时间</h3>
+                            <p class="text-gray-300">21:10 - 21:30</p>
+                            <p class="mt-2">在workshop区域自由交流，结识新朋友，活动结束</p>
+                        </div>
+                        <div class="absolute left-0 md:left-1/2 w-8 h-8 rounded-full bg-halloween-purple flex items-center justify-center transform md:-translate-x-1/2 z-10">
+                            <span class="font-bold">3</span>
+                        </div>
+                        <div class="md:w-1/2 md:pl-12 hidden md:block"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 往期照片 -->
+    <section id="gallery" class="py-16 md:py-24 bg-gradient-to-b from-halloween-black/95 to-halloween-black">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="font-display text-[clamp(1.8rem,5vw,3rem)] text-white mb-4 text-shadow-glow">往期回顾 <span class="text-white">Past Events</span></h2>
+                <div class="w-20 h-1 bg-halloween-orange mx-auto"></div>
+                <p class="mt-4 text-gray-300">看看我们之前的精彩活动瞬间</p>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="overflow-hidden rounded-lg group">
+                    <img src="https://bono12138.github.io/demonstration/sets.png" alt="Past Event" class="w-full h-48 object-cover transition-transform group-hover:scale-110 duration-500">
+                </div>
+                <div class="overflow-hidden rounded-lg group">
+                    <img src="https://bono12138.github.io/demonstration/bar_waiter.png" alt="Past Event" class="w-full h-48 object-cover transition-transform group-hover:scale-110 duration-500">
+                </div>
+                <div class="overflow-hidden rounded-lg group">
+                    <img src="https://bono12138.github.io/demonstration/pumpkin.png" alt="Past Event" class="w-full h-48 object-cover transition-transform group-hover:scale-110 duration-500">
+                </div>
+                <div class="overflow-hidden rounded-lg group">
+                    <img src="https://bono12138.github.io/demonstration/auction.png" alt="Past Event" class="w-full h-48 object-cover transition-transform group-hover:scale-110 duration-500">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 报名表单 -->
+    <section id="register" class="py-16 md:py-24 relative">
+        <div class="absolute top-0 left-0 w-full h-24 bg-gradient-to-b from-halloween-black to-transparent"></div>
+        <div class="container mx-auto px-6">
+            <div class="max-w-2xl mx-auto bg-gradient-to-br from-halloween-black to-halloween-purple/20 rounded-2xl p-8 md:p-12 shadow-xl border border-halloween-purple/30">
+                <div class="text-center mb-10">
+                    <h2 class="font-display text-[clamp(1.8rem,5vw,3rem)] text-white mb-4 text-shadow-glow">立即报名 <span class="text-white">Register Now</span></h2>
+                    <div class="w-20 h-1 bg-halloween-orange mx-auto"></div>
+                    <p class="mt-4 text-gray-300">名额有限，赶紧预约参加我们的万圣节派对吧！</p>
+                </div>
+
+                <form class="space-y-6">
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="name" class="block text-sm font-medium mb-2">姓名 · Name</label>
+                            <input type="text" id="name" class="w-full bg-halloween-black/50 border border-halloween-purple/50 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-halloween-orange text-white" placeholder="请输入您的姓名">
+                        </div>
+                        <div>
+                            <label for="phone" class="block text-sm font-medium mb-2">电话 · Phone</label>
+                            <input type="tel" id="phone" class="w-full bg-halloween-black/50 border border-halloween-purple/50 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-halloween-orange text-white" placeholder="请输入您的电话号码">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="email" class="block text-sm font-medium mb-2">邮箱 · Email</label>
+                        <input type="email" id="email" class="w-full bg-halloween-black/50 border border-halloween-purple/50 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-halloween-orange text-white" placeholder="请输入您的邮箱地址">
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="adults" class="block text-sm font-medium mb-2">成人数量 · Adults</label>
+                            <select id="adults" class="w-full bg-halloween-black/50 border border-halloween-purple/50 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-halloween-orange text-white">
+                                <option value="1">1人</option>
+                                <option value="2">2人</option>
+                                <option value="3">3人</option>
+                                <option value="4">4人</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="kids" class="block text-sm font-medium mb-2">儿童数量 · Kids</label>
+                            <select id="kids" class="w-full bg-halloween-black/50 border border-halloween-purple/50 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-halloween-orange text-white">
+                                <option value="0">0人</option>
+                                <option value="1">1人</option>
+                                <option value="2">2人</option>
+                                <option value="3">3人</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="notes" class="block text-sm font-medium mb-2">备注 · Notes</label>
+                        <textarea id="notes" rows="3" class="w-full bg-halloween-black/50 border border-halloween-purple/50 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-halloween-orange text-white" placeholder="有任何特殊需求请在此说明"></textarea>
+                    </div>
+
+                    <div class="pt-4">
+                        <button type="submit" class="w-full bg-halloween-orange hover:bg-halloween-orange/80 text-white font-bold py-3 px-6 rounded-lg transition-all transform hover:scale-[1.02] shadow-lg shadow-halloween-orange/20 text-lg">
+                            提交报名 <i class="fa fa-paper-plane ml-2"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer class="py-12 bg-halloween-black border-t border-halloween-purple/30">
+        <div class="container mx-auto px-6">
+            <div class="text-center">
+                <div class="font-display text-2xl text-halloween-orange mb-4">
+                    <i class="fa fa-pumpkin-o mr-2"></i>Halloween Fun 2025
+                </div>
+                <p class="text-gray-400 mb-6">2025年10月31日 · 周五 · 19:30-21:30 · 深圳</p>
+                <div class="flex justify-center space-x-6 mb-8">
+                    <a href="#" class="text-gray-400 hover:text-halloween-orange transition-colors text-xl">
+                        <i class="fa fa-weixin"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-halloween-orange transition-colors text-xl">
+                        <i class="fa fa-weibo"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-halloween-orange transition-colors text-xl">
+                        <i class="fa fa-envelope"></i>
+                    </a>
+                </div>
+                <p class="text-gray-500 text-sm">© 2025 Halloween Party. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 返回顶部按钮 -->
+    <button id="backToTop" class="fixed bottom-8 right-8 bg-halloween-orange hover:bg-halloween-orange/80 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-all opacity-0 invisible">
+        <i class="fa fa-arrow-up"></i>
+    </button>
+
+    <script>
+        // 移动端菜单切换
+        const menuToggle = document.getElementById('menuToggle');
+        const mobileMenu = document.getElementById('mobileMenu');
+        
+        menuToggle.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                // 关闭移动菜单（如果打开）
+                if (!mobileMenu.classList.contains('hidden')) {
+                    mobileMenu.classList.add('hidden');
+                }
+                
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // 返回顶部按钮
+        const backToTopButton = document.getElementById('backToTop');
+        
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                backToTopButton.classList.remove('opacity-0', 'invisible');
+                backToTopButton.classList.add('opacity-100', 'visible');
+            } else {
+                backToTopButton.classList.remove('opacity-100', 'visible');
+                backToTopButton.classList.add('opacity-0', 'invisible');
+            }
+            
+            // 导航栏滚动效果
+            const nav = document.querySelector('nav');
+            if (window.pageYOffset > 100) {
+                nav.classList.add('py-2', 'shadow-lg');
+                nav.classList.remove('py-3');
+            } else {
+                nav.classList.add('py-3');
+                nav.classList.remove('py-2', 'shadow-lg');
+            }
+        });
+        
+        backToTopButton.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // 表单提交处理
+        const form = document.querySelector('form');
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            alert('报名信息已提交！我们会尽快与您联系确认详情。');
+            form.reset();
+        });
+    </script>
+</body>
+</html>
