@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-5028TKX6W7"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-5028TKX6W7');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Akulaku ECL Audit Project Record</title>
+    <style>
+        :root {
+            --sidebar-bg: #f5f5f7;
+            --content-bg: #ffffff;
+            --text-primary: #1d1d1f;
+            --text-secondary: #86868b;
+            --accent-color: #007aff;
+            --border-color: #d2d2d7;
+            --card-bg: #ffffff;
+            --hover-bg: #e8e8ed;
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+            --status-resolved-bg: #e4f7e8;
+            --status-resolved-text: #00a83f;
+            --status-open-bg: #fff5e5;
+            --status-open-text: #ff9500;
+            --tag-bg: #f0f0f5;
+        }
+        
+        /* Add joint stakeholder style */
+        .dot-Finance_and_Risk { background: #AF52DE; } /* Purple for Joint */
+        .dot-Auditor { background: #FF3B30; }
+        .dot-Consultant { background: #007AFF; }
+        .dot-Risk_Management { background: #FF9500; }
+        .dot-Finance { background: #34C759; }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: var(--font-family);
+            color: var(--text-primary);
+            background-color: var(--content-bg);
+            overflow: hidden;
+        }
+
+        #app {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 340px;
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            flex-shrink: 0;
+            padding-top: 20px;
+        }
+
+        .sidebar-header {
+            padding: 0 20px 20px 20px;
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .nav-group {
+            margin-bottom: 8px; /* Reduced margin as groups are now collapsible */
+        }
+
+        .nav-group-header {
+            padding: 8px 20px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+            transition: background-color 0.2s;
+        }
+
+        .nav-group-header:hover {
+            background-color: rgba(0,0,0,0.03);
+        }
+
+        .nav-group-title {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            letter-spacing: 0.05em;
+            flex: 1;
+        }
+
+        .group-arrow {
+            width: 14px;
+            height: 14px;
+            margin-right: 4px;
+            color: var(--text-secondary);
+            transition: transform 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+        }
+
+        .group-arrow.collapsed {
+            transform: rotate(-90deg);
+        }
+
+        .group-count {
+            font-size: 11px;
+            color: var(--text-secondary);
+            background: rgba(0,0,0,0.05);
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-left: 8px;
+            font-weight: 500;
+        }
+
+        .nav-group-items {
+            overflow: hidden;
+            /* No transition on height for simple show/hide to avoid complexity with auto height */
+        }
+
+        .nav-group-items.collapsed {
+            display: none;
+        }
+
+        .nav-item {
+            padding: 12px 20px 12px 44px; /* Indented to align with title */
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-left: 4px solid transparent;
+            border-bottom: 1px solid rgba(0,0,0,0.03);
+        }
+
+        /* Adjust indent for the overview item which is not in a collapsible group in the same way */
+        #nav-overview-item {
+            padding-left: 20px;
+        }
+
+        .nav-item:hover {
+            background-color: var(--hover-bg);
+        }
+
+        .nav-item.active {
+            background-color: #e5e5ea;
+            border-left-color: var(--accent-color);
+        }
+
+        .nav-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .nav-item-id {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .nav-item-status {
+            font-size: 10px;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        .status-resolved {
+            background-color: var(--status-resolved-bg);
+            color: var(--status-resolved-text);
+        }
+
+        .status-open {
+            background-color: var(--status-open-bg);
+            color: var(--status-open-text);
+        }
+
+        .nav-item-title {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .nav-item.active .nav-item-title {
+            color: #000;
+            font-weight: 500;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 40px 60px;
+            position: relative;
+        }
+
+        .lang-switch {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            padding: 6px 12px;
+            background: var(--sidebar-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.2s;
+            z-index: 100;
+            color: var(--text-secondary);
+        }
+
+        .lang-switch:hover {
+            background: var(--hover-bg);
+            color: var(--text-primary);
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            letter-spacing: -0.02em;
+        }
+
+        h2 {
+            font-size: 22px;
+            font-weight: 600;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+        }
+
+        .meta-info {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 32px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .category-tag {
+            background-color: var(--tag-bg);
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        }
+
+        .description {
+            font-size: 15px;
+            line-height: 1.7;
+            color: #333;
+            white-space: pre-line; /* Keep pre-line for structure but allow innerHTML parsing */
+        }
+        
+        strong {
+            font-weight: 600;
+            color: #000;
+        }
+
+        /* Timeline */
+        .timeline {
+            position: relative;
+            margin-top: 30px;
+            padding-left: 24px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 8px;
+            bottom: 0;
+            width: 2px;
+            background: #e5e5ea;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 36px;
+            padding-left: 28px;
+        }
+
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            left: -29px;
+            top: 6px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--content-bg);
+            border: 3px solid var(--accent-color);
+            z-index: 1;
+            box-shadow: 0 0 0 3px var(--content-bg);
+        }
+        
+        .timeline-item.audit-action::after {
+            border-color: #ff9500; /* Orange for Audit challenges */
+        }
+
+        .timeline-date {
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-weight: 600;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .timeline-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .timeline-stakeholder {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        
+        .timeline-action-tag {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            background: #f0f0f5;
+            color: #666;
+            font-weight: 500;
+        }
+        
+        .timeline-action-tag.challenge {
+            background: #fff0e6;
+            color: #d96d00;
+        }
+
+        .timeline-detail {
+            font-size: 14px;
+            color: #333;
+            line-height: 1.6;
+            background: #fafafa;
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 3px solid #ddd;
+        }
+
+        .timeline-personnel {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 6px;
+            display: block;
+            font-weight: 500;
+        }
+
+        .resolution-box {
+            background-color: #f2fcf5;
+            border: 1px solid #bfeecb;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+
+        .resolution-title {
+            font-weight: 700;
+            font-size: 15px;
+            color: #008532;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .resolution-title::before {
+            content: '✓';
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+            background: #00a83f;
+            color: white;
+            border-radius: 50%;
+            font-size: 12px;
+            justify-content: center;
+        }
+
+        /* Stakeholders Grid */
+        .stakeholders-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .stakeholder-card {
+            background: #f9f9f9;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #ebebeb;
+        }
+
+        .stakeholder-role {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        .stakeholder-org {
+            font-weight: 700;
+            font-size: 16px;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+        }
+
+        .personnel-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            font-size: 13px;
+        }
+
+        .personnel-list li {
+            margin-bottom: 6px;
+            color: #555;
+            display: flex;
+            align-items: center;
+        }
+        
+        .personnel-list li::before {
+            content: '';
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            background: #d2d2d7;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        /* Animation */
+        .fade-in {
+            animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="sidebar">
+            <div class="sidebar-header" id="nav-header">ECL Audit Tracker</div>
+            
+            <div class="nav-group">
+                <!-- Overview is static and not collapsible in the same way -->
+                <div class="nav-group-header" onclick="renderOverview()" style="padding-bottom: 0;">
+                    <div class="nav-group-title" id="nav-group-overview">概览</div>
+                </div>
+                <div class="nav-item active" onclick="renderOverview()" id="nav-overview-item">
+                    <div class="nav-item-header">
+                        <span class="nav-item-id" id="nav-overview-text">Project Summary</span>
+                    </div>
+                    <div class="nav-item-title">项目总体进度仪表盘</div>
+                </div>
+            </div>
+
+            <div id="issues-nav">
+                <!-- Dynamic Issue Navigation populated by JS -->
+            </div>
+        </div>
+
+        <div class="main-content">
+            <button class="lang-switch" onclick="toggleLanguage()" id="lang-btn">EN / 中</button>
+            <div id="content-area" class="fade-in">
+                <!-- Content populated by JS -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Data & Content ---
+
+        const rawData = {
+            "project_name": "Akulaku 集团 ECL 审计复盘 (不含 BNC)",
+            "audit_period": "FY2021 - FY2023 (FY24 Submitted, Pending Review)",
+            "last_updated": "2025-11-27",
+            "summary": "本报告详细记录了 Akulaku 集团 ECL 建设项目中的关键 Challenge 与解决方案。项目范围覆盖集团内除 Bank Neo Commerce (BNC) 以外的所有实体，分为【非生产性贷款】（印尼消费分期、印尼现金产品、菲律宾消费分期）和【生产性贷款】。\n\n**背景与现状**：\n此次项目风险管理部负责集团范围内除 BNC 以外公司的统一 ECL 建设。审计目前重点关注 FY21、FY22、FY23 三年的模型底稿。FY24 的非生产性贷款模型已经提交，但审计目前暂未开始正式审阅 FY24 模型。\n\n**当前状态**：\n1. **FY21-FY23 (非生产性贷款)**：模型方法论与底稿已通过审计，于 2025年8月29日 正式 Finalize。\n2. **FY23 (生产性贷款)**：审计专家已审阅通过。\n3. **FY24 (非生产性贷款)**：非生产性贷款模型已提交，模型算法进行了升级（如纳入 LGD 折现），目前等待审计排期。\n\n**关键审计发现与解决**：\n- **LGD 折现 (Discounting)**：对于 FY21-FY23，审计最终接受不对回收金额进行折现（或通过 Top-side Adjustment 解决 FY23 影响）；但对于 FY24 模型，已确认必须包含折现算法，且新模型已按此更新。\n- **MEV 符号 (Caveat)**：针对 PH 市场 M2 符号反直觉问题，由于审计无法回答“intuition依据来源”的问题，审计接受了现状。\n- **FLA ODR 窗口**：针对 FLA 模型中 ODR 计算窗口问题，审计接受了 Client/PwC 关于“资产久期短 (Short maturity)”的解释，维持 1 个月窗口。\n- **阶段划分**：确认了 Risk 模型基于 One Obligor 更为审慎，口径差异通过 EJE 调整。\n- **IPE**：IT 审计对数据生成的代码验证要求严格，通过提交完整可复现的代码以及代码执行结果进行了测试，相关流程仍在进行中。",
+            "stakeholders": {
+                "Auditor": { 
+                    "organization": "EY (Ernst & Young) - Audit & FSRM", 
+                    "personnel": ["Mallory Wang", "Thomas Wong", "Roman Law", "Wilson Luk", "Arnold Liu", "Bryan PH Lai", "Franky", "Russel N Ailes (FSRM)", "Shaira (FSRM)", "Hannah G Reyes (FSRM)", "Charlene Keith S Castillo (FSRM)"] 
+                },
+                "Consultant": { 
+                    "organization": "PwC", 
+                    "personnel": ["Jason TB Wang", "Angela Q Wang"] 
+                },
+                "Risk_Management": { 
+                    "organization": "Risk Management", 
+                    "personnel": ["Ultraman Tina (Tina)", "Bono Ackerman (Bono)", "Mora"] 
+                },
+                "Finance": { 
+                    "organization": "Finance", 
+                    "personnel": ["Eric Zhong", "Aaron (Zhou Yi)", "Zack (Tian Ming Ren)", "Neil"] 
+                },
+                "Finance_and_Risk": {
+                    "organization": "Finance & Risk Joint Task",
+                    "personnel": ["Eric Zhong", "Bono Ackerman", "Aaron"]
+                }
+            },
+            "audit_issues": [
+                {
+                    "issue_id": "ISSUE-STG-01",
+                    "title": "阶段划分与计算口径 (Staging & Segmentation)",
+                    "category": "Methodology - Staging & Classification",
+                    "status": "Resolved",
+                    "description": "审计 Challenge：\n1. **口径差异 (Day vs Month DPD)**：Risk 模型基于单一债务人 (One Obligor) 且按天计算 DPD，而财务按月结 DPD 及区分不同实体计算。审计发现两者差异金额超过重要性水平 (Materiality)。\n2. **资产分类 (Channeling Loans)**：审计对 'Channeling with Buyback' (有回购义务助贷) 与 'Without Buyback' 的资产认定存在反复确认，影响 ECL 计提范围。\n3. **阶段划分标准**：审计师质疑财务部和风险管理部对于 Stage 划分标准不一致，需确认最终使用的 DPD 逻辑。\n4. **EAD 分层 (Segmentation)**：审计质疑 EAD 按 Period_IRR 分层是否会导致 PD 匹配错误。",
+                    "timeline": [
+                        { "date": "2024-11-06", "stakeholder": "Auditor", "personnel": "Thomas Wong", "action": "Initiation", "details": "审计入场，要求确认更新后的 ECL 模型是否应用了实际数据 (Actual Figures) 到前期年份。" },
+                        { "date": "2024-11-22", "stakeholder": "Auditor", "personnel": "Mallory Wang", "action": "Request", "details": "要求提供 Channeling Loans 的 Funding Partners 明细，明确区分 'With Buyback' 和 'No Buyback'，并要求提供 Gross Loans Balance。" },
+                        { "date": "2024-12-09", "stakeholder": "Finance_and_Risk", "personnel": "Eric Zhong / Bono", "action": "Clarification", "details": "确认 AFI 自持资金 (Self-funded) 贷款纳入集团模型，应用 Group ECL Rate。" },
+                        { "date": "2025-04-22", "stakeholder": "Auditor", "personnel": "Roman Law", "action": "Rejection", "details": "EY 专家认为按订单 (Order level) 计算 DPD 是不可行的，必须按客户 (Customer level)。" },
+                        { "date": "2025-10-28", "stakeholder": "Finance_and_Risk", "personnel": "Aaron / Bono", "action": "Analysis", "details": "提供了 Bono 版 ECL (按天/人头) 与 财务版 (按月/主体) 的详细对比表。" },
+                        { "date": "2025-11-06", "stakeholder": "Auditor", "personnel": "Wilson Luk", "action": "Calculation", "details": "测算发现两种口径差异金额约 100 万美元，超过重要性水平。" },
+                        { "date": "2025-11-07", "stakeholder": "Auditor", "personnel": "Wilson Luk", "action": "Resolution", "details": "确认 Risk 模型的 One Obligor 方法更为审慎 (Conservative)，差异部分通过财务审计调整入账 (Group EJE)。" },
+                        { "date": "2025-11-11", "stakeholder": "Finance_and_Risk", "personnel": "Eric Zhong / Bono", "action": "Adjustment", "details": "财务部基于 Risk 测算数据执行了 Top-side Adjustment 以消除口径差异。" }
+                    ],
+                    "final_resolution": "确认 Risk 模型基于 One Obligor 原则更为审慎；Channeling 资产分类逻辑厘清；差异金额通过财务审计调整 (EJE) 解决。"
+                },
+                {
+                    "issue_id": "ISSUE-PD-01",
+                    "title": "PD模型 - 宏观因子 (MEV) 经济直觉性",
+                    "category": "Methodology - PD",
+                    "status": "Resolved",
+                    "description": "审计 Challenge：\n1. **MEV 显著性与符号**：部分宏观因子 (如 M2, GDP) 在 PH 市场的符号方向与经济学常识/印尼经验不一致。具体而言，印尼模型中 M2 增加意味着流动性增加、违约下降 (-)；而菲律宾模型中 M2 增加被解释为资金成本上升、违约增加 (+)。\n2. **解释力不足**：EY 认为 M2 在菲律宾的正相关解释 (Cost of funds increase) 不够直观，且 2024 年回溯测试显示 M2 增长平缓，无法有力解释预测偏差。",
+                    "timeline": [
+                        { "date": "2025-06-17", "stakeholder": "Auditor", "personnel": "Roman Law", "action": "Challenge", "details": "正式提出 PH PD 模型中 MEV 符号方向错误及显著性低的问题，拒绝接受。" },
+                        { "date": "2025-07-04", "stakeholder": "Risk_Management", "personnel": "Bono", "action": "Decision", "details": "Bono 判定纯定量优化已达瓶颈，指示 PwC 撰写定性分析文档，解释 M2 在菲律宾市场导致融资成本上升从而增加违约的传导机制。" },
+                        { "date": "2025-07-24", "stakeholder": "Auditor", "personnel": "Mallory Wang", "action": "Challenge", "details": "指出 PwC 引用的非洲数据与菲律宾无通过性，要求提供更相关的文献支持。" },
+                        { "date": "2025-08-29", "stakeholder": "Auditor", "personnel": "FSRM Team", "action": "Comment", "details": "认可 WPI/CPI 的解释，但仍认为 M2 的解释力较弱 (Marginal increase)，且与印尼经验不一致。要求在文档中加入 Caveat (免责说明)。" },
+                        { "date": "2025-08-29", "stakeholder": "Auditor", "personnel": "FSRM Team", "action": "Acceptance", "details": "最终接受了当前的 MEV 选择，但要求在 Narrative 中明确这种不一致性。" }
+                    ],
+                    "final_resolution": "采用了'定量模型+定性传导文档'通过了挑战。尽管 EY 仍对 PH M2 的符号直觉存疑，但鉴于数据限制，最终接受了当前模型，并在文档中加入了 Caveat (限制性说明) 以反映这种不一致性。"
+                },
+                {
+                    "issue_id": "ISSUE-PD-02",
+                    "title": "PD模型 - 迁徙矩阵 (Transition Matrix)",
+                    "category": "Methodology - PD",
+                    "status": "Resolved",
+                    "description": "审计 Challenge：\n审计指出原模型基于 3 年总计数的计算方式 (Count-based over 3 years) 过于简化，未捕捉月度迁徙特征。建议改用月度迁徙矩阵 (Month-on-Month Migration) 计算 TTC PD。",
+                    "timeline": [
+                        { "date": "2025-02-24", "stakeholder": "Auditor", "personnel": "Thomas Wong", "action": "Request", "details": "要求提供 'PD by Account Level' 数据以进行重算，测试 PD 的准确性与完整性。" },
+                        { "date": "2025-07-23", "stakeholder": "Auditor", "personnel": "FSRM Team", "action": "Observation", "details": "指出原方法未追踪月度变动，建议重算。" },
+                        { "date": "2025-08-29", "stakeholder": "Auditor", "personnel": "FSRM Team", "action": "Resolution", "details": "接受了 Client 提供的基于月度迁徙数据的更新计算 (Recalculated monthly)。" }
+                    ],
+                    "final_resolution": "PD 迁徙矩阵改用更精细的月度计算逻辑 (Month-on-Month)，问题解决。"
+                },
+                {
+                    "issue_id": "ISSUE-FLA-01",
+                    "title": "FLA (Overlay) - 权重 (Probability Weights)",
+                    "category": "Methodology - FLA (Overlay)",
+                    "status": "Resolved",
+                    "description": "审计 Challenge：\n质疑 20-60-20 (Upside/Base/Downside) 权重的合理性依据。EY 要求提供详细文档，涵盖宏观经济稳定性、信贷政策方向、治理与审查流程。",
+                    "timeline": [
+                        { "date": "2025-08-08", "stakeholder": "Auditor", "personnel": "Mallory Wang", "action": "Challenge", "details": "要求对 60/20/20 权重提供正式 Documentation，需涵盖宏观稳定性与信贷政策分析。" },
+                        { "date": "2025-08-29", "stakeholder": "Auditor", "personnel": "FSRM Team", "action": "Feedback", "details": "收到了分年度 (2021-2023) 的权重说明文档。认可其提供了清晰的宏观逻辑。建议未来进一步扩展内部/外部驱动因素分析 (如贷款违约趋势、信贷政策变动)。" }
+                    ],
+                    "final_resolution": "PwC 补充了分年度的权重合理性 Memo。审计接受 FY21-FY23 继续沿用 60-20-20 权重。"
+                },
+                {
+                    "issue_id": "ISSUE-FLA-02",
+                    "title": "FLA (Overlay) - 多重共线性 (Multicollinearity)",
+                    "category": "Methodology - FLA (Overlay)",
+                    "status": "Resolved",
+                    "description": "审计 Challenge：\nPH Consumption 模型的 MEV (如 WPI 和 PPI) 存在较高的多重共线性 (VIF > 5)。EY 质疑模型稳定性。",
+                    "timeline": [
+                        { "date": "2025-07-23", "stakeholder": "Auditor", "personnel": "FSRM Team", "action": "Query", "details": "指出 PH Consumption 2022 (WPI VIF 7.90) 和 2021 (PPI VIF 6.18) 存在多重共线性风险。" },
+                        { "date": "2025-07-23", "stakeholder": "Risk_Management", "personnel": "Bono", "action": "Response", "details": "解释由于样本量有限 (Sample size limited)，VIF < 10 是可接受的内部阈值。" },
+                        { "date": "2025-08-29", "stakeholder": "Auditor", "personnel": "FSRM Team", "action": "Comment", "details": "审计指出 'Alternative' 阈值反映了管理层判断。虽然接受了当前模型，但强烈建议将这些阈值及其理由正式文档化，并纳入模型风险管理框架定期验证。" }
+                    ],
+                    "final_resolution": "审计接受了当前解释 (由于样本量限制)，模型通过。要求后续完善文档化管理。"
+                },
+                {
+                    "issue_id": "ISSUE-FLA-03",
+                    "title": "FLA (Overlay) - OOT 回溯测试与 ODR 计算",
+                    "category": "Methodology - FLA (Overlay)",
+                    "status": "Resolved",
+                    "description": "审计 Challenge：\n1. **OOT 测试失败**：PH BNPL 模型在 2024 年的 Out-of-Time (OOT) 回溯测试中表现不佳 (Error 66.59% > 50% 阈值)。\n2. **ODR 计算窗口**：审计建议 ODR 计算采用 12 个月表现期，而 Client 坚持使用 1 个月。",
+                    "timeline": [
+                        { "date": "2025-07-23", "stakeholder": "Auditor", "personnel": "FSRM Team", "action": "Recommendation", "details": "建议 ODR 计算应用 12 个月表现期，以捕捉更长周期的违约行为。" },
+                        { "date": "2025-07-23", "stakeholder": "Consultant", "personnel": "PwC / Bono", "action": "Rejection", "details": "拒绝改用 12 个月 ODR 窗口。理由：产品普遍期限较短 (Common maturity is less than a year)，即大部分产品分期不超过 12 个月，应用 12 个月窗口会导致过度捕捉违约样本，不符合业务实质。" },
+                        { "date": "2025-08-14", "stakeholder": "Auditor", "personnel": "Roman Law", "action": "Feedback", "details": "指出 Gap Analysis 显示 2024 年 OOT 测试结果不理想，要求进行归因分析。" },
+                        { "date": "2025-08-19", "stakeholder": "Risk_Management", "personnel": "Bono", "action": "Defense", "details": "解释 FY23 建摸时受限于数据量，无法预知 2024 年的偏差 (M2 上升, WPI/CPI 下降)。" },
+                        { "date": "2025-08-29", "stakeholder": "Auditor", "personnel": "FSRM Team", "action": "Approval", "details": "接受 FY23 模型状态，认可 '产品普遍期限较短' 的理由维持 1 个月 ODR 窗口。要求在 FY24 建模时监控 OOT 偏差。" }
+                    ],
+                    "final_resolution": "审计接受维持 1 个月 ODR 窗口 (基于产品普遍期限较短的理由)；FY23 模型不进行调整，将 OOT 偏差列为 FY24 建模的重点监控项。"
+                },
+                {
+                    "issue_id": "ISSUE-LGD-01",
+                    "title": "LGD - 折现与部分还款 (Discounting & Partial Repayment)",
+                    "category": "Methodology - LGD",
+                    "status": "Resolved",
+                    "description": "审计 Challenge：\n1. **未折现 (No Discounting)**：LGD 计算未考虑资金时间价值。审计坚持必须折现。\n2. **部分还款 (Partial Repayment)**：Channeling Loans 存在逾期后部分还款的情况，需量化影响。",
+                    "timeline": [
+                        { "date": "2024-12-05", "stakeholder": "Auditor", "personnel": "Mallory Wang", "action": "Inquiry", "details": "询问 Channeling Loan 客户是否存在逾期后部分还款 (Partial Paydown) 的情况，要求量化其对 LGD 的影响。" },
+                        { "date": "2025-06-17", "stakeholder": "Auditor", "personnel": "Roman Law", "action": "Challenge", "details": "正式拒绝 LGD 无限期回收假设，并指出必须进行折现 (Discounting)。" },
+                        { "date": "2025-09-01", "stakeholder": "Auditor", "personnel": "Roman Law", "action": "Requirement", "details": "明确要求对 FY23 LGD 进行折现调整 (Top-side Adjustment)；FY21/22 因数据限制可豁免。同时指出 FY24 及以后模型必须内置折现逻辑。" },
+                        { "date": "2025-09-02", "stakeholder": "Finance_and_Risk", "personnel": "Eric Zhong / Bono", "action": "Execution", "details": "基于 Risk 提供的折现影响测算，Finance 进行了集团层面的 Top-side Adjustment。" },
+                        { "date": "2025-10-21", "stakeholder": "Risk_Management", "personnel": "Bono", "action": "Update", "details": "提交了 FY24 模型，已按要求在 LGD 算法中纳入了折现逻辑。" }
+                    ],
+                    "final_resolution": "FY21-23: 审计接受不修改底稿，仅在 FY23 做 Top-side Adjustment。FY24: 模型已更新算法，正式纳入 LGD 折现处理。"
+                },
+                {
+                    "issue_id": "ISSUE-LGD-03",
+                    "title": "LGD - 回收期分析 (Workout Period Analysis)",
+                    "category": "Methodology - LGD",
+                    "status": "Resolved",
+                    "description": "审计 Challenge：\n审计要求提供回收期分析 (Workout Period Analysis)，以展示违约后的回收主要集中在哪个时间段，从而验证 LGD 计算中关于回收期限的假设。",
+                    "timeline": [
+                        { "date": "2025-07-23", "stakeholder": "Auditor", "personnel": "Roman Law", "action": "Request", "details": "要求讨论 Workout Period Analysis，展示 collection concentration after default。" },
+                        { "date": "2025-07-24", "stakeholder": "Auditor", "personnel": "Mallory Wang", "action": "Clarification", "details": "澄清目的是评估合适的 workout period (如 3, 6, 9, 12 个月)。" },
+                        { "date": "2025-08-01", "stakeholder": "Consultant", "personnel": "PwC / Jason", "action": "Submission", "details": "提供了 LGD 回收期分析文档 (Analysis on workout period of LGD)。" },
+                        { "date": "2025-09-01", "stakeholder": "Finance_and_Risk", "personnel": "Eric Zhong / Risk Team", "action": "Submission", "details": "提供了基于加权平均折现率 (Weighted Average Discounting Rate) 的计算支持。" }
+                    ],
+                    "final_resolution": "Client 提供了加权平均折现率，审计通过 Top-side adjustment 解决 FY23 的折现问题。"
+                },
+                {
+                    "issue_id": "ISSUE-PL-01",
+                    "title": "生产性贷款 - 单项减值与 DCF (Specific Impairment)",
+                    "category": "Methodology - Productive Loan",
+                    "status": "Resolved",
+                    "description": "审计 Challenge：\n对于 Stage 3 (100% PD) 的账户，审计询问是否进行了基于抵押物 (Collateral) 或 DCF (现金流折现) 的单项减值测试。",
+                    "timeline": [
+                        { "date": "2025-07-18", "stakeholder": "Auditor", "personnel": "Arnold Liu", "action": "Comment", "details": "FSRM 提出应考虑 Stage 3 单项减值 (Specific Impairment)。" },
+                        { "date": "2025-09-03", "stakeholder": "Consultant", "personnel": "PwC Team", "action": "Response", "details": "回复审计：由于无法获取抵押物变现价值及未来现金流预测数据 (No information can be obtained)，无法进行 DCF 或单项评估。" },
+                        { "date": "2025-10-14", "stakeholder": "Auditor", "personnel": "Mallory Wang", "action": "Approval", "details": "确认 2023 AFI Productive Loan Model 专家审阅通过。" }
+                    ],
+                    "final_resolution": "鉴于数据限制，审计接受了不进行 Stage 3 单项 DCF 评估的现状，FY23 模型通过。"
+                },
+                {
+                    "issue_id": "ISSUE-PL-02",
+                    "title": "生产性贷款 - PD 调整与 FLA 乘数",
+                    "category": "Methodology - Productive Loan",
+                    "status": "Resolved",
+                    "description": "审计 Challenge：\n1. **PD 调整**：询问 PD 调整逻辑。Client 回复基于 Moody's 行业 PD 并根据 DPD 调整。\n2. **FLA 乘数**：质疑 0.86 乘数的来源。Client 确认基于印尼 BNPL 2023 FLA 模型，审计指出不一致需更新。",
+                    "timeline": [
+                        { "date": "2025-07-15", "stakeholder": "Auditor", "personnel": "FSRM Team", "action": "Query", "details": "询问 PD 调整逻辑和 0.86 乘数基础。" },
+                        { "date": "2025-07-15", "stakeholder": "Consultant", "personnel": "PwC Team", "action": "Response", "details": "解释 PD 基于 Moody's 数据调整；0.86 乘数将更新以与 2023 ID 模型一致。" },
+                        { "date": "2025-09-03", "stakeholder": "Consultant", "personnel": "PwC Team", "action": "Update", "details": "提供了更新后的底稿。" }
+                    ],
+                    "final_resolution": "PwC 更新了底稿，解决了不一致问题。"
+                },
+                {
+                    "issue_id": "ISSUE-IPE-01",
+                    "title": "数据完整性 (IPE) - 代码验证",
+                    "category": "Data Quality / IPE",
+                    "status": "Open",
+                    "description": "审计 Challenge：IT 审计要求提供数据生成过程的证据，以证明 IPE (Information Produced by Entity) 的可靠性，特别是 SQL/Python 代码的运行过程。简单的截图被认为证据不足。此问题进行中。",
+                    "timeline": [
+                        { "date": "2025-04-02", "stakeholder": "Auditor", "personnel": "Arnold Liu", "action": "Request", "details": "要求提供生成 PD/LGD/EAD/FLA inputs 的 Coding 截图。" },
+                        { "date": "2025-04-22", "stakeholder": "Risk_Management", "personnel": "Bono", "action": "Meeting", "details": "Bono 在 10F 现场向审计展示代码运行逻辑。" },
+                        { "date": "2025-05-09", "stakeholder": "Auditor", "personnel": "Wilson Luk", "action": "Testing", "details": "IT 专家现场进行 IPE 测试，查看 Query 代码。" },
+                        { "date": "2025-08-25", "stakeholder": "Risk_Management", "personnel": "Bono", "action": "Submission", "details": "提交了包含完整执行时间戳和输入输出维度的 HTML 代码快照。" },
+                        { "date": "2025-09-25", "stakeholder": "Auditor", "personnel": "Bryan PH Lai", "action": "New Request", "details": "针对更新后的 ECL 模型，要求重新进行 IPE 测试。需提供首末10行全屏截图、总行数、导出结果。" },
+                        { "date": "2025-10-16", "stakeholder": "Risk_Management", "personnel": "Bono", "action": "Response", "details": "提交了新一轮的截图和导数结果。" },
+                        { "date": "2025-10-16", "stakeholder": "Auditor", "personnel": "Bryan PH Lai", "action": "Feedback", "details": "指出截图中缺少部分数据列，无法证明完整性，要求补充。" },
+                        { "date": "2025-11-25", "stakeholder": "Auditor", "personnel": "Arnold Liu", "action": "Inquiry", "details": "询问 PH/ID EAD Inputs 表格来源系统及生成代码逻辑。" },
+                        { "date": "2025-11-27", "stakeholder": "Auditor", "personnel": "Roman Law", "action": "Onsite Review", "details": "进行现场代码审阅 (Code Review)，了解数据生成过程。" }
+                    ],
+                    "final_resolution": "尚未解决。审计正在进行密集的数据溯源与代码逻辑验证 (Code Review)，需确保所有 Input 数据均可追溯且未经篡改。"
+                },
+                {
+                    "issue_id": "ISSUE-BNC-01",
+                    "title": "BNC 模型一致性 (Count vs Exposure)",
+                    "category": "Methodology - Other",
+                    "status": "Resolved",
+                    "description": "审计 Challenge：\n审计发现 BNC 模型与集团模型在 PD 计量上存在方法论不一致：BNC 使用 Count-based，集团模型使用 Exposure-based (或反之)。审计询问是否应统一方法或评估影响。",
+                    "timeline": [
+                        { "date": "2025-06-25", "stakeholder": "Finance", "personnel": "Eric Zhong", "action": "Requirement", "details": "指出获取 BNC PD 数据需由 EY ID 执行，并要求 EY HK 提供与 BNC 的 NDA。" },
+                        { "date": "2025-07-04", "stakeholder": "Auditor", "personnel": "Mallory Wang", "action": "Response", "details": "确认 Engagement Letter 已包含保密条款，无需额外 NDA。" },
+                        { "date": "2025-08-29", "stakeholder": "Auditor", "personnel": "Mallory Wang", "action": "Status Update", "details": "确认正在进行数据对接。" },
+                        { "date": "2025-10-21", "stakeholder": "Auditor", "personnel": "Roman Law", "action": "Resolution", "details": "经过影响评估，确认此次审计重点为非 BNC 部分；BNC 与 Group 的差异被记录为已知事项 (Noted Item)，不影响本次报告出具。" }
+                    ],
+                    "final_resolution": "鉴于本次审计范围明确排除 BNC，且差异已记录，该问题在当前审计阶段视为已解决 (无需调整 Group 模型)。"
+                }
+            ]
+        };
+
+        // --- Application Logic ---
+
+        let currentLang = 'zh';
+        let activeIssueId = null;
+        let isOverviewActive = true;
+        let collapsedGroups = {}; // Track collapsed state
+
+        function t(key) {
+            return key; 
+        }
+
+        function toggleLanguage() {
+            if (typeof gtag === 'function') {
+                gtag('event', 'language_click', {
+                    'button_name': 'EN/CN Switch'
+                });
+            }
+            alert("当前版本专注于中文内容展示。\nmei kong xie ying wen ban a 😓.");
+        }
+
+        function parseMarkdown(text) {
+            if (!text) return '';
+            // Simple markdown parser
+            // Bold: **text** -> <strong>text</strong>
+            let html = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            // Newlines are handled by white-space: pre-line, so we don't need to replace them with <br>
+            return html;
+        }
+
+        function getGroupTitle(category) {
+            if (category.includes("Methodology - PD")) return "PD 模型方法论";
+            if (category.includes("Methodology - LGD")) return "LGD 模型方法论";
+            if (category.includes("Methodology - EAD")) return "EAD 模型方法论";
+            if (category.includes("IPE")) return "数据质量与 IPE 验证";
+            if (category.includes("Productive Loan")) return "生产性贷款模型";
+            if (category.includes("Methodology - FLA")) return "前瞻性调整 (FLA/Overlay)";
+            if (category.includes("Staging")) return "阶段划分与计算口径";
+            return category;
+        }
+
+        function toggleGroup(category) {
+            collapsedGroups[category] = !collapsedGroups[category];
+            if (typeof gtag === 'function') {
+                gtag('event', 'toggle_group', {
+                    'group_name': category,
+                    'action': collapsedGroups[category] ? 'collapse' : 'expand'
+                });
+            }
+            renderSidebar();
+        }
+
+        function renderSidebar() {
+            const issuesNav = document.getElementById('issues-nav');
+            issuesNav.innerHTML = '';
+
+            const groups = {};
+            rawData.audit_issues.forEach(issue => {
+                if (!groups[issue.category]) groups[issue.category] = [];
+                groups[issue.category].push(issue);
+            });
+
+            Object.keys(groups).forEach(category => {
+                const groupDiv = document.createElement('div');
+                groupDiv.className = 'nav-group';
+                
+                const title = getGroupTitle(category);
+                const count = groups[category].length;
+                const isCollapsed = collapsedGroups[category] || false;
+                
+                // Create Header
+                const header = document.createElement('div');
+                header.className = 'nav-group-header';
+                header.onclick = () => toggleGroup(category);
+                header.innerHTML = `
+                    <div class="group-arrow ${isCollapsed ? 'collapsed' : ''}">▼</div>
+                    <div class="nav-group-title">${title}</div>
+                    <div class="group-count">${count}</div>
+                `;
+
+                // Create Items Container
+                const itemsDiv = document.createElement('div');
+                itemsDiv.className = `nav-group-items ${isCollapsed ? 'collapsed' : ''}`;
+                
+                groups[category].forEach(issue => {
+                    const item = document.createElement('div');
+                    item.className = `nav-item ${activeIssueId === issue.issue_id ? 'active' : ''}`;
+                    
+                    const statusClass = issue.status === 'Resolved' ? 'status-resolved' : 'status-open';
+                    const statusText = issue.status === 'Resolved' ? '已解决' : (issue.status === 'Partially Resolved' ? '部分解决' : '进行中');
+                    
+                    // Custom style for Partially Resolved
+                    let customStyle = "";
+                    if (issue.status === 'Partially Resolved') {
+                        customStyle = "background-color: #fff8e1; color: #d96d00;";
+                    }
+
+                    item.innerHTML = `
+                        <div class="nav-item-header">
+                            <span class="nav-item-id">${issue.issue_id}</span>
+                            <span class="nav-item-status ${statusClass}" style="${customStyle}">${statusText}</span>
+                        </div>
+                        <div class="nav-item-title">${parseMarkdown(issue.title)}</div>
+                    `;
+                    
+                    item.onclick = (e) => {
+                        e.stopPropagation(); // Prevent triggering group toggle if nested
+                        isOverviewActive = false;
+                        activeIssueId = issue.issue_id;
+                        updateActiveState();
+                        renderIssue(issue.issue_id);
+                    };
+                    itemsDiv.appendChild(item);
+                });
+                
+                groupDiv.appendChild(header);
+                groupDiv.appendChild(itemsDiv);
+                issuesNav.appendChild(groupDiv);
+            });
+        }
+
+        function updateActiveState() {
+            document.getElementById('nav-overview-item').className = `nav-item ${isOverviewActive ? 'active' : ''}`;
+            const items = document.querySelectorAll('#issues-nav .nav-item');
+            items.forEach(item => {
+                const idSpan = item.querySelector('.nav-item-id');
+                if (idSpan && idSpan.textContent === activeIssueId && !isOverviewActive) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+        }
+
+        function renderOverview() {
+            isOverviewActive = true;
+            activeIssueId = null;
+            updateActiveState();
+
+            if (typeof gtag === 'function') {
+                gtag('event', 'page_view', {
+                    page_title: 'Project Summary (Overview)',
+                    page_location: window.location.href.split('#')[0] + '#overview',
+                    page_path: '/overview'
+                });
+            }
+
+            const content = document.getElementById('content-area');
+            
+            let html = `
+                <div class="fade-in">
+                    <h1>${rawData.project_name}</h1>
+                    <div class="meta-info">
+                        <div class="category-tag">审计周期: ${rawData.audit_period}</div>
+                        <div class="category-tag" style="background:#e8f2ff; color:#007aff">最后更新: ${rawData.last_updated}</div>
+                    </div>
+
+                    <div class="card">
+                        <h3>项目核心摘要</h3>
+                        <p class="description">${parseMarkdown(rawData.summary)}</p>
+                    </div>
+
+                    <h2>项目干系人架构</h2>
+                    <div class="stakeholders-grid">
+            `;
+
+            const s = rawData.stakeholders;
+            const roles = ["Auditor", "Consultant", "Risk_Management", "Finance"];
+            
+            roles.forEach(roleKey => {
+                const roleData = s[roleKey];
+                let roleName = roleData.organization;
+                
+                html += `
+                    <div class="stakeholder-card">
+                        <div class="stakeholder-role">${roleKey.replace('_', ' ')}</div>
+                        <div class="stakeholder-org">${roleName}</div>
+                        <ul class="personnel-list">
+                            ${roleData.personnel.map(p => `<li>${p}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+            });
+
+            html += `</div></div>`;
+            content.innerHTML = html;
+        }
+
+        function renderIssue(id) {
+            const issue = rawData.audit_issues.find(i => i.issue_id === id);
+            
+            if (typeof gtag === 'function' && issue) {
+                gtag('event', 'page_view', {
+                    page_title: `Issue: ${issue.title}`,
+                    page_location: window.location.href.split('#')[0] + '#issue/' + id,
+                    page_path: '/issue/' + id,
+                    issue_category: issue.category,
+                    issue_status: issue.status
+                });
+            }
+
+            const content = document.getElementById('content-area');
+
+            const statusClass = issue.status === 'Resolved' ? 'status-resolved' : 'status-open';
+            const statusText = issue.status === 'Resolved' ? '已解决' : (issue.status === 'Partially Resolved' ? '部分解决' : '进行中');
+
+            let customStatusStyle = "";
+            if (issue.status === 'Partially Resolved') {
+                customStatusStyle = "background-color: #fff8e1; color: #d96d00;";
+            }
+
+            let html = `
+                <div class="fade-in">
+                    <div style="margin-bottom:8px; color: var(--accent-color); font-weight:700; font-size:13px; letter-spacing:0.5px;">${issue.issue_id}</div>
+                    <h1>${parseMarkdown(issue.title)}</h1>
+                    <div class="meta-info">
+                        <span class="nav-item-status ${statusClass}" style="font-size:12px; padding:4px 10px; ${customStatusStyle}">${statusText}</span>
+                        <span class="category-tag">${getGroupTitle(issue.category)}</span>
+                    </div>
+
+                    <div class="card">
+                        <h3>问题背景与 Challenge</h3>
+                        <p class="description">${parseMarkdown(issue.description)}</p>
+                    </div>
+
+                    <h2>解决过程时间线</h2>
+                    <div class="timeline">
+            `;
+
+            issue.timeline.forEach(event => {
+                let stakeholderDisplay = "";
+                let stakeholderClass = "";
+                
+                // Map to Chinese names and highlight Audit actions
+                if (event.stakeholder === 'Auditor') {
+                    stakeholderDisplay = "审计方 (EY)";
+                    stakeholderClass = "audit-action";
+                } else if (event.stakeholder === 'Consultant') {
+                    stakeholderDisplay = "顾问方 (PwC)";
+                } else if (event.stakeholder === 'Risk_Management') {
+                    stakeholderDisplay = "Risk Management";
+                } else if (event.stakeholder === 'Finance') {
+                    stakeholderDisplay = "Finance";
+                } else if (event.stakeholder === 'Finance_and_Risk') {
+                    stakeholderDisplay = "Finance & Risk (Joint)";
+                }
+
+                let actionTagClass = "";
+                if(event.action === "Challenge" || event.action === "Rejection" || event.action === "Query" || event.action === "Question" || event.action === "Request") {
+                    actionTagClass = "challenge";
+                }
+
+                html += `
+                    <div class="timeline-item ${stakeholderClass}">
+                        <div class="timeline-date">${event.date}</div>
+                        <div class="timeline-header">
+                            <span class="timeline-stakeholder">${stakeholderDisplay}</span>
+                            <span class="timeline-action-tag ${actionTagClass}">${event.action}</span>
+                        </div>
+                        <div class="timeline-detail">
+                            ${parseMarkdown(event.details)}
+                            <span class="timeline-personnel">执行人: ${event.personnel}</span>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += `
+                    </div>
+                    
+                    <div class="resolution-box">
+                        <div class="resolution-title">最终决议与成果</div>
+                        <div class="description" style="color:#005c22;">${parseMarkdown(issue.final_resolution)}</div>
+                    </div>
+                </div>
+            `;
+
+            content.innerHTML = html;
+        }
+
+        // Initialize
+        renderSidebar();
+        renderOverview();
+
+    </script>
+</body>
+</html>
