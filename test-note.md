@@ -1,0 +1,1 @@
+测试从 Gemini 通过 GitHub MCP 直接写入
